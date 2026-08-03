@@ -43,7 +43,7 @@ inside the application, so swapping one terminator for another is always a conta
 | Port | Open to | Why |
 | --- | --- | --- |
 | 443 | The internet, at the load balancer | The single public surface |
-| 3001 | Your operator address. Plus the load balancer, when `canvas_public` is on | **Canvas** |
+| 3001 | Your operator address. Plus the load balancer fronting Canvas, when `canvas_public` is on | **Canvas** |
 | 22 | Your operator address | SSH, deploys, issuing publish keys |
 | 8080 | Your operator address | The log viewer, on small deployments |
 | 4106 | Loopback on the VM | The builder surface. Never routable, by construction |
@@ -51,7 +51,7 @@ inside the application, so swapping one terminator for another is always a conta
 **Canvas has a door per audience.** Operators reach it directly from a nominated address, in
 the same trust ring as SSH. A POC that turns on `canvas_public` also serves it through the
 load balancer over HTTPS, and each cloud page shows exactly how:
-[AWS](./aws.md) host-routes it, [DigitalOcean](./digitalocean.md) puts the port in the URL.
+Both grounds reach it at `canvas.<domain>` on 443: [AWS](/architecture/aws) host-routes it on its single ALB, [DigitalOcean](/architecture/digitalocean) gives it a load balancer of its own because DO load balancers cannot route on the hostname.
 
 ## How a node reaches an external service
 
@@ -86,8 +86,8 @@ calling somewhere it should not, has an answer that does not depend on network e
 The allowlist is part of the node's definition, it is sealed into the content hash with
 everything else, and it is enforced on the request itself.
 
-Nodes are documented for developers in [Who Can Run It](../nodes/15-who-can-run-it.md) and
-[Credentials](../nodes/04-credentials.md).
+Nodes are documented for developers in [Who Can Run It](/nodes/who-can-run-it) and
+[Credentials](/nodes/credentials).
 
 ## What a universe must reach outbound
 
@@ -123,4 +123,4 @@ development convenience.
 
 ---
 
-**Next**: [Data and State](./data.md)
+**Next**: [Data and State](/architecture/data)

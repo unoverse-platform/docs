@@ -15,7 +15,7 @@ and this section is about building one.
 A node you build is a folder of YAML files. You describe the API call, and the platform
 makes it.
 
-[Anatomy of a Node](./00-manifest-nodes.md) is the place to start.
+[Anatomy of a Node](/nodes/manifest-nodes) is the place to start.
 
 ## Documentation
 
@@ -23,36 +23,36 @@ makes it.
 
 | Page | Covers |
 |---|---|
-| [Anatomy of a Node](./00-manifest-nodes.md) | The folder, the five files, and how a call is described |
-| [Node Types](./02-node-types.md) | Settling once or emitting many times, and how the platform tells |
+| [Anatomy of a Node](/nodes/manifest-nodes) | The folder, the five files, and how a call is described |
+| [Node Types](/nodes/node-types) | Settling once or emitting many times, and how the platform tells |
 
 ### Building blocks
 
 | Page | Covers |
 |---|---|
-| [Credentials](./04-credentials.md) | Authenticating against a real service |
-| [Who Can Run It](./15-who-can-run-it.md) | Requiring a role before your node runs |
-| [Config Schema](./06-config-schema.md) | The settings form: every field type and how it renders |
-| [Service Connectors](./07-service-connectors.md) | Handing a capability to another node |
-| [MCP Services](./08-mcp-services.md) | Giving an Agent tools it can choose to call |
-| [Connectors & Signals](./09-signal-routing.md) | Wiring nodes together, and putting values on an output |
-| [Beyond One Request](./12-calls-that-loop.md) | Paging, batching, waiting on a job, remembering, and sockets |
+| [Credentials](/nodes/credentials) | Authenticating against a real service |
+| [Who Can Run It](/nodes/who-can-run-it) | Requiring a role before your node runs |
+| [Config Schema](/nodes/config-schema) | The settings form: every field type and how it renders |
+| [Service Connectors](/nodes/service-connectors) | Handing a capability to another node |
+| [MCP Services](/nodes/mcp-services) | Giving an Agent tools it can choose to call |
+| [Connectors & Signals](/nodes/signal-routing) | Wiring nodes together, and putting values on an output |
+| [Beyond One Request](/nodes/calls-that-loop) | Paging, batching, waiting on a job, remembering, and sockets |
 
 ### Ship it
 
 | Page | Covers |
 |---|---|
-| [Discoverability](./14-node-discoverability.md) | Writing the words that decide whether the AI builder offers your node |
-| [Testing](./13-testing-nodes.md) | Running a node against the real API before you wire it up |
-| [Packages](./10-package-marketplace.md) | The envelope around a set of nodes |
-| [Troubleshooting](./05-troubleshooting.md) | When a node loads but does nothing |
+| [Discoverability](/nodes/node-discoverability) | Writing the words that decide whether the AI builder offers your node |
+| [Testing](/nodes/testing-nodes) | Running a node against the real API before you wire it up |
+| [Packages](/nodes/package-marketplace) | The envelope around a set of nodes |
+| [Troubleshooting](/nodes/troubleshooting) | When a node loads but does nothing |
 
 ---
 
 ## The shape of a node
 
 ```
-apps/unoverse/nodes/<package>/
+nodes/<package>/            # in your Studio project workspace
 ├── package.yaml
 ├── credentials/
 ├── shared/
@@ -98,7 +98,7 @@ One file per job, and a node uses the ones it needs.
 A node the workflow triggers has `run.yaml` and `events.yaml`. A node that exists to be
 called by other nodes has `service.yaml` instead, and no outputs at all. Some have both.
 
-[Anatomy of a Node](./00-manifest-nodes.md) walks through each of them with a real example.
+[Anatomy of a Node](/nodes/manifest-nodes) walks through each of them with a real example.
 
 ## How you build one
 
@@ -140,4 +140,4 @@ Whole packages worth reading: [airtable](https://github.com/unoverse-platform/ma
 
 ---
 
-**Next**: [Anatomy of a Node](./00-manifest-nodes.md)
+**Next**: [Anatomy of a Node](/nodes/manifest-nodes)

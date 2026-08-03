@@ -40,9 +40,11 @@ The one true loss is live state. The engine keeps its session registry in proces
 sessions drop on a restart and clients reconnect. That is also the reason a universe runs
 one engine instance today.
 
-## Postgres can be yours
+## Postgres can be yours, on DigitalOcean
 
-Three modes, and the first match wins.
+Three modes, and the first match wins. **[AWS](/architecture/aws) has one mode: it always
+creates the database.** There is no way to point an AWS universe at a database you already
+run, by decision rather than oversight — see the note under the table.
 
 | You provide | What happens |
 | --- | --- |
@@ -60,6 +62,15 @@ side. Backups are yours, and outside the windows below. And the connection budge
 applies, measured against your `max_connections` rather than a number Terraform chose.
 
 Postgres 14 or later, and TLS in the URL. That is not negotiable in either direction.
+
+**On AWS, the universe always gets its own RDS instance.** These modes exist on
+DigitalOcean because a managed cluster there is something operators already own and pay
+for, and standing a second one beside it is waste. On AWS an instance is provisioned per
+stack by convention, so the universe's database is its own, and bringing existing data in is
+a copy: `pg_dump` into the new instance once, at the start. It also keeps the teardown
+honest — everything the AWS ground builds, `unoverse destroy aws` removes, with nothing
+borrowed left behind. Decided 2026-08-02, and the one place the two grounds deliberately
+differ.
 
 ## The connection budget
 
@@ -121,4 +132,4 @@ seam that any future multi-instance work stands on. Only Postgres is flexible.
 
 ---
 
-**Next**: [Security Posture](./security.md)
+**Next**: [Security Posture](/architecture/security)

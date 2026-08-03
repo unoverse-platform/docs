@@ -9,8 +9,11 @@
   },
   "license": "MIT",
   "scripts": {
-    "dev": "mint dev --port 3400",
+    "preview": "mint dev --port 3400",
     "diagrams": "python3 scripts/diagrams/aws.py && python3 scripts/diagrams/digitalocean.py && python3 scripts/diagrams/vm.py",
     "check": "mint broken-links"
+  },
+  "devDependencies": {
+    "mint": "^4.2.762"
   }
 }

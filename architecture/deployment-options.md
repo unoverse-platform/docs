@@ -38,7 +38,7 @@ embeddings grow.
 
 **Large is the vertical ceiling.** Past it the answer is engine work, not a bigger box. That
 work is session affinity across instances, and the connection budget in
-[Data and State](./data.md) is its prerequisite.
+[Data and State](/architecture/data) is its prerequisite.
 
 ## What is deliberately not offered
 
@@ -49,12 +49,14 @@ session affinity at the entry point and a session registry outside the process, 
 exists yet. Documents that promised 20,000-user active/active tiers were describing a plan,
 not a product, and they have been withdrawn.
 
-**No Kubernetes or ECS.** One VM with Docker Compose is the deployment. It is also the thing
-a customer's operations team can read in an afternoon.
+**No Kubernetes or ECS today.** One VM with Docker Compose is the deployment, and a
+customer's operations team can read it in an afternoon. A KVM image and a Kubernetes option
+are coming soon, and both wait on the multiple-instance work above.
 
-**No auth-off mode.** Authentication is always on, because **Canvas** and **Studio** sign
-in against it. Letting anonymous visitors reach a workflow is a per-workflow decision made
-on the trigger, not a property of the deployment.
+**No auth-off mode in a deployment.** `AUTH_ENABLED=false` exists for local testing, and it
+injects a fixed identity carrying no roles and no permissions. The service refuses to start
+if that flag is set while `NODE_ENV=production`. Letting anonymous visitors reach a workflow
+is a per-workflow decision made on the trigger, not a property of the deployment.
 
 **No pipeline at POC tier.** Provisioning is `terraform apply` and deployment is a CLI
 command. Wiring those into CI is a decision a customer makes later, on their own terms.
@@ -65,10 +67,11 @@ Two seams exist for real, and they are worth knowing about because they answer m
 "what if" questions in a review.
 
 **The identity provider is a variable.** Auth0 today, Entra or Cognito tomorrow, without a
-code change. See [Provisioning](./terraform.md).
+code change. See [Provisioning](/architecture/terraform).
 
-**Postgres can be yours.** An existing managed cluster, or a database somewhere else
-entirely. See [Data and State](./data.md).
+**Postgres can be yours, on DigitalOcean.** An existing managed cluster, or a database
+somewhere else entirely. **[AWS](/architecture/aws) always creates its own** and cannot be
+pointed at a database you already run. See [Data and State](/architecture/data).
 
 ## Running it on your own hardware
 
@@ -77,10 +80,10 @@ only things the cloud modules were providing are a TLS terminator, a Postgres, a
 
 You bring your own entry point, which is the one place an on-premises deployment differs. The
 platform ships a requirement rather than a proxy: terminate TLS, forward to `:4105`, and
-honour the settings in [Networking](./networking.md). Any of nginx, HAProxy or
+honour the settings in [Networking](/architecture/networking). Any of nginx, HAProxy or
 F5 does the job, and because the authentication gate is in the application, none of them is
 load bearing.
 
 ---
 
-**Next**: [Provisioning with Terraform](./terraform.md)
+**Next**: [Provisioning with Terraform](/architecture/terraform)

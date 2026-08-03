@@ -47,15 +47,15 @@
           </h2>
           <p className="text-sm text-gray-600 mb-6">
             The platform ships as compiled Docker images. Your work lives in three folders of your own
-            repository and is mounted into the running platform, auto-discovered at boot. You never fork the
+            Studio project and reaches a universe only when you publish it. You never fork the
             platform; the platform never touches your folders.
           </p>
 
           {/* Your repo */}
           <div className="border-4 border-green-500 rounded-lg p-4 bg-green-50 mb-3">
             <div className="bg-green-600 text-white p-3 rounded-lg mb-3 text-center">
-              <h3 className="font-bold text-lg">Your repository <span className="font-normal text-green-200">· authored in Studio</span></h3>
-              <p className="text-xs mt-1">Created from the unoverse starter template · yours to own and version · Studio is the dev workbench for everything in this box</p>
+              <h3 className="font-bold text-lg">Your Studio project <span className="font-normal text-green-200">· on your machine</span></h3>
+              <p className="text-xs mt-1">Scaffolded by Studio (npm create unoverse) · yours to own and version · Studio is the dev workbench for everything in this box</p>
             </div>
             <div className="grid grid-cols-3 gap-3 text-xs">
               {[
@@ -74,7 +74,7 @@
 
           <div className="flex justify-center items-center gap-2 mb-3 text-gray-500">
             <ArrowDown size={22} />
-            <span className="text-xs font-mono">mounted + auto-discovered at boot</span>
+            <span className="text-xs font-mono">published over the API · lands in the universe database</span>
           </div>
 
           {/* Platform images */}
@@ -83,8 +83,8 @@
               <h3 className="font-bold text-lg">Platform images</h3>
               <p className="text-xs mt-1">Compiled Docker images, pulled from the registry · never edited by you</p>
             </div>
-            <div className="grid grid-cols-5 gap-2 text-xs text-center">
-              {["unoverse", "canvas", "studio", "umap", "memory"].map((svc) => (
+            <div className="grid grid-cols-4 gap-2 text-xs text-center">
+              {["unoverse", "canvas", "umap", "memory"].map((svc) => (
                 <div key={svc} className="bg-white rounded-lg p-2 border-2 border-blue-400 font-bold text-blue-800">
                   {svc}
                 </div>
@@ -96,8 +96,8 @@
           <div className="bg-gray-50 rounded-lg p-4 border-2 border-dashed border-gray-400">
             <p className="text-sm text-gray-700">
               <strong>Updates:</strong> platform updates are an image pull
-              (<span className="font-mono text-xs">unoverse update</span>). Your three folders ride along
-              untouched, and your packages are rediscovered on the next start.
+              (<span className="font-mono text-xs">unoverse update</span>). What you published lives in the
+              universe database and rides along untouched.
             </p>
           </div>
 

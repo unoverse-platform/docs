@@ -38,8 +38,38 @@ roles, so they fail every role requirement naturally.
 
 ## Authorization
 
-Roles are `noun:verb` claims on the caller's token, read from either the roles or the
-permissions claim so the same configuration works across providers.
+**Two levels, and the difference matters.** A person holds **roles**; a role grants
+**permissions**; the platform gates on permissions.
+
+| | | |
+| --- | --- | --- |
+| **Role** | who somebody is | `admin`, `developer` |
+| **Permission** | what they may do, always `noun:verb` | `workflow:author`, `marketplace:publish`, `admin:access` |
+
+Both ride the access token as separate claims. Assigning `developer` to a person is one
+action that grants three permissions, and adding a capability later means adding a
+permission to a role rather than editing anyone's account. A node's `requires.role` matches
+against permissions, so a deployment can invent `finance:approve` without the platform
+knowing it exists.
+
+**How each ground provides it.** With `byo-oidc` the provider already models both — an Auth0
+tenant has roles containing permissions, and Terraform touches none of it. Cognito has only
+one level, groups, so the AWS ground holds the role-to-permission map and the pre-token
+Lambda applies it: your Cognito **groups are the roles**, and the Lambda expands them into
+the permissions claim.
+
+Flattening the two is a real failure mode rather than a tidiness argument. A pool built from
+permission-shaped groups gives an administrator every permission the platform grants and no
+`admin` role — so every gate passes except the one deciding whether Canvas opens at all, and
+the person is refused by the surface they own.
+
+<Note>
+**One inconsistency, stated rather than hidden.** Canvas gates on the `admin` **role**, while
+every other surface gates on a permission. The permission for it already exists —
+`admin:access` — and nothing reads it. Checking that instead would let a deployment grant
+Canvas to a `platform-operator` role without making somebody an administrator, which is the
+whole point of separating the two.
+</Note>
 
 Every node states who may run it, and the block is compulsory rather than optional. That is
 the point: a reviewer can tell the difference between a node that was considered and left
@@ -48,7 +78,7 @@ claim, and the person building the workflow can demand more on top. Neither can 
 other, and a node that reaches the executor with nothing declared is treated as requiring
 authentication.
 
-[Who Can Run It](../nodes/15-who-can-run-it.md) is the developer-facing version of this.
+[Who Can Run It](/nodes/who-can-run-it) is the developer-facing version of this.
 
 ## Credentials
 
@@ -92,7 +122,7 @@ problem where a container runtime writes its own rules underneath a host firewal
 
 Outbound, a universe needs the container registry, the npm registry, your identity provider
 and your AI providers. Each provider's Terraform states them, and
-[Networking](./networking.md) explains what breaks if one is blocked.
+[Networking](/architecture/networking) explains what breaks if one is blocked.
 
 ## Secrets and rotation
 
@@ -101,7 +131,7 @@ universe, and so is the credential encryption key. None of them is shared betwee
 deployments and none of them is known to us.
 
 Secrets are entered per environment. They are never copied from one environment to another,
-which is covered in [Environments](./environments.md).
+which is covered in [Environments](/architecture/environments).
 
 ## Auditability
 
@@ -127,4 +157,4 @@ the gap and the restriction.
 
 ---
 
-**Next**: [Environments and Promotion](./environments.md)
+**Next**: [Environments and Promotion](/architecture/environments)

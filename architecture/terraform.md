@@ -64,17 +64,17 @@ offers, and each has its own page.
 
 <CardGroup cols={3}>
 
-<Card title="Amazon Web Services" href="./aws.md">
+<Card title="Amazon Web Services" href="/architecture/aws">
 <img src="/images/logos/aws.svg" alt="" style={{ height: "26px", margin: "0 0 0.6rem" }} noZoom />
 EC2, RDS, ElastiCache, Cognito, Bedrock
 </Card>
 
-<Card title="DigitalOcean" href="./digitalocean.md">
+<Card title="DigitalOcean" href="/architecture/digitalocean">
 <img src="/images/logos/digitalocean.svg" alt="" style={{ height: "26px", margin: "0 0 0.6rem" }} noZoom />
 Droplet, managed Postgres and Redis, load balancer
 </Card>
 
-<Card title="Azure" href="./azure.md">
+<Card title="Azure" href="/architecture/azure">
 <img src="/images/logos/azure.svg" alt="" style={{ height: "26px", margin: "0 0 0.6rem" }} noZoom />
 Planned
 </Card>
@@ -88,22 +88,31 @@ provider removes that whole class of surprise.
 ## Running it
 
 ```bash
-cd infra/aws          # or infra/digitalocean
-cp terraform.tfvars.example terraform.tfvars
+unoverse deploy
 ```
 
-Fill in the five inputs, your operator IP address, and the service credentials the platform
-needs to pull images and call AI providers. Then:
+That is the whole thing, from no server to a running universe. It asks which cloud, connects
+your cloud account, prefills `terraform.tfvars` from what it can discover and from the `.env`
+your universe already has, plans the change, summarises it in plain English with a monthly
+estimate, and applies the plan you approved. Then it ships the platform onto what was built,
+migrations included. [DigitalOcean](/architecture/digitalocean) walks through it.
+
+**The wrapper does not hide Terraform, and does not decide for you.** The saved plan is what
+runs, so what was approved is what happens; `d` prints the full technical plan; and anything
+being destroyed or replaced is called out. Answering no is Terraform's no.
+
+Your platform team can still drive it directly, and nothing about the ground assumes
+otherwise:
 
 ```bash
+cd infra/aws          # or infra/digitalocean
+cp terraform.tfvars.example terraform.tfvars
 terraform apply
 ```
 
-The universe exists at this point but is empty. Deployment is separate (`unoverse deploy init` — it reads the rendered configuration from your applied ground itself), and it is covered in the [Runbooks](../runbooks/overview.md).
-
-There is no wrapper command around any of this. `terraform apply` is the interface, because
-a customer's platform team already knows what it does and can review what it will change
-before it changes it.
+A universe created this way exists but is empty: `unoverse deploy` then reads the rendered
+configuration from your applied ground and installs the platform on it. The [Runbooks](/runbooks/overview)
+cover that path.
 
 ## Resizing
 
@@ -118,4 +127,4 @@ when you brought your own.
 
 ---
 
-**Next**: [Networking](./networking.md)
+**Next**: [Networking](/architecture/networking)

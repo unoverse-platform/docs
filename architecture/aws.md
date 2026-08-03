@@ -26,7 +26,7 @@ control. There is no hosted control plane and the universe does not call home.
 <p className="fig-title">The paths</p>
 <ul>
 <li><span className="num">1</span><span>A client speaks MCP over HTTPS. 443 is open on the load balancer because that is where TLS terminates; 80 exists only to redirect to it. The load balancer then forwards to the engine on 4105, and the instance itself is not reachable from the internet.</span></li>
-<li><span className="num">2</span><span>An operator reaches Canvas through the same load balancer, at unoverse.example.com, which the second host rule forwards to 3001. SSH on 22, the log viewer on 8080, and Canvas direct on 3001 stay open to your address as a fallback, and are the only route when canvas_public is off.</span></li>
+<li><span className="num">2</span><span>An operator reaches Canvas through the same load balancer, at canvas.example.com, which the second host rule forwards to 3001. SSH on 22, the log viewer on 8080, and Canvas direct on 3001 stay open to your address as a fallback, and are the only route when canvas_public is off.</span></li>
 <li><span className="num">3</span><span>The VM reaches Postgres on 5432 and Redis on 6379. Nothing else in the account can.</span></li>
 <li><span className="num">4</span><span>Tokens are verified against Cognito. Bedrock is called with a scoped IAM user.</span></li>
 <li><span className="num">5</span><span>Nodes call out on 443, only to hosts their own package declares.</span></li>
@@ -35,7 +35,7 @@ control. There is no hosted control plane and the universe does not call home.
 </div>
 
 <Note>
-**This is the POC shape: one machine, one availability zone.** Larger deployments keep the same picture and change what sits behind the load balancer, which is where the multiple-instance work will land. [Deployment Options](./deployment-options.md) covers the sizes and what is deliberately not offered yet.
+**This is the POC shape: one machine, one availability zone.** Larger deployments keep the same picture and change what sits behind the load balancer, which is where the multiple-instance work will land. [Deployment Options](/architecture/deployment-options) covers the sizes and what is deliberately not offered yet.
 </Note>
 
 ## What Terraform creates
@@ -43,11 +43,23 @@ control. There is no hosted control plane and the universe does not call home.
 | | |
 | --- | --- |
 | Compute | An EC2 instance with an elastic IP, in two security groups |
-| Data | RDS Postgres 16 and ElastiCache Redis 7, each with a generated password |
+| Data | RDS Postgres 16 and ElastiCache Redis 7, each with a generated password. **Always created — see below** |
 | Identity | A Cognito user pool, an SPA client, a hosted domain, one group per role, and the first administrator |
 | Claims | A pre-token Lambda, so email and roles reach the token |
 | AI | An IAM user scoped to Bedrock |
 | Secrets | A generated credential encryption key |
+
+<Note>
+**This ground always creates the database. You cannot bring your own.** There is no
+`byo_postgres_url` and no way to adopt an RDS instance you already run: every AWS universe
+provisions its own, and that is deliberate. [DigitalOcean](/architecture/digitalocean)
+offers three modes because a managed cluster there is something operators already own and
+pay for, and standing a second one beside it is waste. On AWS an instance is provisioned per
+stack by convention, so the universe's database is its own, teardown removes everything it
+built with nothing borrowed left behind, and moving existing data in is a copy: `pg_dump`
+into the new instance, once, at the start. Decided 2026-08-02, and the one place the two
+grounds deliberately differ.
+</Note>
 
 ## The trust boundary is the security groups
 
@@ -66,11 +78,52 @@ AWS is the one ground where the platform can own the identity provider, and that
 
 Terraform creates the user pool, creates one group per role you listed, creates the first
 administrator and puts them in every group. The roles exist because the apply ran. Cognito
-emails that administrator a temporary password.
+emails that administrator a temporary password **and the address to use it at** — the
+default invitation is credentials with no link, so the template names your Canvas URL. It is
+sent when the account is created, once. Deploying again never re-sends it and never changes
+a password.
 
-The pre-token Lambda is doing real work. Cognito does not put email and group membership
-onto an access token by default, and the platform needs both, so the Lambda adds them. Every
-other ground reaches the same contract by configuring their own provider.
+Cognito refuses any redirect it has not been told about, so the universe's own address is
+always in the client's allowed list, derived from the same expression that builds the email
+link. Add a second front end and it goes in `oauth_callback_urls`; you never have to
+remember the app's own.
+
+The pre-token Lambda is doing real work. Cognito does not put email or group membership onto
+an access token by default, and the platform needs both, so the Lambda adds them. It also
+carries the role-to-permission map: Cognito has one level where the platform needs
+[two](/architecture/security#authorization), so **your Cognito groups are the roles** and the
+Lambda expands them into the permissions claim. `admin` and `developer` are always created;
+anything in `roles` is a deployment's own and grants itself.
+
+Every other ground reaches the same contract by configuring their own provider — an Auth0
+tenant already has roles containing permissions, and Terraform touches none of it.
+
+## What you need before the first apply
+
+Three things, and two of them the CLI collects for you.
+
+**An SSH key on the machine you deploy from.** Deploying is `ssh` from your laptop, so the
+key that must work is the one your laptop holds. The ground reads `~/.ssh/id_ed25519.pub`
+and Terraform uploads it as `<name>-operator`. Nothing has to pre-exist in the account, and
+no private key is ever downloaded or stored. If you have no key at all,
+`ssh-keygen -t ed25519` first: an EC2 key pair created in the console is one whose private
+half you do not have, and the apply will succeed and then fail to reach the instance.
+
+**An email for the first administrator.** `unoverse deploy aws` asks. That account is
+created in Cognito with every role.
+
+**A domain, if you want HTTPS.** Optional, and the honest consequence of skipping it is no
+certificate: the load balancer serves plain HTTP on its own Amazon address, and a browser
+marks it Not Secure. There is nothing to secure it with, because a certificate is proof you
+own a name and `*.elb.amazonaws.com` is Amazon's. Adding one later is two lines and one
+deploy, and nothing is destroyed.
+
+<Note>
+**The domain has to be in Route 53** for this to be two lines. AWS proves you own it by
+writing a DNS record, which it can only do in a zone it controls. A domain hosted elsewhere
+still works — the module prints the validation records for you to create once — but that is
+a manual step and a wait, rather than a variable.
+</Note>
 
 ## What the module actually provisions
 
@@ -88,10 +141,10 @@ Redis has no snapshots, deliberately. It holds cache and queue state, so there i
 it worth restoring.
 
 The module ships the small shape and takes no `size` variable yet. The
-[size table](./deployment-options.md) describes where medium and large land when it does.
+[size table](/architecture/deployment-options) describes where medium and large land when it does.
 
 Postgres connections are direct rather than pooled. The smallest RDS instance allows well
-over a hundred, so the [connection budget](./data.md) has ample headroom.
+over a hundred, so the [connection budget](/architecture/data) has ample headroom.
 
 ## What the POC costs to run
 
@@ -101,11 +154,21 @@ rather than billing.
 | | Monthly, about |
 | --- | --- |
 | EC2 `t3.xlarge` | $120 |
-| Application Load Balancer | $20 |
-| RDS `db.t4g.small` with 20 GB | $26 |
+| RDS `db.t4g.small` | $25 |
 | ElastiCache `cache.t4g.micro` | $12 |
+| Application Load Balancer | $18 |
 | Storage, public IPv4, DNS, transfer | $15 |
-| **Total** | **about $195 a month** |
+| **Total** | **about $190 a month** |
+
+**The ground prices itself.** These numbers live in `infra/aws/prices.tf`, keyed by the
+exact instance types this ground uses, and everything else reads them from there:
+`unoverse deploy` quotes them in its plan summary, and this table quotes the same output.
+Change a size and both move together, because there is only one copy.
+
+```bash
+terraform -chdir=infra/aws output monthly_estimate   # what yours costs, as configured
+terraform -chdir=infra/aws output prices             # the whole table
+```
 
 Cognito is free at POC scale, and the certificate costs nothing. **Model usage is not in
 this number**: Bedrock bills per token, so the AI cost follows what your Agents actually do
@@ -127,7 +190,7 @@ multiplies it.
 As for the box itself: plan on **a few hundred signed-in users and tens of simultaneous
 Agent runs**. That is a pilot, not production. And in practice the first ceiling is not the
 machine but your AI provider's rate limits, tokens per minute on your Bedrock or OpenAI account, which caps simultaneous Agent work long before the CPU does.
-[Deployment Options](./deployment-options.md) has the sizes above this one.
+[Deployment Options](/architecture/deployment-options) has the sizes above this one.
 
 ## One load balancer, host-routed
 
@@ -138,8 +201,8 @@ directly.
 
 **One door serves both hostnames**, which is the thing DigitalOcean cannot do. `api.<domain>`
 forwards to the engine on 4105 by default. Turning on `canvas_public` adds a listener rule
-for `unoverse.<domain>` to Canvas on 3001, and adds that name to the certificate. On
-[DigitalOcean](./digitalocean.md) the same outcome costs a second load balancer, because its
+for `canvas.<domain>` to Canvas on 3001, and adds that name to the certificate. On
+[DigitalOcean](/architecture/digitalocean) the same outcome costs a second load balancer, because its
 load balancers cannot route on the hostname.
 
 **The idle timeout is 3600 seconds**, set deliberately. Streaming and the websocket are
@@ -162,4 +225,4 @@ where the multiple-instance work will land.
 
 ---
 
-**Next**: [DigitalOcean](./digitalocean.md)
+**Next**: [DigitalOcean](/architecture/digitalocean)

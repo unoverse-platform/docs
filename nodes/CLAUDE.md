@@ -1,13 +1,13 @@
 # CLAUDE.md: building unoverse nodes
 
 Authoritative agent guide. A node is a folder of YAML, and this file is the condensed
-rulebook. The pages beside it hold the detail: `00-manifest-nodes.md` first, then the
+rulebook. The pages beside it hold the detail: `manifest-nodes.md` first, then the
 numbered guides.
 
 ## A node is a folder
 
 ```
-apps/unoverse/nodes/<package>/
+nodes/<package>/            # in your Studio project workspace
   package.yaml                # the package: name, category, allowedHosts, requires
   credentials/
     <name>Credential.yaml     # the SHAPE of a credential, never a value
@@ -70,7 +70,7 @@ description: One line on what it does
 whenToUse: >-
   Outcome first, in the words a planner would use. Then what disqualifies it, as a
   property of the work. Never name another node.
-# WHO MAY RUN THIS. Compulsory on every node (15-who-can-run-it.md).
+# WHO MAY RUN THIS. Compulsory on every node (who-can-run-it.md).
 # `required: false` adds no requirement of its own: the node runs for whoever the
 # trigger admitted. It does NOT mean public.
 auth:
@@ -82,7 +82,7 @@ capabilities:
 ```
 
 **`whenToUse` decides whether the node is ever offered.** Read
-`14-node-discoverability.md` before writing it. Lead with the job, disqualify by property,
+`node-discoverability.md` before writing it. Lead with the job, disqualify by property,
 put any wiring fact last.
 
 **`cacheable: true` only for a pure read.** Never for anything effectful, because reuse
@@ -149,7 +149,7 @@ and wait, reply is the FINAL status, always write `failed`), `state`
 (`read`/`merge`/`drain`/`save`), `loop` (LoopStart/LoopEnd bookkeeping), `presign` (mint
 signed URLs, makes no request). `transport: ws` holds a socket open with `open`/`send`/
 `close`. Declare each in `requires` in `package.yaml` (credential schemes go under `requires.credential`). Full reference:
-`12-calls-that-loop.md`.
+`calls-that-loop.md`.
 
 ## `api/events.yaml`
 
@@ -188,7 +188,7 @@ configSchema:
 
     # COMPULSORY, on every node, identical everywhere. The workflow builder's control over
     # who may run THIS box. Lint checks the types, the widget, the dependency and both
-    # defaults. See 15-who-can-run-it.md.
+    # defaults. See who-can-run-it.md.
     authRequired:
       type: boolean
       title: Require sign-in
@@ -328,14 +328,14 @@ Also published: [airtable](https://github.com/unoverse-platform/marketplace/tree
 
 ## Further reading
 
-- `00-manifest-nodes.md`: the format in full
-- `02-node-types.md`: settling once or emitting many times
-- `04-credentials.md`: keys, auth schemes, local testing
-- `15-who-can-run-it.md`: node.yaml's compulsory `auth` block, roles, anonymous triggers
-- `06-config-schema.md`: every field type and the run context
-- `07-service-connectors.md`: offering a capability to other nodes
-- `08-mcp-services.md`: tools for an Agent
-- `09-signal-routing.md`: connectors, and putting values on an output
-- `10-package-marketplace.md`: the package envelope
-- `13-testing-nodes.md`: fixtures and running for real
-- `14-node-discoverability.md`: **read before writing `whenToUse`**
+- `manifest-nodes.md`: the format in full
+- `node-types.md`: settling once or emitting many times
+- `credentials.md`: keys, auth schemes, local testing
+- `who-can-run-it.md`: node.yaml's compulsory `auth` block, roles, anonymous triggers
+- `config-schema.md`: every field type and the run context
+- `service-connectors.md`: offering a capability to other nodes
+- `mcp-services.md`: tools for an Agent
+- `signal-routing.md`: connectors, and putting values on an output
+- `package-marketplace.md`: the package envelope
+- `testing-nodes.md`: fixtures and running for real
+- `node-discoverability.md`: **read before writing `whenToUse`**

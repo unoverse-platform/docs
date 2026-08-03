@@ -44,7 +44,7 @@
     "primary": {
       "type": "button",
       "label": "Get Started",
-      "href": "/onboarding/00a-studio"
+      "href": "/onboarding/studio"
     }
   },
   "navigation": {
@@ -56,29 +56,29 @@
             "group": "Start Here",
             "pages": [
               "index",
-              "onboarding/00-how-it-fits-together",
-              "onboarding/00a-studio",
-              "onboarding/00b-platform",
-              "onboarding/00c-cli"
+              "onboarding/how-it-fits-together",
+              "onboarding/studio",
+              "onboarding/platform",
+              "onboarding/cli"
             ]
           },
           {
             "group": "Challenges",
             "pages": [
-              "onboarding/01-marketplace-nodes",
-              "onboarding/02-create-your-first-agent",
-              "onboarding/03-create-your-first-node",
-              "onboarding/04-ingest-content-to-spatial",
-              "onboarding/05-components-and-templates",
-              "onboarding/06-create-a-mcp",
-              "onboarding/07-create-a-client-app"
+              "onboarding/marketplace-nodes",
+              "onboarding/create-your-first-agent",
+              "onboarding/create-your-first-node",
+              "onboarding/ingest-content-to-spatial",
+              "onboarding/components-and-templates",
+              "onboarding/create-a-mcp",
+              "onboarding/create-a-client-app"
             ]
           },
           {
             "group": "Ship It",
             "pages": [
-              "onboarding/08-deployment",
-              "onboarding/09-update-unoverse"
+              "onboarding/deployment",
+              "onboarding/update-unoverse"
             ]
           }
         ],
@@ -91,26 +91,28 @@
             "group": "Getting Started",
             "pages": [
               "design/overview",
-              "design/01-quick-start",
-              "design/02-sdui-and-mcp-apps",
-              "design/02a-coming-from-react"
+              "design/quick-start",
+              "design/sdui-and-mcp-apps",
+              "design/coming-from-react"
             ]
           },
           {
             "group": "Core Concepts",
             "pages": [
-              "design/03-components",
-              "design/04-state",
-              "design/05-templates",
-              "design/06-styles-and-tokens"
+              "design/components",
+              "design/state",
+              "design/templates",
+              "design/styles-and-tokens",
+              "design/lifecycle-hooks",
+              "design/unoverse-markdown"
             ]
           },
           {
             "group": "Workflow",
             "pages": [
-              "design/07-studio",
-              "design/08-validate-and-ship",
-              "design/09-troubleshooting"
+              "design/studio",
+              "design/validate-and-ship",
+              "design/troubleshooting"
             ]
           }
         ],
@@ -123,29 +125,29 @@
             "group": "Getting Started",
             "pages": [
               "nodes/overview",
-              "nodes/00-manifest-nodes",
-              "nodes/02-node-types"
+              "nodes/manifest-nodes",
+              "nodes/node-types"
             ]
           },
           {
             "group": "Building Blocks",
             "pages": [
-              "nodes/04-credentials",
-              "nodes/15-who-can-run-it",
-              "nodes/06-config-schema",
-              "nodes/07-service-connectors",
-              "nodes/08-mcp-services",
-              "nodes/09-signal-routing",
-              "nodes/12-calls-that-loop"
+              "nodes/credentials",
+              "nodes/who-can-run-it",
+              "nodes/config-schema",
+              "nodes/service-connectors",
+              "nodes/mcp-services",
+              "nodes/signal-routing",
+              "nodes/calls-that-loop"
             ]
           },
           {
             "group": "Ship & Extend",
             "pages": [
-              "nodes/10-package-marketplace",
-              "nodes/13-testing-nodes",
-              "nodes/14-node-discoverability",
-              "nodes/05-troubleshooting"
+              "nodes/package-marketplace",
+              "nodes/testing-nodes",
+              "nodes/node-discoverability",
+              "nodes/troubleshooting"
             ]
           }
         ],
@@ -180,7 +182,7 @@
             ]
           }
         ],
-        "icon": "sitemap"
+        "icon": "network"
       },
       {
         "tab": "Runbooks",
@@ -189,16 +191,16 @@
             "group": "Deploy",
             "pages": [
               "runbooks/overview",
-              "runbooks/01-core",
-              "runbooks/02-database"
+              "runbooks/core",
+              "runbooks/database"
             ]
           },
           {
             "group": "Operate",
             "pages": [
-              "runbooks/04-harden",
-              "runbooks/06-test",
-              "runbooks/09-restart-rebuild"
+              "runbooks/harden",
+              "runbooks/test",
+              "runbooks/restart-rebuild"
             ]
           }
         ],
@@ -210,5 +212,171 @@
     "socials": {
       "github": "https://github.com/unoverse-platform/starter"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/onboarding/00-how-it-fits-together",
+      "destination": "/onboarding/how-it-fits-together"
+    },
+    {
+      "source": "/onboarding/00a-studio",
+      "destination": "/onboarding/studio"
+    },
+    {
+      "source": "/onboarding/00b-platform",
+      "destination": "/onboarding/platform"
+    },
+    {
+      "source": "/onboarding/00c-cli",
+      "destination": "/onboarding/cli"
+    },
+    {
+      "source": "/onboarding/01-marketplace-nodes",
+      "destination": "/onboarding/marketplace-nodes"
+    },
+    {
+      "source": "/onboarding/02-create-your-first-agent",
+      "destination": "/onboarding/create-your-first-agent"
+    },
+    {
+      "source": "/onboarding/03-create-your-first-node",
+      "destination": "/onboarding/create-your-first-node"
+    },
+    {
+      "source": "/onboarding/04-ingest-content-to-spatial",
+      "destination": "/onboarding/ingest-content-to-spatial"
+    },
+    {
+      "source": "/onboarding/05-components-and-templates",
+      "destination": "/onboarding/components-and-templates"
+    },
+    {
+      "source": "/onboarding/06-create-a-mcp",
+      "destination": "/onboarding/create-a-mcp"
+    },
+    {
+      "source": "/onboarding/07-create-a-client-app",
+      "destination": "/onboarding/create-a-client-app"
+    },
+    {
+      "source": "/onboarding/08-deployment",
+      "destination": "/onboarding/deployment"
+    },
+    {
+      "source": "/onboarding/09-update-unoverse",
+      "destination": "/onboarding/update-unoverse"
+    },
+    {
+      "source": "/design/01-quick-start",
+      "destination": "/design/quick-start"
+    },
+    {
+      "source": "/design/02-sdui-and-mcp-apps",
+      "destination": "/design/sdui-and-mcp-apps"
+    },
+    {
+      "source": "/design/02a-coming-from-react",
+      "destination": "/design/coming-from-react"
+    },
+    {
+      "source": "/design/03-components",
+      "destination": "/design/components"
+    },
+    {
+      "source": "/design/04-state",
+      "destination": "/design/state"
+    },
+    {
+      "source": "/design/05-templates",
+      "destination": "/design/templates"
+    },
+    {
+      "source": "/design/06-styles-and-tokens",
+      "destination": "/design/styles-and-tokens"
+    },
+    {
+      "source": "/design/07-studio",
+      "destination": "/design/studio"
+    },
+    {
+      "source": "/design/08-validate-and-ship",
+      "destination": "/design/validate-and-ship"
+    },
+    {
+      "source": "/design/09-troubleshooting",
+      "destination": "/design/troubleshooting"
+    },
+    {
+      "source": "/nodes/00-manifest-nodes",
+      "destination": "/nodes/manifest-nodes"
+    },
+    {
+      "source": "/nodes/02-node-types",
+      "destination": "/nodes/node-types"
+    },
+    {
+      "source": "/nodes/04-credentials",
+      "destination": "/nodes/credentials"
+    },
+    {
+      "source": "/nodes/05-troubleshooting",
+      "destination": "/nodes/troubleshooting"
+    },
+    {
+      "source": "/nodes/06-config-schema",
+      "destination": "/nodes/config-schema"
+    },
+    {
+      "source": "/nodes/07-service-connectors",
+      "destination": "/nodes/service-connectors"
+    },
+    {
+      "source": "/nodes/08-mcp-services",
+      "destination": "/nodes/mcp-services"
+    },
+    {
+      "source": "/nodes/09-signal-routing",
+      "destination": "/nodes/signal-routing"
+    },
+    {
+      "source": "/nodes/10-package-marketplace",
+      "destination": "/nodes/package-marketplace"
+    },
+    {
+      "source": "/nodes/12-calls-that-loop",
+      "destination": "/nodes/calls-that-loop"
+    },
+    {
+      "source": "/nodes/13-testing-nodes",
+      "destination": "/nodes/testing-nodes"
+    },
+    {
+      "source": "/nodes/14-node-discoverability",
+      "destination": "/nodes/node-discoverability"
+    },
+    {
+      "source": "/nodes/15-who-can-run-it",
+      "destination": "/nodes/who-can-run-it"
+    },
+    {
+      "source": "/runbooks/01-core",
+      "destination": "/runbooks/core"
+    },
+    {
+      "source": "/runbooks/02-database",
+      "destination": "/runbooks/database"
+    },
+    {
+      "source": "/runbooks/04-harden",
+      "destination": "/runbooks/harden"
+    },
+    {
+      "source": "/runbooks/06-test",
+      "destination": "/runbooks/test"
+    },
+    {
+      "source": "/runbooks/09-restart-rebuild",
+      "destination": "/runbooks/restart-rebuild"
+    }
+  ]
 }

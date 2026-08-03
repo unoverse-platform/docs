@@ -91,16 +91,16 @@ which reads its ambient stream of observations from there.
 It is always provisioned by the stack rather than brought by you, because the platform owns
 its version and its TLS posture.
 
-Postgres can be yours if you have one. [Data and State](./data.md) covers the rules that
+Postgres can be yours if you have one. [Data and State](/architecture/data) covers the rules that
 come with that, including a connection budget that is not optional.
 
 ## Where to go next
 
 | | |
 | --- | --- |
-| [Deployment Options](./deployment-options.md) | Three sizes, what each one really holds, and what is deliberately not offered |
-| [Provisioning with Terraform](./terraform.md) | Five inputs, one command, and the file it hands you |
-| [Networking](./networking.md) | TLS, ports, and the outbound hosts a universe must reach |
-| [Data and State](./data.md) | Postgres, Redis, the connection budget, backups |
-| [Security Posture](./security.md) | What a reviewer is told, and what is still open |
-| [Environments and Promotion](./environments.md) | Dev, UAT and production, and what never moves between them |
+| [Deployment Options](/architecture/deployment-options) | Three sizes, what each one really holds, and what is deliberately not offered |
+| [Provisioning with Terraform](/architecture/terraform) | Five inputs, one command, and the file it hands you |
+| [Networking](/architecture/networking) | TLS, ports, and the outbound hosts a universe must reach |
+| [Data and State](/architecture/data) | Postgres, Redis, the connection budget, backups |
+| [Security Posture](/architecture/security) | What a reviewer is told, and what is still open |
+| [Environments and Promotion](/architecture/environments) | Dev, UAT and production, and what never moves between them |

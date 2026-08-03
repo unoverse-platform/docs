@@ -38,12 +38,12 @@ against a Postgres and a Redis, so an Azure deployment built by your own platfor
 today.
 
 You take on what the module would have done: the network security group, the certificate on
-your Application Gateway, the entry point settings in [Networking](./networking.md), and the
-connection budget in [Data and State](./data.md).
+your Application Gateway, the entry point settings in [Networking](/architecture/networking), and the
+connection budget in [Data and State](/architecture/data).
 
 Tell us if you are doing this. A real deployment is what turns a planned module into a built
 one.
 
 ---
 
-**Next**: [Networking](./networking.md)
+**Next**: [Networking](/architecture/networking)
