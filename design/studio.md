@@ -14,7 +14,8 @@ unoverse studio
 ```
 
 It opens on http://localhost:4108 and finds your project by looking for `rx/` in the current
-folder or any parent. [Studio](/onboarding/studio) covers the setup in full.
+folder, any parent, or a single folder directly below. So it works from inside your project
+or from the folder you created it in. [Studio](/onboarding/studio) covers the setup in full.
 
 ---
 

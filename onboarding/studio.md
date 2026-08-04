@@ -47,26 +47,37 @@ Open source and free. No account, and nothing else to install.
 unoverse studio
 ```
 
-Run it in the folder where you want your project to live. The first time, it asks what to
-call your project and creates the folders right there:
+Run it wherever you keep your code. The first time, it asks what to call your project and
+makes a folder of that name:
 
 ```
   No project here yet.
 
-  /Users/you/my-folder
+  /Users/you/code
 
-  Name your project [my-project]:
+  Name your project [my-project]: acme
+
+  Created acme/ with rx/acme/, prompts/ and nodes/
 ```
 
-You get `rx/<your-project>/` with `components`, `templates` and `styles`, plus `prompts/`
-and `nodes/`, and a first component so Studio opens on something real rather than an empty
-list.
+The name you type does two jobs: it is the folder, and it is the **org** on everything that
+project publishes. So it has to be lowercase letters, numbers and dashes.
 
-| Folder | Holds |
-| --- | --- |
-| `rx/` | Your interfaces: components, templates, styles |
-| `prompts/` | Agent skills and prompt blocks |
-| `nodes/` | Your own integrations |
+```
+acme/                        your project
+  rx/acme/                   components, templates, styles
+  prompts/                   Agent skills and prompt blocks
+  nodes/                     your own integrations
+```
+
+`rx/` holds a folder per project, not your files directly, because one repository can carry
+several and each publishes separately. Add more from Studio's **New project** whenever you
+want; they sit beside `rx/acme/`.
+
+You also get a first component, so Studio opens on something real rather than an empty list.
+
+Next time, run `unoverse studio` from either `acme/` or the folder above it. It finds the
+project either way.
 
 </Step>
 <Step title="Edit the first component">

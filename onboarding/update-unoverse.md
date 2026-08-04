@@ -4,7 +4,7 @@ title: "Update Unoverse"
 ---
 
 Keep everything current when new versions are released. There are three things that
-update, and each has one command.
+update, and each has one command. **Studio** is a fourth, and it needs no command at all.
 
 ## The three updates
 
@@ -17,6 +17,19 @@ update, and each has one command.
 Your own work is outside all three: what you publish from **Studio** lives in the
 universe's database and rides along untouched, and marketplace content updates per
 item, from the marketplace.
+
+## Studio updates itself
+
+`unoverse studio` fetches the current version every time it launches, so there is nothing
+to update and no version to track.
+
+**The design system comes with it.** The components, atoms and foundation styles you build
+on are part of Studio rather than a copy sitting in your project, so launching Studio is
+what moves you to the current baseline. Nothing in your project folder goes stale, because
+nothing about the design system is written there.
+
+Your own `rx/`, `prompts/` and `nodes/` are untouched by any of this. They are yours, and
+Studio only reads them.
 
 ## Steps
 
