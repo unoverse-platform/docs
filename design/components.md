@@ -133,6 +133,10 @@ Every faced component's root is the same three lines: a `Switch` on `defaultStat
 - **A `hideBelow` threshold must be reachable by the card itself**: keep it *below* the layout's own `maxWidth`. A threshold at or above it can only be satisfied by the surrounding surface, so the element shows on a wide **Studio** stage and silently vanishes in a chat column (linted).
 - The component's own buttons move it: expand = `setValue { defaultState: "focused" }`, its focused face carries its own ✕ that sets it back to `"inline"`. **A component writes only its own slice**: how templates react is [04, State](/design/state).
 
+### Steps inside a face: `layouts/<face>-<step>`
+
+A face can carry steps of its own that belong to it and to no other face. CourseCard's `course` face flips between a detail page and an apply form: inside `layouts/course.json` a `Switch` on `step` (a key the component **declares in its own `state` block**) selects `layouts/course-detail.json` or `layouts/course-apply.json`. The filename prefix carries the ownership, the same rule that makes a layout filename a state name, and **the structure is the declaration**: no manifest list, no registry. Studio derives the steps from the Switch and nests them under the component only while that face is active. A Switch on a *data* field (`kind`, a nested component's `tab`) is content selection, not a step: steps turn only on keys the component owns. When steps share one shape and differ only in data, they collapse into one data-driven state instead ([UNOVERSE_LAYERS](https://github.com/unoverse-platform/docs/blob/main/unoverse/UNOVERSE_LAYERS.md) §3c and §6).
+
 ---
 
 ## Briefed components: the design briefs the AI

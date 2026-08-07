@@ -131,7 +131,7 @@ a manual step and a wait, rather than a variable.
 | --- | --- |
 | Instance | `t3.xlarge`, Ubuntu 22.04, 100 GB gp3 root volume, Elastic IP |
 | Postgres | RDS 16, `db.t4g.small`, single AZ, 20 GB growing to 50, gp3 |
-| Backups | 7 days, with a final snapshot taken on destroy |
+| Backups | 7 days of automated backups, removed with the instance. No final snapshot: take one yourself before destroying if you want a recovery point |
 | Redis | ElastiCache 7.1, `cache.t4g.micro`, one node, TLS in transit with an auth token |
 | Identity | Cognito Essentials pool, SPA client, hosted domain, one group per role |
 | Claims | A pre-token Lambda, held in Terraform so a pool rebuild cannot drop it |
