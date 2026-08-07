@@ -307,6 +307,23 @@ A row's `from` says where it fires:
 `from: tool` exists because a tool's result is never in the HTTP stream. The tool loop
 produced it.
 
+**Two things are recorded without any row here**, because they are execution facts rather
+than node outputs:
+
+- **Every tool call** becomes a bar on the execution timeline the moment it returns, with
+  its arguments, its result, its duration, and whether it succeeded.
+- **Token usage** is read straight off the vendor's reply and summed across the turns of a
+  run, detail blocks included (reasoning tokens, cached tokens). The runtime checks the
+  three places a wire carries it (`usage` on the body or final chunk, `response.usage` on a
+  Responses stream, `metadata.usage` on a Bedrock stream), so a node on any of those wires
+  fills the execution's Token Usage view with nothing declared. A vendor that reports usage
+  anywhere else will not be picked up automatically: that is a platform gap to raise, not
+  something to work around in the node. A connector named `usage` in the example above is a different thing: that is
+  the node choosing to hand the block downstream as data.
+
+Both are fire and forget: recording never slows a run and never fails one, and a node test,
+which has no execution to attach to, records nothing.
+
 For a streaming node, two controls matter:
 
 - `accumulate: true` emits the running total instead of the fragment. A consumer wants the
