@@ -21,6 +21,7 @@ The SDK renderer owns no styles either: it only *resolves* token names against t
 
 - No `px` / `rem` / `em` / `#hex` anywhere in any component, atom, or template definition. Studio's publish lint scans for exactly this and blocks ([08](/design/validate-and-ship)).
 - Sizes use the **space scale** (`"width": "8"` = 2rem, Tailwind-style: step N = N × 0.25rem), and only **real steps**: `0 1 1.5 2 3 4 5 6 7 8 10 12 16 20 24 28 40 50 75 90 100 120 140 160 180 200` (+ `full`/`auto`). An invented step (`"26"`, `"3.5"`) is NOT rounded: it falls through as broken CSS and the element silently reverts to auto sizing. Studio's publish lint rejects off-scale values.
+- **Page widths have NAMES** (`semantic/layout.json`): `compact` 30rem · `narrow` 35rem · `reading` 40rem · `page` 45rem · `wide` 50rem. They are aliases onto the same scale, so `maxWidth`/`hideBelow`/`stackBelow` read as what they are (`"maxWidth": "reading"`, not `"160"`). **The rule, so one value never gets two spellings:** a PAGE-level cap uses a name; an ELEMENT's own size (an image tile's height, a card's max) stays a scale step. An image tile is not a page.
 - ❌ No invented component-named tokens (`cardMin`, `wizardWidth`): use the generic scale steps. If the scale genuinely lacks a step, extend the scale in `styles/`, don't smuggle a value into a definition.
 
 ## Style KEYS are closed too: the cross-platform contract
@@ -30,6 +31,62 @@ It's not just values: the set of style **keys** (`padding`, `direction`, `radius
 Both the schema (editor squiggle) and Studio's publish lint (error) enforce the key set, including inside `hover`/`active` and `when[].apply`. If a design genuinely needs an intent the vocabulary lacks, that's a platform conversation (a new key every renderer must implement): never a definition-side workaround.
 
 **Why so strict:** brand and dark-mode swaps must touch `styles/` only. One raw hex in one definition breaks that guarantee for the whole org.
+
+---
+
+## The grid: `columns` + `span`
+
+Equal splits need nothing but a column count. Two children in a two-column grid are halves; four in a four-column grid are quarters.
+
+```jsonc
+{ "style": { "columns": "2", "gap": "4" } }   // two halves
+{ "style": { "columns": "4", "gap": "4" } }   // four quarters
+```
+
+**`span` is for UNEQUAL splits.** Put a 12-column grid on the container and let each child say how many columns it covers. 6 is a half, 4 a third, 3 a quarter.
+
+```jsonc
+{
+  "type": "Box",
+  "style": { "columns": "12", "gap": "4" },
+  "children": [
+    { "type": "Box", "style": { "span": "8" } },   // two thirds
+    { "type": "Box", "style": { "span": "4" } }    // one third
+  ]
+}
+```
+
+Use the grid rather than percentage widths in a flex row. A grid subtracts its own gaps from the columns, so spans can never overflow; `"width": "50%"` twice plus a gap always does.
+
+### Stacking is automatic
+
+A spanning child gives up its span and takes the whole row once the grid runs out of space, so four quarter-width cards become four full-width cards, stacked. Nothing to author.
+
+The threshold is `grid.stackBelow` in `semantic/grid.json` (starter: `space.120`, 30rem). Override it for the whole org there, or for one grid inline:
+
+```jsonc
+{ "style": { "columns": "12", "stackBelow": "160" } }   // hold the shape until 40rem
+```
+
+**It measures the grid, not the browser window.** A component reacts to the space it was actually given, so the same component stacks correctly in a 360px rail and lays out wide in a full panel, on any device. This is the same container-query mechanism as `hideBelow` / `hideAbove`, and it is why there are no device breakpoints anywhere in `rx/`.
+
+## A shared look belongs in an atom, not in every component
+
+If several components draw the same card, the card's style is written once, in an atom, and composed by `Ref`. Repeating `background` + `border` + `radius` + `padding` in ten definitions is the same duplication LAW 1 exists to prevent, one level up: a token stops a value being repeated, an atom stops a *combination* of them being repeated.
+
+```jsonc
+// rx/atoms/card.json: the shape, once
+{ "name": "Card", "root": { "type": "Box", "style": {
+    "direction": "column", "gap": "1", "padding": "4",
+    "background": "surface.base", "border": "subtle", "radius": "md" } } }
+```
+
+```jsonc
+// any component: compose it, and layer on what is local to this use
+{ "type": "Ref", "ref": "card", "style": { "span": "3" }, "children": [ … ] }
+```
+
+**The `Ref`'s own `style` merges OVER the atom's**, so a component keeps the shared look and still overrides one thing (a tighter padding, no border) without forking the atom. That is the cascade: **atom = the look, `Ref` = this instance's exceptions.** Reach for a new atom the moment a second component needs the same combination; never copy the block.
 
 ---
 
@@ -44,7 +101,9 @@ rx/<project>/styles/
 │   └── radius.json / shadow.json / border.json / motion.json
 ├── semantic/    # named meanings, built FROM base
 │   ├── text-styles.json  # headline.lg, body.sm… (referenced via "font")
-│   ├── fonts.json / spacing.json / icons.json
+│   ├── fonts.json / icons.json
+│   ├── layout.json       # PAGE WIDTHS by name: compact · reading · page · wide
+│   ├── grid.json         # grid.stackBelow: when a columns grid stacks
 │   ├── app-sizes.json    # STANDARD APP SIZES: chat · rail · panel (see below)
 │   └── prose.json / skeleton.json / keyframes.json / root.json
 └── themes/      # brand / dark-mode swaps
@@ -100,6 +159,8 @@ Starting a new org: copy the neutral baseline and re-token it
 - [ ] No component-named tokens invented
 - [ ] New brand/mode = a new `themes/` file, zero definition edits
 - [ ] Theme keeps the full token contract (guard test)
+- [ ] Multi-column layout uses `columns` (+ `span` when unequal), never percentage widths in a flex row
+- [ ] A look two components share lives in an atom, composed by `Ref`, not copied
 
 ---
 
