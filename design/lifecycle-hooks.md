@@ -141,10 +141,10 @@ knowing only what the search gave it. Open it, and it fills its own live details
 maps API. Three parts, no code:
 
 ```
-rx/<org>/components/restaurantcard/
+rx/<org>/components/restaurant-card/
 ├── manifest.yaml            opts in, and declares what the calls may reach
 ├── fetchplacedetails.yaml   the calls, and the fields they return
-├── restaurantcard.yaml      the card itself: props, and a Switch of faces
+├── restaurant-card.yaml      the card itself: props, and a Switch of faces
 └── layouts/                 list · focus · planned
 ```
 

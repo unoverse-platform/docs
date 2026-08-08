@@ -43,7 +43,7 @@ There is **no `<name>.json`**: the manifest is the single contract file. Same fo
   "inputSchema": { "type": "object", "properties": { "message": { "type": "string" } } },
   "layout": "standard",                           // the DEFAULT layout (nothing surfaced)
   "stateOrder": ["welcome", "conversation", "products", "product"],   // states + layouts, in picker order
-  "preview": { "products": ["productcard", "productcard"], "product": ["productcard"] },
+  "preview": { "products": ["product-card", "product-card"], "product": ["product-card"] },
                                                   // per-LAYOUT mock: what Studio seeds (repeat = several instances)
   "binding": { "workflow": "wf-8koixv", "trigger": "inputtrigger1" },   // the app OWNS its workflow
   "autoTrigger": false

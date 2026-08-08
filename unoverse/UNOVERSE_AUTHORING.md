@@ -251,8 +251,8 @@ component that executes code); each lifecycle's code lives in a sibling file nam
 { …, "defaultState": "list", "lifecycle": ["onStart"] }   // authorizes onStart
 ```
 ```
-rx/orgs/<org>/components/restaurantcard/
-   restaurantcard.json      # the UI (data)
+rx/orgs/<org>/components/restaurant-card/
+   restaurant-card.json      # the UI (data)
    manifest.json            # declares "lifecycle": ["onStart"]  ← the opt-in
    onstart.js               # the code: filename = the lifecycle
 ```

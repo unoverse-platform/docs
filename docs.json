@@ -104,6 +104,7 @@
               "design/templates",
               "design/styles-and-tokens",
               "design/lifecycle-hooks",
+              "design/analytics",
               "design/unoverse-markdown"
             ]
           },
