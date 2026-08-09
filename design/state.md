@@ -92,9 +92,13 @@ The ladder is **derived** from the tree: the top level minus the base, in declar
 
 The template's active state is **derived, never stored**: a pure function of the snapshots of the components it hosts. Nothing writes a focus flag anywhere.
 
-### 5. A higher state CANCELS the claims below it
+### 5. A delivery CLEARS the claims below it. Your hand does not.
 
-While a higher-ranked state is active, every hosted component sitting in a lower-ranked state retracts to inline. So releasing the higher state lands on the BASE arrangement, never on a stale lower one: closing focus returns to the conversation, it does not resurrect the rail that was open before focus took over. Durable `lifetime: "conversation"` slices opt out (below). No special close logic exists anywhere; the same ladder walk answers every moment.
+When a component ARRIVES into a higher-ranked state, every hosted component sitting in a lower-ranked state releases its claim and retracts to inline. Releasing the higher state then lands on the BASE arrangement, never on a stale lower one: closing a finder returns to the conversation, it does not resurrect the rail that was open before the finder took over.
+
+The guest's own navigation clears nothing. Tapping a rail card to open its detail page enters `detail` without touching the rail's claims, so closing that page returns to the rail it opened from. Priority decides what SHOWS in both cases; this decides only what is thrown away.
+
+The two are the same walk with one question added: did a delivery put the winner there, or did you? Durable `lifetime: "conversation"` slices opt out (below). No special close logic exists anywhere.
 
 ### 6. Unmatched view = inline. Always.
 

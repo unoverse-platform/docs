@@ -284,30 +284,40 @@ inside it, never ladder entries: the template does not rearrange between them, s
 by rule 2's own logic they are nested, not public. (Caught on the sab pilot: listing
 them in the ladder let the welcome hero draw inside reaction states.)
 
-One component in `focus` and seven in `products`: `focus` is higher, the template
-enters `focus`, and whether the seven still show is the focus LAYOUT's own business
-(include a rail slot or don't). When the focused component sets itself back, the walk
-re-runs and the template drops to `products`. No special close logic; the same walk
-answers every moment.
+One component in `focus` and seven in `products`: `focus` is higher, so the template
+enters `focus`. The finder ARRIVED, so the seven release their claim (rule 4). When the
+focused component sets itself back, the walk re-runs, finds nothing below, and lands on
+the BASE. It does not land on the rail those seven used to hold.
+
+A guest TAP is the other case. Tapping a rail card enters `detail` and clears nothing,
+so closing the page returns to the rail. No special close logic; the same walk answers
+every moment.
 
 Ties (two components in the same view): most recent write wins, the surviving v1
 `limit: 1` law. The pinned and guest-control laws survive as modifiers of this
 derivation.
 
-**THE SEVEN RULES (final ruling, 2026-08-09, superseding the 08-08 cancellation
-write).** One principle, priority, stated as the complete behavioral law:
+**THE SEVEN RULES (2026-08-09; rule 4 amended the same day).** Pure masking left a
+stale rail waiting behind every focus surface, so rule 4 clears again. One principle,
+priority, stated as the complete behavioral law:
 
 1. Every component says what state it is in.
 2. The template has a priority list; top wins. No word is special.
 3. The screen always shows the highest state that has a component in it.
-4. While a higher state shows, nothing below can touch the screen. Lower states
-   refresh their contents silently underneath (MASKING: nothing is wiped).
+4. When a DELIVERY takes a higher state, the states below it are CLEARED. Every
+   component sitting in a lower-ranked state releases its claim and retracts to
+   inline. The guest's own navigation clears nothing. Tapping a rail card to open its
+   page leaves the rail's claims intact, so closing the page has something to return
+   to. Priority decides what SHOWS in both cases. This decides only what is thrown
+   away. Durable `lifetime: "conversation"` slices opt out.
 5. Arrivals REFRESH their state: a server arrival into state X retracts
    earlier-turn components sitting in X to inline (new cards replace the rail; a
    new wizard replaces the wizard). Same-turn siblings coexist; durable
    `lifetime: "conversation"` slices opt out. (`store.supersede`.)
-6. When the top state clears, the ladder simply looks again: the next-highest
-   matched state shows with its refreshed contents, else the base.
+6. When the top state clears, the ladder looks again. After a delivery cleared the
+   rungs below, it finds nothing and lands on the BASE. Closing a focus surface never
+   resurrects the rail that was open before it. After the guest's own navigation the
+   claims below are intact. Closing a detail page returns to the rail it opened from.
 7. Typing changes NOTHING by itself. The old new-turn reset (`beginExchange`, the
    "two lifetimes" chat-layer wipe) is deleted: only arrivals move the screen and
    only closings release it. A wizard mid-flow survives the guest's next message.
