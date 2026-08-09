@@ -48,11 +48,11 @@ The same rules the platform's guard tests enforce in CI, run by Studio before an
 | **tiers** | component names unique across the design system and every org (no shadowing); design-system definitions never reference org components (incl. template preview lists) | error |
 | **space scale** | dimension values are real scale steps: an invented step is silently broken CSS ([06](/design/styles-and-tokens)) | error |
 | **microapp: three homes** | all `props` are `input: true`; the `state` block is SCALAR view-state only (arrays/objects/URLs = slop) ([03](/design/components)) | error |
-| **microapp: faces** | a faced component's root is `Switch on defaultState` → `layouts/<state>` (filename = state name) and declares its arrival state (manifest) | error |
-| **manifests** | discovery meta correct (`description` ≤120, `whenToUse` utterance-shaped, no envelope duplicates); a template manifest resolves its `layout` and its `stateOrder` matches `states/` | error |
-| **reaction contract** | flags the deprecated bridge: a component writing `defaultState` into template state, or a top-level envelope `defaultState` ([04](/design/state)) | warn |
-| **global slots** | `from: "all"` with no `where` and no `type`, a reaction surface selects by state ([05](/design/templates)) | warn |
-| **states picker** | a definition with layers (a `Switch`) but no `states/` folder ([07](/design/studio)) | hint |
+| **microapp: state tree** | a tree component's root switches on the public axis (`view`; legacy alias `defaultState`); every state resolves a layout (same-name default) and the tree declares an `initial` | error |
+| **manifests** | discovery meta correct (`description` ≤120, `whenToUse` utterance-shaped, no envelope duplicates); a template manifest declares its `states:` tree (base first) and resolves its base `layout`; every reachable public state appears in some hosting template's declared order | error |
+| **reaction contract** | flags the deprecated bridge: a component writing its view into template state, or a top-level envelope `defaultState` ([04](/design/state)) | warn |
+| **global slots** | `from: "all"` with no `where` and no `type`; a reaction slot selects on the public axis (`view`) ([05](/design/templates)) | warn |
+| **state switcher** | a definition with a `Switch` on an owned key but no declared state tree: Studio's switcher renders the tree, not the layouts ([07](/design/studio)) | hint |
 
 The platform's own CI additionally runs the **theme-contract** and **discoverability-meta** guards, and the SDK build enforces the **closed set** at the renderer level: you can't drift past them even if a rule were missed at publish.
 
@@ -72,11 +72,11 @@ What no linter can decide: audit every artifact against this before calling it d
 - [ ] Derived values computed in the node, sent as plain fields: no logic simulated in the definition
 
 **State ([04](/design/state))**
-- [ ] Reaction contract respected: a component writes only its own slice; template surfaces react via `select.where`; `setTemplateValue` only for the template's own chrome
+- [ ] Reaction contract respected: a component writes only its own slice; templates react by name via their declared tree, slots select on `view`; `setTemplateValue` only for the template's own chrome
 - [ ] Locked state respected: lifecycle from derived flags, voice via `callState`, host chrome via `props`
 
 **Templates ([05](/design/templates))**
-- [ ] No component-type rules in slots; reaction surfaces select by `where`; components own their size and faces
+- [ ] No component-type rules in slots; reaction slots select by `where` on the public axis; components own their size and states
 - [ ] Manifest binds the workflow; `whenToUse` outcome-first, disqualifies by property
 
 **Style ([06](/design/styles-and-tokens))**

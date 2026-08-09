@@ -7,6 +7,8 @@ title: "Coming from React"
 
 SDUI feels alien for about a day, because your framework reflexes reach for code. This table is the mapping. The reason it must be data: one definition renders through **every** platform's SDK, web today; iOS, Android, React Native and Flutter as those SDKs land. Anything you could only express in code would fork per platform; data can't fork.
 
+And the state model is not a house invention: it is the orthodox stack you already know, as data. One discriminant per axis is the discriminated-union doctrine ("make impossible states impossible"); nested states with an `initial` at every level are [statecharts](https://statecharts.dev/); a streamed component is a spawned [actor](https://stately.ai/docs/actors) that owns its state and publishes it; and "derive, don't store" is React's own [Choosing the State Structure](https://react.dev/learn/choosing-the-state-structure). If anything, this is *more* React-like than most React codebases.
+
 ---
 
 ## The translation table
@@ -16,6 +18,9 @@ SDUI feels alien for about a day, because your framework reflexes reach for code
 | `useState(false)` for a toggle | A **dev-named key** the component writes into its own slice (`setValue`), read by `visibleWhen`. Template chrome (panels, draft) uses `setTemplateValue` | [04](/design/state) |
 | `{isOpen && <Panel/>}` conditional render | `visibleWhen: { field: "openPanel", eq: "faq" }` (bare field name = truthy test) | [04](/design/state) |
 | `switch`/ternary between views | `Switch` `on` one discriminant with `cases` | [04](/design/state) |
+| `status: 'loading' \| 'loaded'` discriminated union | the **state tree**: one `view` axis, top-level states public, nested states private, each state owning its layout | [03](/design/components) |
+| An XState machine with nested states | the same shape, minus the transition machinery: no guards, no actions, no event objects; transitions are plain `setValue` writes | [04](/design/state) |
+| Spawning a child actor / `useActor` | a streamed component: the host places it at spawn, subscribes to its public `view`, and never writes into it afterwards | [04](/design/state) |
 | `items.map(item => <Row/>)` | `Each` with `bind: { items: "items" }` + a `template` | [03](/design/components) |
 | `onClick={() => setStep("confirm")}` | `action: { type: "setValue", values: [{ key: "step", value: "confirm" }] }` | [04](/design/state) |
 | A shared `<Button/>` component | An **atom** in `rx/atoms/`, used via `Ref`: `props` remaps fields, `with` passes literals | [03](/design/components) |

@@ -3,25 +3,25 @@ sidebarTitle: "Components"
 title: "Components"
 ---
 
-**A component is a light, self-contained app: its manifest is the contract, its layouts are its faces, and everything it shows has exactly one home.**
+**A component is a light, self-contained app: its manifest is the contract, its state tree is the spine, and everything it shows has exactly one home.**
 
 ---
 
 ## The anatomy
 
 ```
-rx/components/productfinder/
-├── productfinder.json    # envelope: name, nodeSize, outputs, props, state, stateOrder, root
+rx/components/product-card/
+├── product-card.json     # envelope: name, nodeSize, outputs, props, the STATE TREE, root
 ├── manifest.json         # the RENDER CONTRACT + discovery meta (see below)
-├── layouts/              # the FACES: one file per master state; filename = state name
-│   ├── inline.json       #   the in-conversation card (the universal default)
-│   └── focused.json      #   the expanded face (or any custom state: layouts/product.json)
-├── states/               # the component's PRIVATE steps (a wizard's questions)
-│   ├── goals.json … results.json
-└── components/           # component-local shared partials (only when 2+ states share a shape)
+├── layouts/              # the DRAWINGS: one file per state that owns an arrangement
+│   ├── products.json     #   the rail card (state `products`, same-name default)
+│   ├── product.json      #   the full page (the `detail` state's shell)
+│   ├── product-detail.json  # a private step's drawing
+│   └── product-apply.json   # a private step's drawing
+└── components/           # component-local shared partials (only when 2+ layouts share a shape)
 ```
 
-A **flat component** (a simple card, a chart) is the reduced form: just `<name>.json` with its `root`, one face, no manifest, no `layouts/`, no `states/`. Simplicity is the default; structure is **earned**.
+A **flat component** (a simple card, a chart) is the reduced form: just `<name>.json` with its `root`, one drawing, no manifest, no `layouts/`. Simplicity is the default; structure is **earned**.
 
 **Components live in TWO tiers** (same anatomy in both):
 
@@ -32,30 +32,30 @@ A **flat component** (a simple card, a chart) is the reduced form: just `<name>.
 
 Names are **unique across the design system and every org**: a collision is a lint error (no shadowing). Both address forms are first-class: the bare URI is the canonical address for a design-system component, the org URI for an org component; uniqueness means a bare ref also resolves an org component unambiguously. Direction rule: org things may reference design-system things; **design-system things never reference org things** (lint-enforced, including template preview lists).
 
-- File lookup is case-insensitive by filename; `name` is the display/type name.
-- **`components/` vs atoms:** a shape shared across *this component's* states → its own `components/` (`$include`). A shape shared across *many components* (a close button, a choice row) → a universal atom in `rx/atoms/` (`Ref`). Used once → inline it. Atoms are **authoring-time only**: the server always expands them before serving (channels only ever receive fully-expanded primitive trees; atoms are never served, never enumerable, and have no **Studio** view). A `Ref`'s `props` remaps *fields*; its `with` passes *literals* into the atom: `{ "type": "Ref", "ref": "button", "with": { "label": "Learn more", "icon": "arrowRight" }, "action": { … } }` hardcodes those attributes, and a truthy `with` key satisfies (drops) a matching `visibleWhen` guard, so unprovided pieces stay hidden.
+- **Everything is kebab-case, and `name` IS the folder name** (`product-card`, `deal-page`, `form-field`): the folder, the `<name>.yaml` inside it, and the `name:` field all carry the same string. `name` is not a display label. The served URI is built from it, so a component named `InvestorApplication` in a folder named `investor-application` loads from disk, passes every other check, and then answers **"definition not found"** in Studio and every channel. Guard: `server/tests/rx/definition-naming.test.ts`.
+- **`components/` vs atoms:** a shape shared across *this component's* layouts → its own `components/` (`$include`). A shape shared across *many components* (a close button, a choice row) → a universal atom in `rx/atoms/` (`Ref`). Used once → inline it. Atoms are **authoring-time only**: the server always expands them before serving (channels only ever receive fully-expanded primitive trees; atoms are never served, never enumerable, and have no **Studio** view). A `Ref`'s `props` remaps *fields*; its `with` passes *literals* into the atom: `{ "type": "Ref", "ref": "button", "with": { "label": "Learn more", "icon": "arrowRight" }, "action": { … } }` hardcodes those attributes, and a truthy `with` key satisfies (drops) a matching `visibleWhen` guard, so unprovided pieces stay hidden.
 
 ---
 
 ## The manifest: the render contract
 
 ```jsonc
-// rx/components/productfinder/manifest.json
+// rx/components/product-card/manifest.json
 {
-  "title": "Product Finder",
-  "description": "Personalised product recommendations matched to your goals.",   // what it IS, ≤120 chars
-  "whenToUse": "Find the right product or qualification for my career goals…",    // the USER's words: findIntent ranks on this
-  "category": "Input",
-  "version": "1.0.0",
-  "defaultState": "focused"    // the ARRIVAL state: an OPEN name; omit for "inline"
+  "title": "Product Card",
+  "description": "A compact product card, expandable to full product detail.",   // what it IS, ≤120 chars
+  "whenToUse": "Show one product or service a customer could take…",             // the USER's words: findIntent ranks on this
+  "category": "Finance",
+  "version": "1.0.0"
 }
 ```
 
-- **`defaultState` = the state the component arrives in.** An open name (`inline`, `focused`, `product`, anything). The server injects it into the component's scope, so it renders that face the moment it streams in. Default: `inline`.
-- **`lifetime` (OPTIONAL) = how long the rendered instance survives.** Default `"turn"`: the universal reset, the instance returns to inline / retires on the next user turn ([04 §Two lifetimes](/design/state)). `"conversation"`: a **durable, conversation-scoped surface** (a cart, an itinerary, a composed page), the platform keys the instance by the *conversation* (every re-call hydrates the SAME slice: merge, never re-place) and the new-turn reset skips it; it stays on screen until replaced, self-closed, or a **new template loads** (the template swap is the hard refresh boundary). Closed set `turn | conversation`, lint-checked.
+- **The arrival state is the tree's `initial`** (below): the state the component wakes in when its host can honor it; otherwise the host's placement scan runs ([04](/design/state) rule 2). *Legacy:* a manifest `defaultState` key is the pre-v2 spelling of that declaration, still read.
+- **`lifetime` (OPTIONAL) = how long the rendered instance survives.** Default `"turn"`: the universal reset, the instance returns to its initial chain on the next user turn ([04 §Two lifetimes](/design/state)). `"conversation"`: a **durable, conversation-scoped surface** (a cart, an itinerary, a composed page), the platform keys the instance by the *conversation* (every re-call hydrates the SAME slice: merge, never re-place), the new-turn reset skips it, and cancellation skips it; it stays on screen until replaced, self-closed, or a **new template loads** (the template swap is the hard refresh boundary). Closed set `turn | conversation`, lint-checked.
 - **Manifest presence = spatially discoverable.** The discovery meta (`title`/`description`/`whenToUse`) lives here and ONLY here: never duplicated in the envelope. A component that's only ever streamed by a workflow, arrives inline, and needs no discovery can skip the manifest entirely.
 - `whenToUse` is **utterance-shaped**: the words a user would say ("find the right product for me"), never selector-shaped dev framing ("use this when the user asks…").
 - **Naming is discoverability** ([05 §Naming](/design/templates): canonical: `docs/nodes/node-discoverability.md`). **Spatial** embeds `` `title. whenToUse||description [category]` `` and ranks it against the user's own words: `title` = the thing itself (no mechanism, no org prefix), `description` = one ≤120-char line of what it IS, `whenToUse`'s **opening words** carry the ranking, `category` = the job's domain. Disqualify by property, never by naming a sibling.
+- **Name the component for the THING, not one rendering of it**: `course`, never `courseCard`. "Card" is a layout's name, not an identity.
 
 ---
 
@@ -109,33 +109,82 @@ attachable component and fails the build on a bind the row can't satisfy. Deep l
 
 ---
 
-## The faces: root switches on `defaultState`
+## The state tree: states own their layouts
 
-Every faced component's root is the same three lines: a `Switch` on `defaultState` whose cases `$include` a layout **named after the state**:
+A stateful component declares a **state tree** on the `view` axis, and every state names the drawing that shows it. This is the spine of the whole design (`rx/sab/components/product-card`, as shipped):
+
+```yaml
+# product-card.yaml (envelope excerpt)
+state:
+  view:                      # the PUBLIC axis
+    initial: products
+    states:
+      products: {}                          # same-name default: draws layouts/products
+      detail:                               # the full page
+        layout: product                     # declared only because the filename differs
+        on: step
+        initial: detail
+        states:                             # PRIVATE substates (the steps)
+          detail: { layout: product-detail }
+          apply:  { layout: product-apply }
+```
+
+Read top to bottom it answers, in order: what states exist, which are public, which nest privately, and what draws each one. The rules:
+
+- **Top-level states are PUBLIC**: the component's entire interface to templates and hosts. Everything nested below is **PRIVATE**: not addressable by templates, not addressable by senders, invisible in the snapshot. Here the public menu is `products · detail`; the `step` axis and its states do not exist outside the card.
+- **The rearrange rule is how you place a state.** *If the template must rearrange to show it, make it a public state. If the template wouldn't move, nest it privately.* One piece of data walks horizontally across the public states: the same product is `products` (a rail card) and `detail` (a full page), same object, different ways of being shown, each needing the template to move. Steps that never move the page (`detail` ↔ `apply` inside the page) nest privately. Promotion is deliberate; privacy is the default. And remember the bite from [04](/design/state) rule 6: an ignored public state falls inline; a step promoted for no reason collapses the surface into the flow.
+- **`layout:` is optional; same-name is the default.** A state with no declaration draws the layout of its own name; `{}` is a complete state. Write `layout:` only when the filename differs (a state renamed for meaning keeping its historical files). The filename is a readability convention now, not the contract: the state VALUE is the contract, so a layout can be reused by two states. *Legacy:* v1 required filename = state name; that survives only as this default.
+- **The shell vs the steps.** A state's own layout is its SHELL: always on while the state is active, never a choice. Its nested substates are the STEPS: the only choices inside it, addressed by their **state names** (the layout filenames are plumbing). One step, or none, is not a choice. *Legacy:* the v1 `layouts/<face>-<step>` filename convention (ownership carried by a filename prefix) is dead; ownership is carried by nesting in the tree. So is the v1 `states/` sibling folder + authored `stateOrder`: a private step is a tree entry owning a layout, not a sibling file convention.
+- **Input is neither a state nor a step.** A composer or edit form is the template's ONE input tool, never a component state; a card's Edit stages its data into it.
+- **A state is a state decision, never a width decision.** The same `view` write that moves the template also redraws the component. Container queries (`hideBelow`) are for fine adjustments *inside* a layout, never for picking one. A `hideBelow` threshold must be reachable by the card itself: keep it *below* the layout's own `maxWidth` (linted).
+- The component's own buttons move it: the rail card's tap is `setValue { view: "detail" }`; the page carries its own ✕ that sets `view` back. **A component writes only its own slice**: how templates react is [04, State](/design/state).
+
+### The root: a Switch on the public axis
+
+The root projects the tree: a `Switch` on `view` (*legacy alias:* `defaultState`) whose cases include each public state's shell:
 
 ```jsonc
 "root": {
   "type": "Box",
-  "style": { "width": "full", "height": "full", "container": "inline-size" },
+  "style": { "width": "full", "container": "inline-size" },
   "children": [
-    { "type": "Switch", "on": "defaultState",
+    { "type": "Switch", "on": "view",
       "cases": {
-        "inline":  { "$include": "layouts/inline" },
-        "focused": { "$include": "layouts/focused" },
-        "default": { "$include": "layouts/inline" }    // inline is the universal default
-      } }
-  ]
+        "products": { "$include": "layouts/products" },
+        "detail":   { "$include": "layouts/product" }
+      } } ]
 }
 ```
 
-- **The layout filename = the state name.** A custom arrival state `product` gets `layouts/product.json`: no special-casing, any open name works.
-- **The face is a state decision, never a width decision.** The same `defaultState` write that makes a template's surface react also flips the face. Container queries (`hideBelow`) are for fine adjustments *inside* a face, never for picking one.
-- **A `hideBelow` threshold must be reachable by the card itself**: keep it *below* the layout's own `maxWidth`. A threshold at or above it can only be satisfied by the surrounding surface, so the element shows on a wide **Studio** stage and silently vanishes in a chat column (linted).
-- The component's own buttons move it: expand = `setValue { defaultState: "focused" }`, its focused face carries its own ✕ that sets it back to `"inline"`. **A component writes only its own slice**: how templates react is [04, State](/design/state).
+A private axis is its own `Switch` (on `step`) inside the shell it belongs to. A `Switch` on a *data* field (`kind`, a nested component's `tab`) is content selection, not a step: steps turn only on keys the component owns.
 
-### Steps inside a face: `layouts/<face>-<step>`
+### Variants: one state, several arrangements
 
-A face can carry steps of its own that belong to it and to no other face. CourseCard's `course` face flips between a detail page and an apply form: inside `layouts/course.json` a `Switch` on `step` (a key the component **declares in its own `state` block**) selects `layouts/course-detail.json` or `layouts/course-apply.json`. The filename prefix carries the ownership, the same rule that makes a layout filename a state name, and **the structure is the declaration**: no manifest list, no registry. Studio derives the steps from the Switch and nests them under the component only while that face is active. A Switch on a *data* field (`kind`, a nested component's `tab`) is content selection, not a step: steps turn only on keys the component owns. When steps share one shape and differ only in data, they collapse into one data-driven state instead ([UNOVERSE_LAYERS](https://github.com/unoverse-platform/docs/blob/main/unoverse/UNOVERSE_LAYERS.md) §3c and §6).
+A state may own several layouts when one meaning has several arrangements:
+
+```yaml
+focused:
+  layouts: { horizontal: focused-h, vertical: focused-v }
+```
+
+Variants bind the SAME fields and differ only in arrangement; anything that changes meaning or bound data is a second state, not a variant (lint-enforced). The COMPONENT picks its variant by the space it finds itself in (container queries); the template never requests one.
+
+### Most "states" are data
+
+Seven wizard questions sharing one shape (heading + choice rows) are ONE state whose data changes per step, never seven files. The `step` value selects which data the layout binds; only genuinely different arrangements (`summary`, `result`) earn files. Inside a step, an option list is **hardcoded** `items` on an `Each`; picking an option writes the answer + the next step in one `setValue`:
+
+```jsonc
+{ "type": "Each",
+  "items": [ { "value": "start", "label": "Start my career" }, … ],   // literal content
+  "template": { "type": "Ref", "ref": "choice-row",
+    "action": { "type": "setValue", "values": [
+      { "key": "careerStage", "value": "{{value}}" },
+      { "key": "step", "value": "situation" },
+      { "key": "progressPct", "value": "33%" }
+    ] } } }
+```
+
+⚠️ **A state never guards itself**: the tree already selects it; a `visibleWhen` re-checking the same discriminant inside a case is an error.
 
 ---
 
@@ -156,49 +205,24 @@ A **brief** is metadata that tells an AI what should fill a bound element. It si
   "template": { "$include": "components/story-section" } }   // its binds define the item shape
 ```
 
-- **Shape (linted, closed):** a string (just the description) or `{ description, maxLength }` on a bound element, `{ description, minItems, maxItems }` on an `Each`, **JSON Schema's own vocabulary**, because the brief IS the schema fragment it compiles to. A brief on a node with **no** bind (a face or partial root) is *composition context*: rules about the whole, like ordering or refinement behavior.
+- **Shape (linted, closed):** a string (just the description) or `{ description, maxLength }` on a bound element, `{ description, minItems, maxItems }` on an `Each`, **JSON Schema's own vocabulary**, because the brief IS the schema fragment it compiles to. A brief on a node with **no** bind (a shell or partial root) is *composition context*: rules about the whole, like ordering or refinement behavior.
 - **What it becomes: this is MCP-native, no side-channel:** the platform compiles every brief into the component's **MCP tool schema** (each key passes through verbatim, `description`, `maxLength`, `minItems`, `maxItems` are native JSON Schema, the Each's template binds → the array's `items` schema). An agent that discovers the component sees a rich, *required* schema: so it must gather real content (**Spatial** search) and hydrate the fields before it can render. The hydrated call's values flow back in as the component's state. **The schema IS the instruction channel**; there is no prompt to maintain anywhere else.
 - **Grounding is part of the compiled contract:** fields are filled only from search results in the conversation, never invented. The compiler injects this law into every briefed schema.
 - **The server referees and mirrors:** invalid/empty compositions are rejected with an instructive result before anything renders (the agent self-corrects and retries); a successful render returns *the page as the guest sees it* in the tool result, so the agent refines surgically on later turns ("more golf" knows which section to swap).
-- **The single-face pattern pairs naturally:** a continuously-enriched page (one named face + `default` → the same face, no `inline`, no ✕) arrives in its surface, can never leave it, and each refinement turn merges new data into the same instance.
+- **The single-state pattern pairs naturally:** a continuously-enriched page (one public state, no `inline`, no ✕) arrives in its slot, can never leave it, and each refinement turn merges new data into the same instance.
 - Any number of briefed components can be live at once: each compiles to its own tool.
 
 **Design edits the page; the page briefs the AI.** Changing a description or a length in the definition changes the agent's behavior on the next render: no prompt engineering, no redeploy.
 
 ---
 
-## Private steps: `states/` + `stateOrder`
-
-A wizard's questions are the component's own states: one file per step in `states/`, listed in the envelope's `stateOrder` (the exact set, in order, **Studio**'s state picker and the mock walk use it):
-
-```jsonc
-"stateOrder": ["goals", "situation", "subject", "route", "mode", "commitment", "searching", "results"]
-```
-
-Inside a step, an option list is **hardcoded** `items` on an `Each`; picking an option writes the answer + the next step in one `setValue`:
-
-```jsonc
-{ "type": "Each",
-  "items": [ { "value": "start", "label": "Start my career" }, … ],   // literal content
-  "template": { "type": "Ref", "ref": "choice-row",
-    "action": { "type": "setValue", "values": [
-      { "key": "careerStage", "value": "{{value}}" },
-      { "key": "step", "value": "situation" },
-      { "key": "progressPct", "value": "33%" }
-    ] } } }
-```
-
-⚠️ **A state never guards itself**: the root `Switch` (or the step `Switch`) already selects it; a `visibleWhen` re-checking the same discriminant inside a case is an error.
-
----
-
 ## Component checklist
 
-- [ ] Flat if it can be: structure (`layouts/`, `states/`, manifest) is earned
-- [ ] Manifest = render contract: arrival `defaultState` (open name) + discovery meta (no envelope duplicates)
-- [ ] Root = `Switch on defaultState` → `layouts/<state>` (filename = state name); `default` case → inline
+- [ ] Flat if it can be: structure (`layouts/`, a state tree, manifest) is earned
+- [ ] Manifest = discovery meta only (no envelope duplicates); the tree's `initial` is the arrival
+- [ ] The tree sorts every state by the rearrange rule: public = the template moves, private = nested; input is template chrome, never a state
+- [ ] Root = `Switch on view` → each public state's shell; `layout:` written only where the filename differs
 - [ ] Three homes respected: content hardcoded · `state` block scalar view-state only · `props` all `input: true`
-- [ ] `stateOrder` names exactly the `states/` files
 - [ ] Publish from Studio passes lint with 0 errors: every rule above is enforced
 
 ---

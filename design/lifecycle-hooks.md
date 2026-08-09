@@ -29,13 +29,16 @@ changes on its own schedule, so the component asks for it when it renders.
 | Hook | Fires | Use it for |
 |---|---|---|
 | `onStart` | the instance is **created** | data every copy of the card needs, however it is shown |
-| `onEnterView` | the instance **enters one of its views** | data only that view needs |
+| `onEnterView` | the instance **enters one of its states** | data only that state needs |
 
-**A view is a state, and the manifest key says `layouts`.** Both are true, and they are the
-same word. A component's `root` is a `Switch` on `defaultState`, and each case includes the
-face file named after it. State `course` renders `layouts/course`. So `layouts: [ course ]`
-scopes the hook to the state named `course`, and the file it renders happens to carry that
-name too.
+**The scope key is spelled `layouts`, and its entries are STATE names.** A component
+declares a state tree, and each state owns the layout that draws it ([03](/design/components)),
+so scoping a hook to a state also names the moment its drawing appears. The names in the
+list are always states, never layout filenames: the shipped `product-card` declares
+`layouts: [ detail ]`, and `detail` is the state whose shell file is `layouts/product`.
+When a state's layout carries the same name (the same-name default), the two readings
+coincide, which is why the spelling never mattered before states and filenames could
+differ.
 
 The distinction matters more than it looks. A card and its detail view are **one
 instance**: a course in a grid and the same course expanded differ only by which layout is
@@ -53,14 +56,14 @@ The manifest opts in. Nothing runs that the manifest did not name.
 ```yaml manifest.yaml
 lifecycle:
   - phase: onEnterView
-    layouts: [ course ]      # only this view wakes it, the grid layouts never do
+    layouts: [ detail ]      # only this state wakes it, the grid state never does
     handler: getDetail       # a platform-ready handler, so this component ships no code
 ```
 
 Three fields:
 
 - **`phase`**: which moment, `onStart` or `onEnterView`.
-- **`layouts`**: which views wake it. `onEnterView` only. Omit it and every layout fires.
+- **`layouts`**: which STATES wake it. `onEnterView` only. Omit it and every state fires.
 - **`handler`**: what runs. Either a platform-ready handler, or your own, in which case
   `<handler>.yaml` sits beside the manifest.
 
@@ -68,9 +71,9 @@ Three fields:
 job; `onEnterView` already said the moment. It also means one component can want two
 different jobs at the same moment without a naming collision.
 
-**Nothing to wire up.** A component changes its own view by writing `defaultState` (the
+**Nothing to wire up.** A component changes its own view by writing `view` (the
 close button on a focused card writes `list`, the card in the list writes `focus`). That
-write **is** the event: the platform reports it, and a hook scoped to the entered layout
+write **is** the event: the platform reports it, and a hook scoped to the entered state
 runs. No signal to author, no extra action to chain, nothing to remember. If your card
 already changes its own view, it already emits the event.
 
@@ -117,7 +120,7 @@ through a model to reach a card.
 ```yaml
 lifecycle:
   - phase: onEnterView
-    layouts: [ course, product ]
+    layouts: [ detail ]        # the state name, exactly as product-card ships it
     handler: getDetail
 ```
 
@@ -144,7 +147,7 @@ maps API. Three parts, no code:
 rx/<org>/components/restaurant-card/
 ├── manifest.yaml            opts in, and declares what the calls may reach
 ├── fetchplacedetails.yaml   the calls, and the fields they return
-├── restaurant-card.yaml      the card itself: props, and a Switch of faces
+├── restaurant-card.yaml      the card itself: props, and its state tree
 └── layouts/                 list · focus · planned
 ```
 
@@ -156,11 +159,11 @@ description: One restaurant as a compact card, expandable to full detail and a b
 whenToUse: Show one restaurant a guest could eat at. Stream one card per restaurant so options build up as the conversation continues.
 category: Travel
 version: 1.0.0
-defaultState: list
 
 # The card fills its live details when it is OPENED, not when it lands in the list.
-# `defaultState` goes list to focus on the card's own button, and that write IS the event.
-# A list of twelve cards costs nothing until one of them is looked at.
+# Its tree declares `initial: list`; `view` goes list to focus on the card's own
+# button, and that write IS the event. A list of twelve cards costs nothing until
+# one of them is looked at.
 lifecycle:
   - phase: onEnterView
     layouts: [ focus ]
@@ -177,7 +180,7 @@ credentials:
 
 `handler: fetchPlaceDetails` is not a platform handler, so the platform runs
 `fetchplacedetails.yaml` from this folder. `layouts: [ focus ]` is why the card in the
-list never calls anything: only entering the `focus` face wakes the hook.
+list never calls anything: only entering the `focus` state wakes the hook.
 
 **`allowedHosts` is not optional.** A hook that makes requests without it is a lint error,
 not a warning. Deny by default, and the refusal names the component.
@@ -311,8 +314,8 @@ these is an error, not a silent no-op:
 ## Which one do I need?
 
 ```
-Does the data belong to ONE view (a detail panel, an expanded face)?
-  → onEnterView, scoped to that layout
+Does the data belong to ONE state (a detail page, an expanded card)?
+  → onEnterView, scoped to that state
 
 Is it the item's own stored record?
   → handler: getDetail, no code

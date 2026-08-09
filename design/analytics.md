@@ -37,15 +37,16 @@ A node with no `analytics` block reports nothing. Silence is the default.
 
 ## Opening a view is an action
 
-A card and its detail view are one instance. Opening the detail view writes `defaultState`,
-which is an action like any other. So it takes the same key.
+A card and its detail view are one instance. Opening the detail view writes `view` (the
+public state; legacy spelling `defaultState`), which is an action like any other. So it
+takes the same key.
 
 ```yaml
 - type: Box
   action:
     type: setValue
     values:
-      - key: defaultState
+      - key: view
         value: detail
   analytics:
     event: view_item

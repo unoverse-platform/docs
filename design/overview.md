@@ -25,9 +25,9 @@ Work through these in order: each doc builds on the previous one.
 ### Core Concepts
 | Doc | What you'll learn |
 |---|---|
-| [03: Components](/design/components) | Contained microapps: the manifest render contract, `layouts/<state>` faces, the three homes for content |
-| [04: State](/design/state) | **The three buckets, the two writes, the four moves, and which state is locked (SDK/voice/native)** |
-| [05: Templates (MCP Apps)](/design/templates) | Template shells, `ComponentSlot`, `Timeline`, the manifest, `defaultState`, `whenToUse` |
+| [03: Components](/design/components) | Contained microapps: the state tree (public vs private, states own layouts), the three homes for content |
+| [04: State](/design/state) | **The three buckets, the two writes, the reaction contract's six rules, and which state is locked (SDK/voice/native)** |
+| [05: Templates (MCP Apps)](/design/templates) | Template shells: the manifest state tree (the priority ladder), `ComponentSlot`, `Timeline`, `whenToUse` |
 | [06: Styles & Tokens](/design/styles-and-tokens) | LAW 1 (own zero values), base → semantic → theme layers, org styles |
 | [06b: Lifecycle Hooks](/design/lifecycle-hooks) | A component fetching its own data when it is created or when one of its views is opened |
 
@@ -62,7 +62,7 @@ Work through these in order: each doc builds on the previous one.
 | **UI is data** | Definitions are JSON. The SDK renderer is dumb and generic: it never knows your feature. |
 | **Closed vocabulary** | A fixed set of primitives (`Box`, `Text`, `Switch`, `Each`, …). You compose; you never add primitives. |
 | **Own zero values** | No `px`, no `#hex` in definitions: token names only. Rebrand = edit `styles/`, zero definition changes. |
-| **The reaction contract** | A component writes only its own slice (`setValue`); templates react via state selectors (`select.where`); **inline is the universal default**. |
+| **The reaction contract** | A component is a small state machine that writes only its own slice (`setValue`); templates react by name, in their declared priority order; **inline is the universal default**. |
 | **Locked state is read-only** | Conversation flow, voice call state, and native host chrome are managed for you: you project them, never manage them. |
 | **MCP is the standard** | Templates are MCP Apps: definitions are MCP resources, sends are `tools/call`, answers are elicitations. No bespoke transport. |
 | **Studio is the proof** | The dev loop IS the production loop: if it works in **Studio**, it works on every channel. |

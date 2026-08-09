@@ -44,20 +44,20 @@ The top nav is flat: **Apps · Components · Styles · Nodes · AI**, and a head
 
 Render a component or template with **mock data and mock history**, no backend logic involved. This is your daily loop while designing.
 
-### Mock data = prop defaults. The state picker = the `states/` folder.
+### Mock data = prop defaults. The state switcher = the state tree.
 
 Two mechanisms, zero hand-maintained fixtures:
 
 1. **Prop `default`s are the mock data.** Studio renders every definition from its declared defaults: which is why defaults should be realistic content, not empty strings.
-2. **Two docks: layouts on top, states on the left.** A component has two axes, and **Studio** never shares one control between them:
-   - its **layout faces**: the root `Switch on defaultState` cases (`inline`, `focused`, a custom `product`), are a **toggle at the top of the toolbar** (first control after the name). Any face name appears automatically; `inline` always leads; a flat component with no face switch shows no toggle. Any non-inline face gets the grow container.
-   - its own **`states/`** files (a wizard's private steps, `goals.json … results.json`) are the **left-rail list** under the component's name.
+2. **States on top, steps below.** The switcher renders the definition's declared state tree ([03](/design/components)), and nothing else:
+   - the **public states** (the top level of the `view` axis) are **pills in the sub-navigation**, one per state, in tree order. A flat component with no tree shows none.
+   - selecting a state reveals **its steps beneath, by step name**: the state's nested substates, never layout filenames (those are plumbing). The state's own shell is not listed (it is always on), and one drawing is not a choice: a single-layout state shows nothing below.
 
-   Picking a face writes `defaultState` into the slice; picking a state walks the wizard: both via the same generic `setValue` a real component's buttons use. (Templates work the same way: the app's `states/` are the picker, one active at a time; acting inside the preview transitions state like the runtime.)
+   Picking a state writes `view` into the slice; picking a step writes the state's own axis (`step`): both via the same generic `setValue` a real component's buttons use. (Templates work the same way: the manifest's `states:` tree is the switcher, base first; acting inside the preview transitions state like the runtime.)
 
-So "viewable states" is not extra work: it falls straight out of organizing a definition into layers ([03](/design/components)): the folder that structures your `Switch` cases is the same folder **Studio** reads. Use the picker to exercise every discriminant value (each wizard `step`, `inline/focused`, each `callState` phase), and vary prop defaults to check edge data (empty lists, long text: how you catch a `bind` without a default).
+**The viewer renders the served state tree; it never scans layouts.** There is no `visibleWhen` archaeology and no Switch-scanning: the declaration IS the enumeration, so "viewable states" falls straight out of authoring the tree. Use the switcher to exercise every discriminant value (each public state, each wizard `step`, each `callState` phase), and vary prop defaults to check edge data (empty lists, long text: how you catch a `bind` without a default).
 
-**Apps show their widget's states too.** Selecting an app template (a single-widget shell) also lists its **seeded component's** states as pills: a wizard's steps are one click each, activated by writing the widget's `Switch` discriminant into its slice, exactly what its own buttons do.
+**Apps show their widget's states too.** Selecting an app template (a single-widget shell) also lists its **seeded component's** public states as pills, activated by writing the widget's `view` into its slice, exactly what its own buttons do.
 
 ### Copy for Canvas: drop a component onto a workflow
 
@@ -73,7 +73,7 @@ Use Live mode to verify the things mock can't:
 
 - your component's **node** receives and merges streamed `COMPONENT_DATA` correctly,
 - the **template selection** picks your app for the intents you wrote `whenToUse` for,
-- **reaction flow**: the widget streams in (or is clicked) into a state, the template's `where` surface frames it, its ✕ returns it inline cleanly,
+- **reaction flow**: the widget streams in (or is clicked) into a public state, the template's ladder walk enters the matching state and its slot frames the widget, its ✕ releases it back to the base cleanly,
 - **turn lifecycle**: thinking indicators derived from `isStreaming` appear and, critically, clear.
 
 ---
