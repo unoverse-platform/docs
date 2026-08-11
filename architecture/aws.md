@@ -125,6 +125,52 @@ still works — the module prints the validation records for you to create once 
 a manual step and a wait, rather than a variable.
 </Note>
 
+## Deploying into an account that withholds IAM
+
+Some accounts are owned by the customer and governed by a permission set. AWS's
+`PowerUserAccess` policy is the common shape, and it excludes IAM by design. Two resources
+in this ground need IAM write. Both have an answer, and neither costs you a feature.
+
+**The Bedrock user.** Set `bedrock_credentials = false` and Terraform skips the user and its
+access key. Create a key by hand later, then paste it into a credential like any other
+provider key. Nothing in the platform reads those outputs.
+
+**The pre-token Lambda's execution role.** This one cannot be skipped. Cognito puts neither
+email nor roles on an access token without the Lambda, and no Lambda runs without a role.
+Ask whoever administers the account to create it, then set `pretoken_role_arn` to the ARN
+they return.
+
+That role is close to empty. Its trust policy names `lambda.amazonaws.com`. Its one
+permission is the AWS managed `AWSLambdaBasicExecutionRole`, which writes log lines.
+
+```hcl
+pretoken_role_arn   = "arn:aws:iam::000000000000:role/unoverse-pretoken-role"
+bedrock_credentials = false
+```
+
+Leave both settings out anywhere you can create IAM roles yourself. The module then creates
+the role, waits for it to propagate, and behaves as it always has.
+
+<Note>
+**One IAM permission is still needed on the principal that deploys.** `iam:PassRole` is
+checked against whoever creates the Lambda, not whoever created the role. The deploy creates
+the Lambda, so it must be allowed to attach that role. Being handed an ARN does not remove
+the requirement, and `PowerUserAccess` does not grant it.
+</Note>
+
+Request it scoped to the one role and the one service:
+
+```json
+{
+  "Effect": "Allow",
+  "Action": "iam:PassRole",
+  "Resource": "arn:aws:iam::000000000000:role/unoverse-pretoken-role",
+  "Condition": {
+    "StringEquals": { "iam:PassedToService": "lambda.amazonaws.com" }
+  }
+}
+```
+
 ## What the module actually provisions
 
 | | |
@@ -135,7 +181,7 @@ a manual step and a wait, rather than a variable.
 | Redis | ElastiCache 7.1, `cache.t4g.micro`, one node, TLS in transit with an auth token |
 | Identity | Cognito Essentials pool, SPA client, hosted domain, one group per role |
 | Claims | A pre-token Lambda, held in Terraform so a pool rebuild cannot drop it |
-| AI | An IAM user and access key scoped to Bedrock |
+| AI | An IAM user and access key scoped to Bedrock, unless you switch it off |
 
 Redis has no snapshots, deliberately. It holds cache and queue state, so there is nothing in
 it worth restoring.

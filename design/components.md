@@ -10,47 +10,46 @@ title: "Components"
 ## The anatomy
 
 ```
-rx/components/product-card/
-├── product-card.json     # envelope: name, nodeSize, outputs, props, the STATE TREE, root
-├── manifest.json         # the RENDER CONTRACT + discovery meta (see below)
+rx/marketplace/components/product-card/
+├── product-card.yaml     # envelope: name, nodeSize, outputs, props, the STATE TREE, root
+├── manifest.yaml         # the RENDER CONTRACT + discovery meta (see below)
 ├── layouts/              # the DRAWINGS: one file per state that owns an arrangement
-│   ├── products.json     #   the rail card (state `products`, same-name default)
-│   ├── product.json      #   the full page (the `detail` state's shell)
-│   ├── product-detail.json  # a private step's drawing
-│   └── product-apply.json   # a private step's drawing
+│   ├── products.yaml     #   the rail card (state `products`, same-name default)
+│   ├── product.yaml      #   the full page (the `detail` state's shell)
+│   ├── product-detail.yaml  # a private step's drawing
+│   └── product-apply.yaml   # a private step's drawing
 └── components/           # component-local shared partials (only when 2+ layouts share a shape)
 ```
 
-A **flat component** (a simple card, a chart) is the reduced form: just `<name>.json` with its `root`, one drawing, no manifest, no `layouts/`. Simplicity is the default; structure is **earned**.
+A **flat component** (a simple card, a chart) is the reduced form: just `<name>.yaml` with its `root`, one drawing, no manifest, no `layouts/`. Simplicity is the default; structure is **earned**.
 
 **Components live in TWO tiers** (same anatomy in both):
 
 | Tier | Home | Scope | URI |
 |---|---|---|---|
-| **Design system** | `rx/components/<name>/` | generic, org-neutral: any org can use it (cards, charts, markdown, media) | `unoverse://components/<name>` |
+| **Design system** | `rx/marketplace/components/<name>/` | generic, org-neutral: any org can use it (cards, charts, markdown, media) | `unoverse://components/<name>` |
 | **Org** | `rx/<project>/components/<name>/` | **org-private**: that client's own components/microapps, usable and discoverable only inside that org's apps and conversations | `unoverse://components/<org>/<name>` |
 
 Names are **unique across the design system and every org**: a collision is a lint error (no shadowing). Both address forms are first-class: the bare URI is the canonical address for a design-system component, the org URI for an org component; uniqueness means a bare ref also resolves an org component unambiguously. Direction rule: org things may reference design-system things; **design-system things never reference org things** (lint-enforced, including template preview lists).
 
 - **Everything is kebab-case, and `name` IS the folder name** (`product-card`, `deal-page`, `form-field`): the folder, the `<name>.yaml` inside it, and the `name:` field all carry the same string. `name` is not a display label. The served URI is built from it, so a component named `InvestorApplication` in a folder named `investor-application` loads from disk, passes every other check, and then answers **"definition not found"** in Studio and every channel. Guard: `server/tests/rx/definition-naming.test.ts`.
-- **`components/` vs atoms:** a shape shared across *this component's* layouts → its own `components/` (`$include`). A shape shared across *many components* (a close button, a choice row) → a universal atom in `rx/atoms/` (`Ref`). Used once → inline it. Atoms are **authoring-time only**: the server always expands them before serving (channels only ever receive fully-expanded primitive trees; atoms are never served, never enumerable, and have no **Studio** view). A `Ref`'s `props` remaps *fields*; its `with` passes *literals* into the atom: `{ "type": "Ref", "ref": "button", "with": { "label": "Learn more", "icon": "arrowRight" }, "action": { … } }` hardcodes those attributes, and a truthy `with` key satisfies (drops) a matching `visibleWhen` guard, so unprovided pieces stay hidden.
+- **`components/` vs atoms:** a shape shared across *this component's* layouts → its own `components/` (`$include`). A shape shared across *many components* (a close button, a choice row) → a universal atom in `rx/marketplace/atoms/` (`Ref`). Used once → inline it. Atoms are **authoring-time only**: the server always expands them before serving (channels only ever receive fully-expanded primitive trees; atoms are never served, never enumerable, and have no **Studio** view). A `Ref`'s `props` remaps *fields*; its `with` passes *literals* into the atom: `{ type: Ref, ref: button, with: { label: Learn more, icon: arrowRight }, action: { … } }` hardcodes those attributes, and a truthy `with` key satisfies (drops) a matching `visibleWhen` guard, so unprovided pieces stay hidden.
 
 ---
 
 ## The manifest: the render contract
 
-```jsonc
-// rx/components/product-card/manifest.json
-{
-  "title": "Product Card",
-  "description": "A compact product card, expandable to full product detail.",   // what it IS, ≤120 chars
-  "whenToUse": "Show one product or service a customer could take…",             // the USER's words: findIntent ranks on this
-  "category": "Finance",
-  "version": "1.0.0"
-}
+```yaml
+# rx/marketplace/components/product-card/manifest.yaml
+title: Product Card
+description: A compact product card, expandable to full product detail.   # what it IS, ≤120 chars
+whenToUse: Show one product or service a customer could take…             # the USER's words: findIntent ranks on this
+category: Finance
+version: 1.0.0
 ```
 
-- **The arrival state is the tree's `initial`** (below): the state the component wakes in when its host can honor it; otherwise the host's placement scan runs ([04](/design/state) rule 2). *Legacy:* a manifest `defaultState` key is the pre-v2 spelling of that declaration, still read.
+- **The arrival state is the tree's `initial`** (below): the state the component wakes in when its host can honor it; otherwise the host's placement scan runs ([04](/design/state) rule 2).
+- **`defaultState` in a manifest is TWO different things, and only one of them is legacy.** As the *arrival* declaration it is the pre-v2 spelling of the tree's `initial`: a component that declares a `state.view` tree has already said where it arrives, so the loader seeds the alias and then **drops it** rather than shipping two spellings on one slice. But when the component is loaded as an **MCP app** (`loadComponentApp`), the same key is the app's **load mode**, a different axis that happens to share the name, and it defaults to `focus` when absent. **Do not delete it from a manifest as "legacy cleanup"**: on a component that is also an app, removing it silently changes how the app loads. `product-card` keeps `defaultState: products` for exactly this reason.
 - **`lifetime` (OPTIONAL) = how long the rendered instance survives.** Default `"turn"`: the universal reset, the instance returns to its initial chain on the next user turn ([04 §Two lifetimes](/design/state)). `"conversation"`: a **durable, conversation-scoped surface** (a cart, an itinerary, a composed page), the platform keys the instance by the *conversation* (every re-call hydrates the SAME slice: merge, never re-place), the new-turn reset skips it, and cancellation skips it; it stays on screen until replaced, self-closed, or a **new template loads** (the template swap is the hard refresh boundary). Closed set `turn | conversation`, lint-checked.
 - **Manifest presence = spatially discoverable.** The discovery meta (`title`/`description`/`whenToUse`) lives here and ONLY here: never duplicated in the envelope. A component that's only ever streamed by a workflow, arrives inline, and needs no discovery can skip the manifest entirely.
 - `whenToUse` is **utterance-shaped**: the words a user would say ("find the right product for me"), never selector-shaped dev framing ("use this when the user asks…").
@@ -99,12 +98,14 @@ misses and the mock leaks into production. The canonical row shape and the guard
 attachable component and fails the build on a bind the row can't satisfy. Deep law:
 `UNOVERSE_MCP_TEMPLATE_PROTOCOL.md` §Content-attached cards.
 
-```jsonc
-// productfinder.json (envelope): the state block is lean scalars only
-"state": { "step": "goals", "phase": "about", "progressPct": "16%", "questionLabel": "Question 1 of 6" },
-"props": {
-  "products": { "type": "array", "input": true, "default": [ /* 3 mock products for preview */ ] }
-}
+```yaml
+# productfinder.yaml (envelope): the state block is lean scalars only
+state: { step: goals, phase: about, progressPct: 16%, questionLabel: Question 1 of 6 }
+props:
+  products:
+    type: array
+    input: true
+    default: [ ]        # 3 mock products for preview
 ```
 
 ---
@@ -143,17 +144,16 @@ Read top to bottom it answers, in order: what states exist, which are public, wh
 
 The root projects the tree: a `Switch` on `view` (*legacy alias:* `defaultState`) whose cases include each public state's shell:
 
-```jsonc
-"root": {
-  "type": "Box",
-  "style": { "width": "full", "container": "inline-size" },
-  "children": [
-    { "type": "Switch", "on": "view",
-      "cases": {
-        "products": { "$include": "layouts/products" },
-        "detail":   { "$include": "layouts/product" }
-      } } ]
-}
+```yaml
+root:
+  type: Box
+  style: { width: full, container: inline-size }
+  children:
+    - type: Switch
+      on: view
+      cases:
+        products: { $include: layouts/products }
+        detail:   { $include: layouts/product }
 ```
 
 A private axis is its own `Switch` (on `step`) inside the shell it belongs to. A `Switch` on a *data* field (`kind`, a nested component's `tab`) is content selection, not a step: steps turn only on keys the component owns.
@@ -173,15 +173,19 @@ Variants bind the SAME fields and differ only in arrangement; anything that chan
 
 Seven wizard questions sharing one shape (heading + choice rows) are ONE state whose data changes per step, never seven files. The `step` value selects which data the layout binds; only genuinely different arrangements (`summary`, `result`) earn files. Inside a step, an option list is **hardcoded** `items` on an `Each`; picking an option writes the answer + the next step in one `setValue`:
 
-```jsonc
-{ "type": "Each",
-  "items": [ { "value": "start", "label": "Start my career" }, … ],   // literal content
-  "template": { "type": "Ref", "ref": "choice-row",
-    "action": { "type": "setValue", "values": [
-      { "key": "careerStage", "value": "{{value}}" },
-      { "key": "step", "value": "situation" },
-      { "key": "progressPct", "value": "33%" }
-    ] } } }
+```yaml
+type: Each
+items:                                          # literal content
+  - { value: start, label: Start my career }
+template:
+  type: Ref
+  ref: choice-row
+  action:
+    type: setValue
+    values:
+      - { key: careerStage, value: "{{value}}" }
+      - { key: step, value: situation }
+      - { key: progressPct, value: 33% }
 ```
 
 ⚠️ **A state never guards itself**: the tree already selects it; a `visibleWhen` re-checking the same discriminant inside a case is an error.
@@ -192,17 +196,21 @@ Seven wizard questions sharing one shape (heading + choice rows) are ONE state w
 
 A **brief** is metadata that tells an AI what should fill a bound element. It sits **on the node that renders what it describes**: next to the `bind` it governs, never in a separate file or the manifest:
 
-```jsonc
-{ "type": "Text",
-  "brief": { "description": "Name the day in the guest's OWN emotional language: never a generic label.",
-             "maxLength": 60 },
-  "bind": { "value": "headline" }, "style": { … } }
+```yaml
+- type: Text
+  brief:
+    description: Name the day in the guest's OWN emotional language: never a generic label.
+    maxLength: 60
+  bind: { value: headline }
+  style: { … }
 
-{ "type": "Each",
-  "brief": { "description": "Order as the day would be lived. Variety of kind over similarity.",
-             "minItems": 3, "maxItems": 5 },
-  "bind": { "items": "sections" },
-  "template": { "$include": "components/story-section" } }   // its binds define the item shape
+- type: Each
+  brief:
+    description: Order as the day would be lived. Variety of kind over similarity.
+    minItems: 3
+    maxItems: 5
+  bind: { items: sections }
+  template: { $include: components/story-section }   # its binds define the item shape
 ```
 
 - **Shape (linted, closed):** a string (just the description) or `{ description, maxLength }` on a bound element, `{ description, minItems, maxItems }` on an `Each`, **JSON Schema's own vocabulary**, because the brief IS the schema fragment it compiles to. A brief on a node with **no** bind (a shell or partial root) is *composition context*: rules about the whole, like ordering or refinement behavior.

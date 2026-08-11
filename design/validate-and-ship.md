@@ -20,14 +20,14 @@ Validation lives in **Studio**, because Studio is the only thing that publishes:
 
 It validates two shapes: **envelope** files (with the `unoverse` field) and **bare node** partials (`layouts/`, `states/`, `components/`, atoms).
 
-One-off sweep of everything from the CLI, if you want it (needs `ajv` once: `npm i -D ajv` at the repo root; Studio runs the same schema as you type):
+One-off sweep of everything from the CLI, if you want it (needs `ajv` and `yaml` once: `npm i -D ajv yaml` at the repo root; Studio runs the same schema as you type). Definitions are YAML; the schema file itself is JSON:
 
 ```bash
 # from the repo root: validate every definition against the schema
-node -e 'const A=require("ajv");const fs=require("fs"),p=require("path");
+node -e 'const A=require("ajv"),Y=require("yaml");const fs=require("fs"),p=require("path");
 const v=new A({allErrors:true,strict:false}).compile(JSON.parse(fs.readFileSync("rx/_schema/unoverse.schema.json")));
-const w=d=>fs.existsSync(d)?fs.readdirSync(d).flatMap(f=>{const q=p.join(d,f);return fs.statSync(q).isDirectory()?w(q):(f.endsWith(".json")&&f!=="manifest.json"&&!f.endsWith(".states.json")?[q]:[])}):[];
-let bad=0;for(const d of["rx/marketplace/components","rx/atoms","rx"])for(const f of w(d))if(!v(JSON.parse(fs.readFileSync(f)))){bad++;console.log("✗",f,v.errors[0].instancePath,v.errors[0].message)}
+const w=d=>fs.existsSync(d)?fs.readdirSync(d).flatMap(f=>{const q=p.join(d,f);return fs.statSync(q).isDirectory()?w(q):(f.endsWith(".yaml")&&f!=="manifest.yaml"&&!f.endsWith(".states.yaml")?[q]:[])}):[];
+let bad=0;for(const d of["rx/marketplace/components","rx/marketplace/atoms","rx"])for(const f of w(d))if(!v(Y.parse(fs.readFileSync(f,"utf8")))){bad++;console.log("✗",f,v.errors[0].instancePath,v.errors[0].message)}
 console.log(bad?bad+" invalid":"clean ✓")'
 ```
 

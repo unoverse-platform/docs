@@ -300,7 +300,7 @@ state inspector.
 ## 9. Why it fits the framework
 
 No new rendering machinery: layouts compose with `$include` (`Ref` stays for global
-`rx/atoms/` shapes needing per-use remapping), the tree compiles to the `Switch`
+`rx/marketplace/atoms/` shapes needing per-use remapping), the tree compiles to the `Switch`
 already in the vocabulary, and the three state buckets are unchanged underneath
 (STATE_MODEL §2). What IS new is the derivation the runtime owes (STATE_MODEL §8:
 the ordered ladder, state-owns-layout resolution, the arrival scan). Layers remain a

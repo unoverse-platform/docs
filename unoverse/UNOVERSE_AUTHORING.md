@@ -63,10 +63,10 @@ Every component, template, and atom is one JSON file with the same envelope:
 
   | Kind | Lives in | Form |
   |---|---|---|
-  | component (design system) | `rx/components/<name>/<name>.json` + optional `manifest.json` (discovery) + `layouts/` (one file per state that owns an arrangement) + optional `components/` (shapes 2+ layouts share) | flat `rx/components/<name>.json` for a simple one-layout card; **generic + org-neutral: any org can use it**. Addressed `unoverse://components/<name>` |
+  | component (design system) | `rx/marketplace/components/<name>/<name>.json` + optional `manifest.json` (discovery) + `layouts/` (one file per state that owns an arrangement) + optional `components/` (shapes 2+ layouts share) | flat `rx/marketplace/components/<name>.json` for a simple one-layout card; **generic + org-neutral: any org can use it**. Addressed `unoverse://components/<name>` |
   | component (org) | `rx/orgs/<org>/components/<name>/`: same anatomy; **org-private** (the client's own microapp). Addressed `unoverse://components/<org>/<name>`; the server injects `org` from the folder. Names unique across ALL tiers (lint-enforced) | the client's finders/pages, never a restyle of a shared component (that's the theme's job) |
   | template | `rx/orgs/<org>/templates/<name>/`, **manifest-only**: `manifest.json` IS the envelope; it declares the template tree in `states:`; root = `layouts/<manifest.layout>.json` (+ `states/` for the base's contained substate files, + `components/`) | org-scoped; no `<name>.json` |
-  | atom | `rx/atoms/<name>.json` | shared partials, **authoring-time only**: the server always expands them before serving (never served, never enumerable, no Studio view) |
+  | atom | `rx/marketplace/atoms/<name>.json` | shared partials, **authoring-time only**: the server always expands them before serving (never served, never enumerable, no Studio view) |
 
 ### The state tree: the root declares the machine (State Model v2)
 
@@ -202,7 +202,7 @@ capability**: there is no flag inside it, and nothing else grants it.
 The manifest carries only discovery meta:
 
 ```jsonc
-// rx/components/planfinder/manifest.json
+// rx/marketplace/components/planfinder/manifest.json
 {
   "title": "Plan Finder",                       // display name (falls back to the def name)
   "description": "A guided plan-finder quiz: a few eligibility and preference questions ending in a best-fit plan recommendation.",
@@ -425,7 +425,7 @@ one named for an unknown lifecycle, is a lint error (no silent/surprise code exe
 
 ## 4. Your first component (walkthrough)
 
-A focusable card that expands inline → focused. File: `rx/components/mywidget/mywidget.json`.
+A focusable card that expands inline → focused. File: `rx/marketplace/components/mywidget/mywidget.json`.
 
 ```jsonc
 {
@@ -477,14 +477,14 @@ A focusable card that expands inline → focused. File: `rx/components/mywidget/
 That's a complete, stateful component. The `state.view` tree declares the two states it
 can be in and which one it arrives in; the `Switch` draws whichever is current; `setValue`
 moves between them and the renderer redraws. Both names are PUBLIC (top level of the tree),
-so a template may rearrange for either. Drop the folder in `rx/components/` and it's
+so a template may rearrange for either. Drop the folder in `rx/marketplace/components/` and it's
 discoverable immediately (no registration).
 
 ---
 
 ## 5. Composition: atoms (`Ref`), `$include`, `Each`
 
-**Atoms (`Ref`)** are shared partials in `rx/atoms/` (e.g. `button`, `account-row`,
+**Atoms (`Ref`)** are shared partials in `rx/marketplace/atoms/` (e.g. `button`, `account-row`,
 `section-header`, `close-button`). Atoms are **authoring-time only**: the server always
 expands a `Ref` before serving, so channels only ever receive fully-expanded primitive
 trees (atoms are never served, never enumerable, and have no Studio view). A `Ref` inlines
@@ -492,7 +492,7 @@ an atom and **remaps its fields** via `props` (the atom's bind field ← your da
 It may also override `visibleWhen`, `action`, or `style`:
 
 ```jsonc
-// atom rx/atoms/account-row.json binds label/sub/meta…
+// atom rx/marketplace/atoms/account-row.json binds label/sub/meta…
 { "type": "Ref", "ref": "account-row",
   "props": { "label": "name", "sub": "accountNumber", "meta": "bankName" },
   "action": { "type": "setValue", "values": [{ "key": "step", "value": "amount" }] } }
@@ -515,7 +515,7 @@ bindings take the literal value.
 **bare node** (no envelope). Use it to give each *view* its own file:
 
 ```jsonc
-{ "$include": "step-source" }   // ← rx/components/<name>/step-source.json
+{ "$include": "step-source" }   // ← rx/marketplace/components/<name>/step-source.json
 ```
 
 **`Each`** repeats a subtree over a bound array; each item is the data scope for one copy:

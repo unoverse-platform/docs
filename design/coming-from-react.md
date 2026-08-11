@@ -23,7 +23,7 @@ And the state model is not a house invention: it is the orthodox stack you alrea
 | Spawning a child actor / `useActor` | a streamed component: the host places it at spawn, subscribes to its public `view`, and never writes into it afterwards | [04](/design/state) |
 | `items.map(item => <Row/>)` | `Each` with `bind: { items: "items" }` + a `template` | [03](/design/components) |
 | `onClick={() => setStep("confirm")}` | `action: { type: "setValue", values: [{ key: "step", value: "confirm" }] }` | [04](/design/state) |
-| A shared `<Button/>` component | An **atom** in `rx/atoms/`, used via `Ref`: `props` remaps fields, `with` passes literals | [03](/design/components) |
+| A shared `<Button/>` component | An **atom** in `rx/marketplace/atoms/`, used via `Ref`: `props` remaps fields, `with` passes literals | [03](/design/components) |
 | Splitting a big component into files | `$include` of `layouts/`/`states/`/`components/` siblings: but extraction is **earned**, not default | [03](/design/components) |
 | CSS / styled-components / Tailwind values | **Semantic token names** only: `"padding": "lg"`, `"color": "text.primary"`. The values live in `rx/<project>/styles/` | [06](/design/styles-and-tokens) |
 | `className="hover:shadow-md"` | `style: { hover: { "shadow": "md" } }` | [06](/design/styles-and-tokens) |

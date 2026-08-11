@@ -47,7 +47,7 @@ Work through these in order: each doc builds on the previous one.
 | I want to… | Build a… | Doc |
 |---|---|---|
 | Show a piece of streamed data (a card, a chart, a list) | **Component**: design-system tier (the installed marketplace package, org-neutral) or project tier (`rx/<project>/components/`, that org's own) | [03](/design/components) |
-| Reuse a small piece across components | **Atom** (`rx/atoms/`: authoring-time only; the server expands it before serving) | [03](/design/components) |
+| Reuse a small piece across components | **Atom** (`rx/marketplace/atoms/`: authoring-time only; the server expands it before serving) | [03](/design/components) |
 | Define a whole surface (chat, voice, dashboard) | **Template** (`rx/<project>/templates/`) | [05](/design/templates) |
 | Change colors / spacing / brand | **Tokens** (`rx/<project>/styles/`) | [06](/design/styles-and-tokens) |
 | Make UI react (tabs, wizard steps, expand/collapse) | **State + the four moves** | [04](/design/state) |

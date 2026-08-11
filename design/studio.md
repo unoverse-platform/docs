@@ -92,7 +92,7 @@ Debugging order, always: **stream log** (did it arrive?) → **state inspector**
 ## The full loop
 
 ```bash
-vi rx/components/pricecard/pricecard.json   # 1. edit (schema validates as you type)
+vi rx/acme/components/pricecard/pricecard.yaml   # 1. edit (schema validates as you type)
 unoverse build              # 2. the node re-synthesizes from the definition at boot
 # 3. Studio: mock states → looks right
 # 4. Studio: live mode → streams right

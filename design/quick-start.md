@@ -5,7 +5,7 @@ title: "Quick Start"
 
 **Build your first component, validate it, deploy it, and see it render in Studio.**
 
-No React. No build config. One JSON file.
+No React. No build config. One YAML file.
 
 ---
 
@@ -24,35 +24,40 @@ A `PriceCard` component: a card that shows a product name, a price, and a short 
 # and a complete copy of the default token set in styles/)
 ```
 
-This creates `rx/components/pricecard/pricecard.json`, already passing the linter: you fill the TODOs and shape the tree. Edited for our card:
+This creates `rx/acme/components/pricecard/pricecard.yaml`, already passing the linter: you fill the TODOs and shape the tree. Edited for our card:
 
-```jsonc
-{
-  "unoverse": "1.0",
-  "kind": "component",
-  "name": "PriceCard",
-  "category": "Commerce",
-  "description": "A card showing a product name, price and short description.",
-  "whenToUse": "Show a single product or plan with its price. Not for lists of products (use a list component) or for charts.",
-  "props": {
-    "title":       { "type": "string", "default": "Pro Plan", "input": true },
-    "price":       { "type": "string", "default": "$29/mo", "input": true },
-    "description": { "type": "string", "default": "Everything in Basic plus priority support.", "input": true }
-  },
-  "root": {
-    "type": "Box",
-    "style": { "width": "full", "direction": "column", "gap": "3", "padding": "lg",
-               "background": "surface.base", "border": "subtle", "shadow": "lg" },
-    "children": [
-      { "type": "Text", "bind": { "value": "title" },
-        "style": { "font": "headline.sm", "weight": "semibold", "color": "text.primary" } },
-      { "type": "Text", "bind": { "value": "price" },
-        "style": { "font": "headline.lg", "color": "text.primary" } },
-      { "type": "Text", "bind": { "value": "description" }, "visibleWhen": "description",
-        "style": { "font": "body.md", "color": "text.secondary" } }
-    ]
-  }
-}
+```yaml
+unoverse: "1.0"
+kind: component
+name: pricecard
+category: Commerce
+description: A card showing a product name, price and short description.
+whenToUse: Show a single product or plan with its price. Not for lists of products (use a list component) or for charts.
+props:
+  title:       { type: string, default: Pro Plan, input: true }
+  price:       { type: string, default: $29/mo, input: true }
+  description: { type: string, default: Everything in Basic plus priority support., input: true }
+root:
+  type: Box
+  style:
+    width: full
+    direction: column
+    gap: "3"
+    padding: lg
+    background: surface.base
+    border: subtle
+    shadow: lg
+  children:
+    - type: Text
+      bind: { value: title }
+      style: { font: headline.sm, weight: semibold, color: text.primary }
+    - type: Text
+      bind: { value: price }
+      style: { font: headline.lg, color: text.primary }
+    - type: Text
+      bind: { value: description }
+      visibleWhen: description
+      style: { font: body.md, color: text.secondary }
 ```
 
 What each part is:
@@ -63,7 +68,7 @@ What each part is:
 | `whenToUse` | **Required for components**: the AI reads this to pick your component. Outcome-first, in the user's vocabulary. See [08](/design/validate-and-ship) |
 | `props` | The **data contract**: every field the definition reads, with a default (the **Studio** mock). `input: true` = fed by the workflow at runtime, mark **all** workflow-fed props |
 | `root` | The UI tree, built only from **primitives** ([02](/design/sdui-and-mcp-apps)) |
-| `bind` | An object mapping the primitive's target → your data field: `{ "value": "title" }`, `{ "src": "image" }` |
+| `bind` | An object mapping the primitive's target → your data field: `{ value: title }`, `{ src: image }` |
 | `visibleWhen` | A bare field name is a truthy test: the description row hides when empty |
 | `style` values | **Token names only**: `"3"`, `"surface.base"`, `"headline.sm"`. Never `12px` or `#fff` ([06](/design/styles-and-tokens)) |
 
@@ -71,20 +76,21 @@ What each part is:
 
 ## Step 2: Validate as you type
 
-The JSON Schema at `rx/_schema/unoverse.schema.json` catches structural mistakes (unknown primitive, missing `whenToUse`, a `Switch` without `cases`, an illegal condition) **in your editor**. Wire it once in `.vscode/settings.json`:
+The JSON Schema at `rx/_schema/unoverse.schema.json` catches structural mistakes (unknown primitive, missing `whenToUse`, a `Switch` without `cases`, an illegal condition) **in your editor**. Definitions are YAML, so wire it once through the YAML extension in `.vscode/settings.json` (the schema file itself stays JSON: it is the schema, not a definition):
 
 ```jsonc
 {
-  "json.schemas": [
-    {
-      "fileMatch": ["**/rx/**/components/**/*.json", "**/rx/**/templates/**/*.json", "**/rx/**/atoms/*.json"],
-      "url": "./rx/_schema/unoverse.schema.json"
-    }
-  ]
+  "yaml.schemas": {
+    "./rx/_schema/unoverse.schema.json": [
+      "**/rx/**/components/**/*.yaml",
+      "**/rx/**/templates/**/*.yaml",
+      "**/rx/**/atoms/*.yaml"
+    ]
+  }
 }
 ```
 
-Now a typo like `"type": "Bax"` or a missing `description` is a red squiggle, not a runtime surprise. [08: Validate & Ship](/design/validate-and-ship) covers the full enforcement stack (schema → linter → checklist).
+Now a typo like `type: Bax` or a missing `description` is a red squiggle, not a runtime surprise. [08: Validate & Ship](/design/validate-and-ship) covers the full enforcement stack (schema → linter → checklist).
 
 ---
 
@@ -93,7 +99,7 @@ Now a typo like `"type": "Bax"` or a missing `description` is a red squiggle, no
 Two mechanisms, both already in your file:
 
 - **Prop `default`s ARE the mock.** Studio renders the component from them with no backend: that's why every prop carries a realistic default, not an empty string.
-- **The `states/` folder is the state picker.** If your component has multiple layers (a `Switch` on a discriminant: wizard steps, inline↔focused), enumerate each layer as `states/<layer>.json` and **Studio** automatically shows a pill per state; clicking one sets the discriminant and that layer draws itself ([07](/design/studio)). PriceCard is single-view, so it needs none.
+- **The `states/` folder is the state picker.** If your component has multiple layers (a `Switch` on a discriminant: wizard steps, inline↔focused), enumerate each layer as `states/<layer>.yaml` and **Studio** automatically shows a pill per state; clicking one sets the discriminant and that layer draws itself ([07](/design/studio)). PriceCard is single-view, so it needs none.
 
 ---
 

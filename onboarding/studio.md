@@ -47,21 +47,19 @@ Open source and free. No account, and nothing else to install.
 unoverse studio
 ```
 
-Run it wherever you keep your code. The first time, it asks what to call your project and
-makes a folder of that name:
+Make a folder for your project, and run it there. The first time, it builds the project in
+that folder and names it after the folder:
 
 ```
-  No project here yet.
+mkdir acme && cd acme
+unoverse studio
 
-  /Users/you/code
-
-  Name your project [my-project]: acme
-
-  Created acme/ with rx/acme/, prompts/ and nodes/
+  Created rx/acme/, prompts/ and nodes/ in /Users/you/code/acme
 ```
 
-The name you type does two jobs: it is the folder, and it is the **org** on everything that
-project publishes. So it has to be lowercase letters, numbers and dashes.
+The folder's name is also the **org** on everything that project publishes. So it has to be
+lowercase letters, numbers and dashes. If your folder is called something else, Studio asks
+for a name instead.
 
 ```
 acme/                        your project
@@ -76,8 +74,11 @@ want; they sit beside `rx/acme/`.
 
 You also get a first component, so Studio opens on something real rather than an empty list.
 
-Next time, run `unoverse studio` from either `acme/` or the folder above it. It finds the
-project either way.
+Next time, run `unoverse studio` from `acme/` or anywhere inside it.
+
+A project and a universe are different sets of files, so they can share one folder. Run
+`unoverse create` in this folder later and you get a universe here too, with your `rx/`,
+`prompts/` and `nodes/` untouched.
 
 </Step>
 <Step title="Edit the first component">

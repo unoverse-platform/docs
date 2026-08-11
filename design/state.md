@@ -118,9 +118,9 @@ CONVERSATION state (the turns + each instance's *data*) is durable and append-on
 
 Inside a template state's layout, the slot that renders the placed component selects by the **view**, never by component type, never by id:
 
-```jsonc
-{ "type": "ComponentSlot",
-  "select": { "from": "all", "where": { "field": "view", "eq": "focus" }, "limit": 1 } }
+```yaml
+type: ComponentSlot
+select: { from: all, where: { field: view, eq: focus }, limit: 1 }
 ```
 
 - "Which component?" is intrinsic: the one whose view matches. Conflicts: most recent wins (`limit: 1`).
@@ -144,12 +144,13 @@ Inside a template state's layout, the slot that renders the placed component sel
 - **`setValue`** → the component's **own slice**: its answers, its `step`, its `view`. This is the only thing a component ever writes.
 - **`setTemplateValue`** → template state: **only for what is genuinely the template's own** (a disclosure panel, the composer draft). ❌ A component chaining `setTemplateValue` to open a surface is the deprecated bridge: the linter flags it; the template tree reacts by name instead.
 
-```jsonc
-// a wizard option: record the answer + advance: one setValue, own slice
-{ "action": { "type": "setValue", "values": [
-    { "key": "subject", "value": "{{value}}" },
-    { "key": "step", "value": "route" }
-  ] } }
+```yaml
+# a wizard option: record the answer + advance: one setValue, own slice
+action:
+  type: setValue
+  values:
+    - { key: subject, value: "{{value}}" }
+    - { key: step, value: route }
 ```
 
 Anything that is not one of these two routes to the **server as a native MCP call** ([02](/design/sdui-and-mcp-apps)): sending a message is `tools/call`; answering a waiting wizard is an elicitation. You never build transport.

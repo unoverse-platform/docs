@@ -76,21 +76,26 @@ What the tree means, line by line:
 
 > **The app is always the ACTIVE state's layout total: nothing else, ever.**
 
-Widths are declared with the neutral `appWidth` key, always a **named org size** from `styles/semantic/app-sizes.json` (`chat` · `chat-slim` · `rail` · `panel`: served on the theme, resolved by the SDK like any token). Two declaration points, both inside a layout:
+Widths are declared with the neutral `appWidth` key, always a **named org size** from `styles/semantic/app-sizes.yaml` (`chat` · `chat-slim` · `rail` · `panel`: served on the theme, resolved by the SDK like any token). Two declaration points, both inside a layout:
 
-```jsonc
-// components/core.yaml: the chat column: a panel, always open, exactly `chat` wide
-{ "type": "Box", "appWidth": "chat", … }
+```yaml
+# components/core.yaml: the chat column: a panel, always open, exactly `chat` wide
+type: Box
+appWidth: chat
 
-// layouts/products.yaml: the arrangement: core + the rail, whose slot declares ITS width
-{ "type": "Box", "style": { "direction": "row", "width": "full", "height": "full", "overflow": "hidden" },
-  "children": [
-    { "$include": "components/core" },
-    { "type": "ComponentSlot", "appWidth": "rail",
-      "select": { "from": "all", "where": { "field": "view", "eq": "products" } },
-      "frame": { "type": "Box", "style": { "direction": "column", "overflow": "auto", … },
-                 "children": [ { "type": "ComponentSlot" } ] } }
-  ] }
+# layouts/products.yaml: the arrangement: core + the rail, whose slot declares ITS width
+type: Box
+style: { direction: row, width: full, height: full, overflow: hidden }
+children:
+  - { $include: components/core }
+  - type: ComponentSlot
+    appWidth: rail
+    select: { from: all, where: { field: view, eq: products } }
+    frame:
+      type: Box
+      style: { direction: column, overflow: auto }
+      children:
+        - { type: ComponentSlot }
 ```
 
 So the width is one of a small known set by construction: the base layout is the core alone; a rail layout is core + rail; layouts can even use a different core (a slim call column beside a panel). The host animates between the totals; nothing inside ever resizes.
@@ -111,14 +116,15 @@ The rules (all lint-enforced):
 - **`Timeline`**: renders the conversation (you supply the `user`/`assistant` turn subtrees; per-turn scope carries `text`, `streaming`, …). The conversation bucket is locked to the stream ([04](/design/state)).
 - **`ComponentSlot`**: where components render. Two forms:
 
-```jsonc
-// 1. the FLOW slot: components render inline in the conversation (the default home)
-{ "type": "ComponentSlot", "select": {} }
+```yaml
+# 1. the FLOW slot: components render inline in the conversation (the default home)
+- type: ComponentSlot
+  select: {}
 
-// 2. a REACTION slot: renders whichever component put the template in this state
-{ "type": "ComponentSlot",
-  "select": { "from": "all", "where": { "field": "view", "eq": "detail" }, "limit": 1 },
-  "frame": { /* the chrome the selected component renders inside */ } }
+# 2. a REACTION slot: renders whichever component put the template in this state
+- type: ComponentSlot
+  select: { from: all, where: { field: view, eq: detail }, limit: 1 }
+  frame: { }    # the chrome the selected component renders inside
 ```
 
 Rules that bite:

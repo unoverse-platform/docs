@@ -61,7 +61,7 @@ Definitions compose ONLY these. The set is frozen: adding to it is an SDK change
 | Concern | The MCP-standard answer |
 |---|---|
 | **How definitions reach clients** | Served as **MCP resources** (`unoverse://` URIs). Clients subscribe; `resources/updated` notifications ARE hot reload: in dev *and* prod. |
-| **How the app binds to logic** | The template's `manifest.json` names its **workflow**. The app owns its workflow: clients pull the app; nothing is pushed by name. |
+| **How the app binds to logic** | The template's `manifest.yaml` names its **workflow**. The app owns its workflow: clients pull the app; nothing is pushed by name. |
 | **How a user message is sent** | `tools/call` on the app's trigger tool. Fire-and-forget: results come back over the component stream, never the call result. |
 | **How a form/wizard answers** | Native MCP **elicitation** resolving the held `tools/call`: the agent is literally waiting on the user's answer. |
 | **How UI state arrives** | Run-scoped messages (`COMPONENT_INIT/DATA`, `TEMPLATE_DATA`, `WORKFLOW_STATE`) on the MCP **`/stream`**. |
@@ -78,7 +78,7 @@ https://api.<domain>/mcp          → all orgs (flattened)
 https://api.<domain>/mcp/<org>    → only that org's apps, as one connector
 ```
 
-Within an org, **exactly one app's `manifest.json` sets `"default": true`**, the org's **home** (typically its chat template, e.g. `acmechatlayout`). The endpoint tags that tool with `_meta["unoverse/default"]`, so a client knows which app to open first as the conversation's entry point. A lint rule enforces **at most one `default` per org**.
+Within an org, **exactly one app's `manifest.yaml` sets `default: true`**, the org's **home** (typically its chat template, e.g. `acmechatlayout`). The endpoint tags that tool with `_meta["unoverse/default"]`, so a client knows which app to open first as the conversation's entry point. A lint rule enforces **at most one `default` per org**.
 
 MCP is pull-based (no "auto-open on connect"): our SDK reads that flag and opens the home app immediately, rendering its arrival `defaultState`; a foreign host (ChatGPT) surfaces it when the user first engages. `default` only answers *"which app is the front door"*: the app's own `defaultState`/`autoTrigger`/`binding` behave exactly as usual. (The old per-app `expose` flag is removed: org scoping is the boundary now.)
 
