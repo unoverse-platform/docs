@@ -114,7 +114,7 @@ It is not a fourth kind of state.
 | Voice piece | Nature | Lands in |
 |---|---|---|
 | mic / speaker / WS audio frames | native I/O | the service (`useVoiceService`) |
-| call state (connecting / speaking / muted) | UI state of the voice template | **template state**, as the derived `callState` value (`idle` · `active` · `agentSpeaking` · `userSpeaking`) |
+| call state (connecting / speaking / muted) | UI state of the voice template | **template state**, as the derived `callState` value (`idle` · `active` · `speaking` · `listening`) |
 | transcript (the words said) | conversation content | **conversation** |
 
 The service is instantiated by the shared renderer (`StreamedUnoverseTemplate`), its

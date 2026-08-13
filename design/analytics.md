@@ -35,30 +35,36 @@ A node with no `analytics` block reports nothing. Silence is the default.
 
 ---
 
-## Opening a view is an action
+## Opening a view is a moment, not a click
 
-A card and its detail view are one instance. Opening the detail view writes `view` (the
-public state; legacy spelling `defaultState`), which is an action like any other. So it
-takes the same key.
+A card and its detail view are one instance. The detail can open several ways: the card is
+tapped, the workflow pushes it open, a suggestion lands on it. Reporting the tap alone
+misses the rest.
 
-```yaml
-- type: Box
-  action:
-    type: setValue
-    values:
-      - key: view
-        value: detail
-  analytics:
+So the view event is declared in the **manifest**, beside the lifecycle hooks, and it uses
+their grammar. It fires when the state is entered, however it was entered.
+
+```yaml manifest.yaml
+lifecycle:
+  - phase: onEnterView
+    layouts: [ detail ]
+    handler: getDetail
+analytics:
+  - phase: onEnterView
+    layouts: [ detail ]
     event: view_item
     params:
       item_id: "{{universal_id}}"
       item_name: "{{title}}"
 ```
 
-Clicks, submits and view changes are one mechanism. There is no separate way to report a
-view, because there is no separate way to open one.
+`layouts` names the STATES that fire it, exactly as it does for a hook. The component
+already reports entering a state, because that is the moment `onEnterView` exists for. The
+declaration rides the same moment, so there is nothing to wire and no action to chain.
 
----
+A button whose action does something of its own — submit, book, send — still carries its
+`analytics` key on the node, as above. The manifest form exists for moments that are
+states, because a state can be reached from more than one place.
 
 ## Choosing event names
 

@@ -179,7 +179,7 @@ Because the root DECLARES the state tree, everything downstream is a projection:
 ## Locked state: managed FOR you, read-only to you
 
 1. **Conversation & lifecycle**: written only by the stream. "Is it thinking" is the derived `isStreaming`/`isEmpty` flags; project them, never simulate them (a stuck flag is a stream-delivery bug to report, not to patch in a definition).
-2. **Voice**: the SDK's voice service owns the audio natively and, as a producer, projects **`callState`** (`idle · active · agentSpeaking · userSpeaking`) into the template's scope; a voice template branches its phases on that one field. The transcript rides the conversation. A template binds the service by declaring `service: "voice"` in its manifest. You never wire audio.
+2. **Voice**: the SDK's voice service owns the audio natively and, as a producer, projects **`callState`** (`idle · active · speaking · listening`) into the template's scope; a voice template branches its phases on that one field. The transcript rides the conversation. A template binds the service by declaring `service: "voice"` in its manifest. You never wire audio.
 3. **Native host chrome**: ephemeral toggles that belong to the embedding host live in the host's own state, passed as `props`; never in the store, never a new primitive.
 
 ### The decision table
