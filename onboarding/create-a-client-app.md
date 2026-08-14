@@ -120,10 +120,12 @@ The embed keeps two values in `localStorage`, and neither is a cookie.
 
 | Key | Lifetime | Purpose |
 |---|---|---|
-| `unoverse:conversation` | 30 minutes since last use | A visitor moving between your pages keeps their thread |
 | `unoverse:guestId` | indefinite | A returning anonymous visitor is recognised |
 
-The 30 minutes matches how long the universe keeps an agent's memory of a thread.
+The conversation itself is never stored: it lives exactly as long as the page that opened
+it. A reload starts a fresh conversation; the agent still recognises the visitor through
+the guest id and user memory. `window.unoverse.newConversation()` starts one deliberately
+mid-page.
 
 ---
 
