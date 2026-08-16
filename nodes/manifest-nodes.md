@@ -140,6 +140,45 @@ workflow-building agent is trying to do, so it decides whether your node is ever
 **offered**. Read [node-discoverability.md](/nodes/node-discoverability) before you
 write it.
 
+`cacheable` opts the node into memoization: the engine may serve a prior run's output when
+nothing that matters has changed, instead of re-executing. `true` is for idempotent,
+side-effect-free reads (search, scrape, fetch-by-id) — never for anything effectful or
+non-deterministic. Nodes that read content through a **volatile URL** (a presigned link
+that changes every run) use the object form and declare the content's real identity
+instead:
+
+```yaml
+capabilities:
+  cacheable:
+    ignore: [fileUrl]     # volatile config fields, dropped from the fingerprint
+    key: [etag]           # input leaf fields that identify the content
+```
+
+Every config field you did not `ignore` still busts the cache. `key` fields are matched by
+dot suffix against the resolved inputs, so the declaration works whatever the upstream node
+is called; if a key field collects nothing on a run, that run is not cached.
+
+`emitsExternally` is the other side of that coin, and you set it when your node's effect
+**cannot be undone**: it sends, posts, charges, or writes into somewhere outside the
+platform. A deleted scratch row can be undone and needs nothing; a delivered email cannot.
+
+```yaml
+capabilities:
+  cacheable: false
+  emitsExternally: true
+```
+
+Test runs withhold these nodes. `runTest`, `startTestRun` and `stepNode` record what the
+node would have done and do not perform it, because an agent building a workflow re-runs it
+after every stage, and without this each attempt would put a real message in a real inbox.
+The withheld output is marked `__withheld` and deliberately does not look like a success, so
+nothing downstream and no reviewer can mistake it for a delivery; your node's inputs are
+still traced, so the message can be checked for correctness. A genuine send is a real run of
+the workflow, and there is no parameter that lets a test perform one.
+
+If you are unsure, set it. A withheld node costs a build nothing; an unwanted send costs a
+real person something.
+
 ### `interface.yaml`: what it connects to
 
 ```yaml

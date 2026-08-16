@@ -62,9 +62,23 @@ analytics:
 already reports entering a state, because that is the moment `onEnterView` exists for. The
 declaration rides the same moment, so there is nothing to wire and no action to chain.
 
-A button whose action does something of its own — submit, book, send — still carries its
-`analytics` key on the node, as above. The manifest form exists for moments that are
-states, because a state can be reached from more than one place.
+A server action takes a manifest entry too. Key it by `action` instead of `phase`:
+
+```yaml
+analytics:
+  - action: apply
+    event: generate_lead
+    params:
+      form_type: request_callback
+      item_id: "{{universal_id}}"
+```
+
+An `action` entry fires when your universe receives that action from the component. Not
+on the click, which an ad-blocker can silence, and not on the workflow finishing. The
+submission arrived; that is the fact it reports.
+
+A button whose action stays on the page still carries its `analytics` key on the node,
+as above.
 
 ## Choosing event names
 

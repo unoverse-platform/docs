@@ -79,6 +79,7 @@ auth:
 
 capabilities:
   cacheable: false            # true ONLY for idempotent, side-effect-free reads
+  # emitsExternally: true     # set when the effect cannot be undone (send, post, charge)
 ```
 
 **`whenToUse` decides whether the node is ever offered.** Read
@@ -88,6 +89,41 @@ put any wiring fact last.
 **`cacheable: true` only for a pure read.** Never for anything effectful, because reuse
 skips the side effect, and never for anything non-deterministic, because re-running is the
 correct behaviour.
+
+**`emitsExternally: true` when the effect has no inverse.** Sending an email, posting to a
+third party, charging a card, firing a webhook: once it has left the building the engine
+cannot take it back. Test runs (`runTest`, `startTestRun`, `stepNode`) **withhold** these
+nodes, tracing what the node would have done instead of doing it, because a build calls
+`runTest` after every stage and each one would otherwise reach a real person. A real send is
+a real run of the workflow; there is no flag that lets a test perform it.
+
+Set it whenever the effect cannot be undone. Deleting a scratch row can be undone and does
+not need it. If in doubt, set it: a withheld node costs a build nothing, an unwanted send
+costs someone something. Only ever set it to `true` — omitting it is the default.
+
+This is the positive half of what `cacheable: false` already implies. Saying "do not cache
+me" describes an effectful node only by omission, which the engine cannot act on.
+
+**The object form, for content keyed by identity rather than by URL.** A parse node's
+`fileUrl` is usually a presigned link: a new signature every run over the same bytes, so
+caching on it never hits, and caching on the bare URL risks a stale transcript when the
+file changes underneath it. Declare what is volatile and what actually identifies the
+content:
+
+```yaml
+capabilities:
+  cacheable:
+    ignore: [fileUrl]     # volatile config fields, dropped from the fingerprint
+    key: [etag]           # input leaf fields that identify the content
+```
+
+`ignore` names top-level resolved-config fields that are transport, not identity — every
+other config field still busts the cache. `key` names input leaf fields matched by dot
+suffix against the resolved inputs (wiring-independent: `etag` matches
+`file.<anyUpstreamNode>.file.etag`), and their collected values become the content's
+identity in the fingerprint. If a key field collects nothing on a run — a hand-typed URL
+with no upstream etag — that run is simply not cached: no identity, no reuse. Declaring
+the object form is itself the opt-in.
 
 ## `interface.yaml`
 
