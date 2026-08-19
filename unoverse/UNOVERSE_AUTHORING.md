@@ -64,7 +64,7 @@ Every component, template, and atom is one JSON file with the same envelope:
   | Kind | Lives in | Form |
   |---|---|---|
   | component (design system) | `rx/marketplace/components/<name>/<name>.json` + optional `manifest.json` (discovery) + `layouts/` (one file per state that owns an arrangement) + optional `components/` (shapes 2+ layouts share) | flat `rx/marketplace/components/<name>.json` for a simple one-layout card; **generic + org-neutral: any org can use it**. Addressed `unoverse://components/<name>` |
-  | component (org) | `rx/orgs/<org>/components/<name>/`: same anatomy; **org-private** (the client's own microapp). Addressed `unoverse://components/<org>/<name>`; the server injects `org` from the folder. Names unique across ALL tiers (lint-enforced) | the client's finders/pages, never a restyle of a shared component (that's the theme's job) |
+  | component (org) | `rx/orgs/<org>/components/<name>/`: same anatomy; **org-private** (the client's own microapp). Addressed `unoverse://components/<org>/<name>`; the server injects `org` from the folder. Names unique within the org; never shadow a design-system name (lint-enforced); two orgs may share a name | the client's finders/pages, never a restyle of a shared component (that's the theme's job) |
   | template | `rx/orgs/<org>/templates/<name>/`, **manifest-only**: `manifest.json` IS the envelope; it declares the template tree in `states:`; root = `layouts/<manifest.layout>.json` (+ `states/` for the base's contained substate files, + `components/`) | org-scoped; no `<name>.json` |
   | atom | `rx/marketplace/atoms/<name>.json` | shared partials, **authoring-time only**: the server always expands them before serving (never served, never enumerable, no Studio view) |
 
@@ -106,11 +106,13 @@ state:
   the manifest's `states:` tree declares and the compiler contains (§8).
 
 - **Tier rules.** An org pack is `rx/orgs/<org>/{templates, styles, components}`. Component
-  names are **unique across the design system and every org**: a collision is a lint error
-  (no shadowing). Both address forms are first-class: the bare URI
+  names are **unique within a tier**: two orgs may ship the same name (each addressed by
+  its org URI), but an org may never shadow a design-system name (that collision is a
+  lint error, per UNOVERSE_COMPONENT_ORGS.md). Both address forms are first-class: the bare URI
   (`unoverse://components/<name>`) is the canonical address for a design-system component,
-  the org URI (`unoverse://components/<org>/<name>`) for an org component, and uniqueness
-  means a bare ref also resolves an org component unambiguously.
+  the org URI (`unoverse://components/<org>/<name>`) for an org component. A bare ref
+  still resolves an org component while its name is unique across orgs; once two orgs
+  carry it, the bare ref errors loudly, listing the qualified candidates.
   Direction: org definitions may reference design-system ones;
   **design-system definitions never reference org ones** (lint-enforced, including template
   preview lists). An org component is never a restyle of a shared one. That's the theme's job.

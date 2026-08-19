@@ -142,7 +142,7 @@ Names are **optional**: raw CSS in `appWidth` is always valid, but prefer them: 
 
 ## Org scoping
 
-- **Components live in TWO tiers.** The design system (the installed marketplace package: generic, universal: cards, charts, media) is shared by every org and references token *names* only. An **org component** (`rx/<project>/components/`: the client's own microapp: their finder, their page) is **org-private**: it belongs to that client and is served under their org. Names are unique across all tiers (lint-enforced), so a bare reference is unambiguous.
+- **Components live in TWO tiers.** The design system (the installed marketplace package: generic, universal: cards, charts, media) is shared by every org and references token *names* only. An **org component** (`rx/<project>/components/`: the client's own microapp: their finder, their page) is **org-private**: it belongs to that client and is served under their org. Names are unique within a tier, and an org never shadows a design-system name (lint-enforced), so a bare reference resolves the design system or a uniquely-named org component; two orgs sharing a name each address theirs as `<org>/<name>`.
 - **Atoms are universal and authoring-time only**: `rx/marketplace/atoms/`, one copy; the server expands every `Ref` before serving (atoms are never served or enumerable).
 - **Templates and styles are org-scoped**: `rx/<project>/`. Each org gets its own complete token set and templates. There are **no overlays**: if two orgs need different looks from the *same* universal component, that difference is 100% in their `styles/`. A component only becomes an org component when it IS the client's product, not to restyle a shared one.
 

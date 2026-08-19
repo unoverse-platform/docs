@@ -61,9 +61,10 @@ face in `scripts/lib/lint.mjs`) runs at authoring time and **mirrors** the serve
 | Closed primitive set + required fields per primitive | error | schema + `closed-set` |
 | Closed **style keys** + **space-scale steps** (an invented step = silently broken CSS) | error | none (lint-first) |
 | `$include`/`Ref` resolution: everything composes | error | `…: fully expands` tests |
-| **Component tiers**: names unique across the design system (`rx/marketplace/components/`) and every
-  org (`rx/orgs/<org>/components/`), no shadowing; design-system definitions never reference
-  org components (incl. template preview lists) | error | none |
+| **Component tiers**: names unique within a home, and an org component never shadows a
+  design-system name (two orgs MAY share a name, each addressed `<org>/<name>`,
+  per UNOVERSE_COMPONENT_ORGS.md); design-system definitions never reference
+  org components (incl. template preview lists) | error | `component-tiers.test.ts` |
 | A `Switch` case never re-guards its own discriminant | error | `self-guard.test.ts` |
 | **Microapp three homes**: all `props` are `input: true`; the `state` block is **scalar
   view-state only** (an array/object/URL in `state` is slop); the ONE admitted object is a

@@ -45,7 +45,7 @@ The same rules the platform's guard tests enforce in CI, run by Studio before an
 | **conditions** | only `eq`/`ne`/`in`/truthy: no `and`/`or`/arithmetic; `style.when` entries carry `field` + `apply` | error |
 | **self-guard** | a `Switch` case never re-checks its own discriminant ([03](/design/components)) | error |
 | **resolution** | every `$include` path and `Ref` atom actually exists | error |
-| **tiers** | component names unique across the design system and every org (no shadowing); design-system definitions never reference org components (incl. template preview lists) | error |
+| **tiers** | component names unique within a home, and an org component never shadows a design-system name (two orgs may share a name; each is addressed `<org>/<name>`); design-system definitions never reference org components (incl. template preview lists) | error |
 | **space scale** | dimension values are real scale steps: an invented step is silently broken CSS ([06](/design/styles-and-tokens)) | error |
 | **microapp: three homes** | all `props` are `input: true`; the `state` block is SCALAR view-state only (arrays/objects/URLs = slop) ([03](/design/components)) | error |
 | **microapp: state tree** | a tree component's root switches on the public axis (`view`; legacy alias `defaultState`); every state resolves a layout (same-name default) and the tree declares an `initial` | error |

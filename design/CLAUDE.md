@@ -22,7 +22,7 @@ UI is **data**: neutral JSON in `rx/`, rendered natively per platform by a dumb,
 
 Exemplars (as shipped): `rx/sab/components/product-card` (component tree: `products {}` + `detail` with private steps) · `rx/sab/templates/sab-chat-layout/manifest.yaml` (template tree: `main>welcome` contained; ladder `focus/products/detail`).
 
-**Two component tiers:** design system = the installed marketplace package (generic, org-neutral, any org); org = `rx/<project>/components/` (**org-private**, that client's own, discoverable only in their apps). Names UNIQUE across all tiers (lint error on collision); org may reference design-system, design-system NEVER references org (lint). URIs: `unoverse://components/<org>/<name>` (org) · `unoverse://components/<name>` (design system; bare also resolves any unique name).
+**Two component tiers:** design system = the installed marketplace package (generic, org-neutral, any org); org = `rx/<project>/components/` (**org-private**, that client's own, discoverable only in their apps). Names UNIQUE per tier: two orgs may ship the same name, but an org NEVER shadows a design-system name (lint error); org may reference design-system, design-system NEVER references org (lint). URIs: `unoverse://components/<org>/<name>` (org) · `unoverse://components/<name>` (design system; bare also resolves a uniquely-named org component, and errors listing candidates when two orgs share the name).
 
 ## 3. Three homes: everything a component shows (slop rule)
 
