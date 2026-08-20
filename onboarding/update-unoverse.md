@@ -28,7 +28,7 @@ on are part of Studio rather than a copy sitting in your project, so launching S
 what moves you to the current baseline. Nothing in your project folder goes stale, because
 nothing about the design system is written there.
 
-Your own `rx/`, `prompts/` and `nodes/` are untouched by any of this. They are yours, and
+Your own `design/`, `prompts/` and `nodes/` are untouched by any of this. They are yours, and
 Studio only reads them.
 
 ## Steps

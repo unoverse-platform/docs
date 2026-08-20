@@ -7,7 +7,7 @@ title: "Lifecycle Hooks"
 
 Think React lifecycle. A component fetches on mount, and the framework decides when mount
 happens. Here the platform owns the fire points, and a hook is data like everything else in
-`rx/`. You declare the calls. The platform runs them.
+`design/`. You declare the calls. The platform runs them.
 
 ---
 
@@ -144,7 +144,7 @@ knowing only what the search gave it. Open it, and it fills its own live details
 maps API. Three parts, no code:
 
 ```
-rx/<org>/components/restaurant-card/
+design/<org>/components/restaurant-card/
 ├── manifest.yaml            opts in, and declares what the calls may reach
 ├── fetchplacedetails.yaml   the calls, and the fields they return
 ├── restaurant-card.yaml      the card itself: props, and its state tree
@@ -253,7 +253,7 @@ camel-cased file works on a laptop and fetches nothing in a container.
 </Note>
 
 A component describes what it shows. The calls describe how to fetch something. Neither
-has to grow into the other, which is how `rx/` stays free of code.
+has to grow into the other, which is how `design/` stays free of code.
 
 <Note>
 A raw `<phase>.js` file beside the manifest is the older form, and the one case still

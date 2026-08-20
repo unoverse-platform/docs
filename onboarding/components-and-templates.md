@@ -10,7 +10,7 @@ This challenge is a build, not a theory tour:
 | | |
 | --- | --- |
 | **What you'll build** | Your org and its theme, plus a price card component your Agent can stream data into |
-| **Where it lives** | `rx/<your-project>/components/pricecard/` |
+| **Where it lives** | `design/<your-project>/components/pricecard/` |
 | **Where you'll see it** | Live in **Studio** while you design; in the conversation once wired to a workflow |
 
 This approach is called **SDUI**, server-driven UI. The interface is served as data, and each channel's native SDK renders it. One definition renders on your website, in your mobile apps, and on every channel you connect; publish a change and it is live on all of them at once, with no release cycle. [This introduction to SDUI](https://medium.com/digia-studio/server-driven-ui-sdui-the-necessary-evil-for-scalable-mobile-apps-80c650a2c8de) covers the pattern and why it scales; [SDUI and MCP Apps](/design/sdui-and-mcp-apps) explains how it works here.
@@ -37,12 +37,12 @@ Your own work lives in your org: its components, its apps, its brand. One comman
 # In Studio: New Project → "acme"
 ```
 
-You get `rx/acme/` with `components/`, `templates/`, and a complete copy of the default token set in `styles/`, self-contained and ready to rebrand.
+You get `design/acme/` with `components/`, `templates/`, and a complete copy of the default token set in `styles/`, self-contained and ready to rebrand.
 
 </Step>
 <Step title="Make your theme">
 
-The first design work in a new org is the brand. It lives in `rx/acme/styles/`:
+The first design work in a new org is the brand. It lives in `design/acme/styles/`:
 
 | Folder | What you set there |
 | --- | --- |
@@ -57,12 +57,12 @@ Change token values freely; keep every token name, and the theme contract stays 
 </Step>
 <Step title="Create your own component">
 
-Author your component in your project, at `rx/acme/components/pricecard/pricecard.json`. Here is a complete simple price card, and what it renders:
+Author your component in your project, at `design/acme/components/pricecard/pricecard.json`. Here is a complete simple price card, and what it renders:
 
 <Tabs>
 <Tab title="Definition">
 
-```json rx/acme/components/pricecard/pricecard.json
+```json design/acme/components/pricecard/pricecard.json
 {
   "unoverse": "1.0",
   "kind": "component",

@@ -1,7 +1,7 @@
 # Unoverse: Authoring Components & Templates (the complete guide)
 
 > **Status**: 🟢 Guide (June 2026). The single source of truth for *writing definitions*.
-> **Audience**: anyone creating or reviewing `apps/unoverse/rx/**` definitions.
+> **Audience**: anyone creating or reviewing `apps/unoverse/design/**` definitions.
 > **Companions**: [`UNOVERSE_STATE_MODEL.md`](./UNOVERSE_STATE_MODEL.md) (where state lives),
 > [`UNOVERSE_LAYERS.md`](./UNOVERSE_LAYERS.md) (how state organizes UI: `layouts/` + `states/` + `components/`),
 > [`UNOVERSE_CONFORMANCE.md`](./UNOVERSE_CONFORMANCE.md) (how these rules are **enforced**: the
@@ -10,7 +10,7 @@
 >
 > **One line:** a definition is **React without the framework**: state is data, the renderer
 > redraws on every change, and a tiny control-flow vocab decides what shows. You build **any**
-> UI in `rx/` data and **never edit the SDK**.
+> UI in `design/` data and **never edit the SDK**.
 >
 > **Use this doc two ways:** read §1–§8 to *build*; run §9 (the **conformance checklist**) to
 > *audit* an existing component or template.
@@ -63,10 +63,10 @@ Every component, template, and atom is one JSON file with the same envelope:
 
   | Kind | Lives in | Form |
   |---|---|---|
-  | component (design system) | `rx/marketplace/components/<name>/<name>.json` + optional `manifest.json` (discovery) + `layouts/` (one file per state that owns an arrangement) + optional `components/` (shapes 2+ layouts share) | flat `rx/marketplace/components/<name>.json` for a simple one-layout card; **generic + org-neutral: any org can use it**. Addressed `unoverse://components/<name>` |
-  | component (org) | `rx/orgs/<org>/components/<name>/`: same anatomy; **org-private** (the client's own microapp). Addressed `unoverse://components/<org>/<name>`; the server injects `org` from the folder. Names unique within the org; never shadow a design-system name (lint-enforced); two orgs may share a name | the client's finders/pages, never a restyle of a shared component (that's the theme's job) |
-  | template | `rx/orgs/<org>/templates/<name>/`, **manifest-only**: `manifest.json` IS the envelope; it declares the template tree in `states:`; root = `layouts/<manifest.layout>.json` (+ `states/` for the base's contained substate files, + `components/`) | org-scoped; no `<name>.json` |
-  | atom | `rx/marketplace/atoms/<name>.json` | shared partials, **authoring-time only**: the server always expands them before serving (never served, never enumerable, no Studio view) |
+  | component (design system) | `design/marketplace/components/<name>/<name>.json` + optional `manifest.json` (discovery) + `layouts/` (one file per state that owns an arrangement) + optional `components/` (shapes 2+ layouts share) | flat `design/marketplace/components/<name>.json` for a simple one-layout card; **generic + org-neutral: any org can use it**. Addressed `unoverse://components/<name>` |
+  | component (org) | `design/orgs/<org>/components/<name>/`: same anatomy; **org-private** (the client's own microapp). Addressed `unoverse://components/<org>/<name>`; the server injects `org` from the folder. Names unique within the org; never shadow a design-system name (lint-enforced); two orgs may share a name | the client's finders/pages, never a restyle of a shared component (that's the theme's job) |
+  | template | `design/orgs/<org>/templates/<name>/`, **manifest-only**: `manifest.json` IS the envelope; it declares the template tree in `states:`; root = `layouts/<manifest.layout>.json` (+ `states/` for the base's contained substate files, + `components/`) | org-scoped; no `<name>.json` |
+  | atom | `design/marketplace/atoms/<name>.json` | shared partials, **authoring-time only**: the server always expands them before serving (never served, never enumerable, no Studio view) |
 
 ### The state tree: the root declares the machine (State Model v2)
 
@@ -105,7 +105,7 @@ state:
   the files for the base arrangement's contained substates (a welcome hero), which
   the manifest's `states:` tree declares and the compiler contains (§8).
 
-- **Tier rules.** An org pack is `rx/orgs/<org>/{templates, styles, components}`. Component
+- **Tier rules.** An org pack is `design/orgs/<org>/{templates, styles, components}`. Component
   names are **unique within a tier**: two orgs may ship the same name (each addressed by
   its org URI), but an org may never shadow a design-system name (that collision is a
   lint error, per UNOVERSE_COMPONENT_ORGS.md). Both address forms are first-class: the bare URI
@@ -204,7 +204,7 @@ capability**: there is no flag inside it, and nothing else grants it.
 The manifest carries only discovery meta:
 
 ```jsonc
-// rx/marketplace/components/planfinder/manifest.json
+// design/marketplace/components/planfinder/manifest.json
 {
   "title": "Plan Finder",                       // display name (falls back to the def name)
   "description": "A guided plan-finder quiz: a few eligibility and preference questions ending in a best-fit plan recommendation.",
@@ -285,9 +285,9 @@ loads, fetch its live details from Google Maps").
 
 **The mental model: browser & page.** The platform has **one universal component node**
 that renders every component (`nodes/components/src/lib`, where `synthesize` builds a node def
-per rx component, `DesignComponentExecutor` runs them all; the only per-component variance
+per design component, `DesignComponentExecutor` runs them all; the only per-component variance
 is DATA). That node is a **browser**; a component is a **page**. Most pages are just
-content (the rx JSON). Some pages also carry a **script**, and the browser runs whatever
+content (the design JSON). Some pages also carry a **script**, and the browser runs whatever
 script the page brought, **without being rebuilt per page**. The handler is that script:
 it travels *with* the component, so **any** universal node, on **any** server, can run it.
 Nothing is baked into the node.
@@ -301,7 +301,7 @@ component that executes code); each lifecycle's code lives in a sibling file nam
 { …, "defaultState": "list", "lifecycle": ["onStart"] }   // authorizes onStart
 ```
 ```
-rx/orgs/<org>/components/restaurant-card/
+design/orgs/<org>/components/restaurant-card/
    restaurant-card.json      # the UI (data)
    manifest.json            # declares "lifecycle": ["onStart"]  ← the opt-in
    onstart.js               # the code: filename = the lifecycle
@@ -417,7 +417,7 @@ Future lifecycles are more fire points named the same way: `onexit`, `onrefresh`
 re-pull `onEnterView` deliberately does not do), each added to the platform's phase set
 and then to a manifest's `lifecycle` array. A component implements only the lifecycles it
 needs; absence = no handler, zero cost. Authors add **handlers**, never fire points: the
-phase set is platform-owned precisely so nothing can invent a moment to run code. The rx folder was
+phase set is platform-owned precisely so nothing can invent a moment to run code. The design folder was
 data-only until this feature. Lifecycle handlers are the **one sanctioned code carve-out**
 (like atoms), enforced by conformance: a lifecycle file must be **named for a known
 lifecycle** AND **opted into by the manifest's `lifecycle` array**. An un-opted file, or
@@ -427,7 +427,7 @@ one named for an unknown lifecycle, is a lint error (no silent/surprise code exe
 
 ## 4. Your first component (walkthrough)
 
-A focusable card that expands inline → focused. File: `rx/marketplace/components/mywidget/mywidget.json`.
+A focusable card that expands inline → focused. File: `design/marketplace/components/mywidget/mywidget.json`.
 
 ```jsonc
 {
@@ -479,14 +479,14 @@ A focusable card that expands inline → focused. File: `rx/marketplace/componen
 That's a complete, stateful component. The `state.view` tree declares the two states it
 can be in and which one it arrives in; the `Switch` draws whichever is current; `setValue`
 moves between them and the renderer redraws. Both names are PUBLIC (top level of the tree),
-so a template may rearrange for either. Drop the folder in `rx/marketplace/components/` and it's
+so a template may rearrange for either. Drop the folder in `design/marketplace/components/` and it's
 discoverable immediately (no registration).
 
 ---
 
 ## 5. Composition: atoms (`Ref`), `$include`, `Each`
 
-**Atoms (`Ref`)** are shared partials in `rx/marketplace/atoms/` (e.g. `button`, `account-row`,
+**Atoms (`Ref`)** are shared partials in `design/marketplace/atoms/` (e.g. `button`, `account-row`,
 `section-header`, `close-button`). Atoms are **authoring-time only**: the server always
 expands a `Ref` before serving, so channels only ever receive fully-expanded primitive
 trees (atoms are never served, never enumerable, and have no Studio view). A `Ref` inlines
@@ -494,7 +494,7 @@ an atom and **remaps its fields** via `props` (the atom's bind field ← your da
 It may also override `visibleWhen`, `action`, or `style`:
 
 ```jsonc
-// atom rx/marketplace/atoms/account-row.json binds label/sub/meta…
+// atom design/marketplace/atoms/account-row.json binds label/sub/meta…
 { "type": "Ref", "ref": "account-row",
   "props": { "label": "name", "sub": "accountNumber", "meta": "bankName" },
   "action": { "type": "setValue", "values": [{ "key": "step", "value": "amount" }] } }
@@ -517,7 +517,7 @@ bindings take the literal value.
 **bare node** (no envelope). Use it to give each *view* its own file:
 
 ```jsonc
-{ "$include": "step-source" }   // ← rx/marketplace/components/<name>/step-source.json
+{ "$include": "step-source" }   // ← design/marketplace/components/<name>/step-source.json
 ```
 
 **`Each`** repeats a subtree over a bound array; each item is the data scope for one copy:
@@ -633,7 +633,7 @@ between states by name (STATE_MODEL §5). Two template-only primitives place con
 to a workflow, and describes it. The sab pilot, as shipped:
 
 ```yaml
-# rx/sab/templates/sab-chat-layout/manifest.yaml
+# design/sab/templates/sab-chat-layout/manifest.yaml
 name: sab-chat-layout
 description: The SAB customer-support chat, with a route to live support.
 whenToUse: "Ask SAB a banking question or get general help…"   # SELECTION text: below
@@ -793,8 +793,8 @@ authored cleanly. Adding to this set is an SDK change gated by build-failing gua
 
 ## 11. Tokens: where values live
 
-`rx/orgs/<org>/styles/` is the only place raw values exist (each org's style set is complete
-and self-contained; `rx/orgs/default/styles` is the default token set and the starter you copy
+`design/orgs/<org>/styles/` is the only place raw values exist (each org's style set is complete
+and self-contained; `design/orgs/default/styles` is the default token set and the starter you copy
 for a new org): `base/` (raw scales: color, spacing, radius, shadow, border, motion,
 typography) → `semantic/` + `themes/` (named meanings components use: `text.primary`,
 `surface.base`, `action.primary`, `space` steps, `headline.sm`). A brand or dark-mode change is

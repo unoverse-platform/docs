@@ -13,7 +13,7 @@ npm install -g unoverse
 unoverse studio
 ```
 
-It opens on http://localhost:4108 and finds your project by looking for `rx/` in the current
+It opens on http://localhost:4108 and finds your project by looking for `design/` in the current
 folder, any parent, or a single folder directly below. So it works from inside your project
 or from the folder you created it in. [Studio](/onboarding/studio) covers the setup in full.
 
@@ -92,7 +92,7 @@ Debugging order, always: **stream log** (did it arrive?) → **state inspector**
 ## The full loop
 
 ```bash
-vi rx/acme/components/pricecard/pricecard.yaml   # 1. edit (schema validates as you type)
+vi design/acme/components/pricecard/pricecard.yaml   # 1. edit (schema validates as you type)
 unoverse build              # 2. the node re-synthesizes from the definition at boot
 # 3. Studio: mock states → looks right
 # 4. Studio: live mode → streams right

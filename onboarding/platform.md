@@ -146,12 +146,12 @@ Don't mix them up. `.env` is local development on your laptop; production config
 
 ## Where your code lives
 
-**Not in this repo.** This repo operates the universe; everything you author lives in a **Studio project**: Studio scaffolds it (`rx/`, `prompts/`, `nodes/` in the project folder), validates it as you work, and publishes it to your universe over the API.
+**Not in this repo.** This repo operates the universe; everything you author lives in a **Studio project**: Studio scaffolds it (`design/`, `prompts/`, `nodes/` in the project folder), validates it as you work, and publishes it to your universe over the API.
 
 | You build | In | Guide |
 | --- | --- | --- |
 | **Logic**: custom workflow nodes (YAML manifests) | Studio project `nodes/` | [Create Your First Node](/onboarding/create-your-first-node) |
-| **Design**: components, templates, styles | Studio project `rx/` | [Components and Templates](/onboarding/components-and-templates) |
+| **Design**: components, templates, styles | Studio project `design/` | [Components and Templates](/onboarding/components-and-templates) |
 | **Behavior**: Agent skills and prompt blocks | Studio project `prompts/` | [Create Your First Agent](/onboarding/create-your-first-agent) |
 
 You don't have to build everything yourself. The **marketplace** offers the design system and ready-made nodes and services to install into your universe, per item.
@@ -160,7 +160,7 @@ You don't have to build everything yourself. The **marketplace** offers the desi
 
 ```bash Daily workflow
 unoverse start                               # start your day
-# edit nodes/, rx/, or prompts/
+# edit nodes/, design/, or prompts/
 unoverse build                               # build all + restart
 unoverse build @unoverse-platform/my-node    # or build one package
 unoverse stop                                # end your day

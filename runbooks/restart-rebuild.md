@@ -3,7 +3,7 @@ sidebarTitle: "Restart & Rebuild"
 title: "Runbook: Restart & Rebuild"
 ---
 
-Rebuild packages and restart services so the platform picks up your latest changes. Component nodes are definition-backed: they re-synthesize from `rx/` at boot; there is no generation step, ever.
+Rebuild packages and restart services so the platform picks up your latest changes. Component nodes are definition-backed: they re-synthesize from `design/` at boot; there is no generation step, ever.
 
 ## When To Use
 
@@ -21,7 +21,7 @@ unoverse build
 # Build one package only
 unoverse build @unoverse-platform/my-package
 
-# Restart only: component nodes re-synthesize from rx/ definitions at boot
+# Restart only: component nodes re-synthesize from design/ definitions at boot
 unoverse build
 
 ```
@@ -42,15 +42,15 @@ unoverse deploy    # pull latest images + restart
 |------|---------|-------------|
 | **1. Install deps** | `npm install` | Installs workspace dependencies |
 | **2. Build packages** | `npm run build` | Compiles node packages (TypeScript → `dist/`) |
-| **3. Restart unoverse** | `unoverse build` | Reloads built packages, and re-synthesizes component nodes from `rx/` definitions: the node catalog is loaded **at boot**, so a rebuild without a restart appears to do nothing |
+| **3. Restart unoverse** | `unoverse build` | Reloads built packages, and re-synthesizes component nodes from `design/` definitions: the node catalog is loaded **at boot**, so a rebuild without a restart appears to do nothing |
 
 ## Which change needs which step?
 
 | You changed | Do |
 |---|---|
 | A newly published node (from Studio) | nothing: live on the next workflow run |
-| An **existing** component/template's look (`rx/`) | nothing: definitions are read live; hard-refresh the client |
-| A **new** component, or props/structure changes (`rx/`) | `unoverse build` |
+| An **existing** component/template's look (`design/`) | nothing: definitions are read live; hard-refresh the client |
+| A **new** component, or props/structure changes (`design/`) | `unoverse build` |
 | A skill or prompt block (`prompts/`) | `unoverse build` |
 
 ## Manual Step-by-Step (when CLI commands aren't enough)
@@ -64,7 +64,7 @@ npm run build
 
 # 3. Restart the service that loads packages (the workflow engine runs
 #    in-process in unoverse, so one restart covers everything: component
-#    nodes re-synthesize from rx/ at this boot)
+#    nodes re-synthesize from design/ at this boot)
 unoverse build
 
 # 4. Verify

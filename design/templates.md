@@ -17,7 +17,7 @@ The connection between components and templates is **one rule**:
 ## The anatomy: manifest-only
 
 ```
-rx/<project>/templates/acmechatlayout/
+design/<project>/templates/acmechatlayout/
 ├── manifest.yaml        # THE ENVELOPE: everything about the app, incl. the state tree
 ├── layouts/             # the ARRANGEMENTS: one per state (same-name default)
 │   ├── main.yaml        #   the base: the core chat alone
@@ -30,7 +30,7 @@ rx/<project>/templates/acmechatlayout/
 There is **no `<name>.yaml`**: the manifest is the single contract file. Same grammar as components ([03](/design/components)): a component declares a `view` tree; a template declares a `states:` tree. Each layout is a complete arrangement: typically `{ "$include": "components/core" }` plus that state's slot, so shared chrome lives once in `components/` and every layout includes it.
 
 ```yaml
-# manifest.yaml: the whole app in one file (rx/sab/templates/sab-chat-layout, as shipped)
+# manifest.yaml: the whole app in one file (design/sab/templates/sab-chat-layout, as shipped)
 name: sab-chat-layout
 description: The SAB customer-support chat, with a route to live support.
 whenToUse: Ask SAB a banking question or get general help from customer support…   # utterance-shaped: selection text

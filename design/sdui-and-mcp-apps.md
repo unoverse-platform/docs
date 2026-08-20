@@ -12,7 +12,7 @@ title: "SDUI & MCP Apps"
 ```
   YOU WRITE (data)                 THE PLATFORM PROVIDES (code)
 ┌──────────────────────┐        ┌─────────────────────────────────┐
-│ rx/ definitions      │        │ SDK renderer (per platform)     │
+│ design/ definitions      │        │ SDK renderer (per platform)     │
 │  components/ atoms/  │  MCP   │  web · Flutter · iOS · Android  │
 │  orgs/<org>/         │ ─────► │  dumb, generic, style-free      │
 │    templates/ styles/│ stream │                                 │

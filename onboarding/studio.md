@@ -54,7 +54,7 @@ that folder and names it after the folder:
 mkdir acme && cd acme
 unoverse studio
 
-  Created rx/acme/, prompts/ and nodes/ in /Users/you/code/acme
+  Created design/acme/, prompts/ and nodes/ in /Users/you/code/acme
 ```
 
 The folder's name is also the **org** on everything that project publishes. So it has to be
@@ -63,27 +63,27 @@ for a name instead.
 
 ```
 acme/                        your project
-  rx/acme/                   components, templates, styles
+  design/acme/                   components, templates, styles
   prompts/                   Agent skills and prompt blocks
   nodes/                     your own integrations
 ```
 
-`rx/` holds a folder per project, not your files directly, because one repository can carry
+`design/` holds a folder per project, not your files directly, because one repository can carry
 several and each publishes separately. Add more from Studio's **New project** whenever you
-want; they sit beside `rx/acme/`.
+want; they sit beside `design/acme/`.
 
 You also get a first component, so Studio opens on something real rather than an empty list.
 
 Next time, run `unoverse studio` from `acme/` or anywhere inside it.
 
 A project and a universe are different sets of files, so they can share one folder. Run
-`unoverse create` in this folder later and you get a universe here too, with your `rx/`,
+`unoverse create` in this folder later and you get a universe here too, with your `design/`,
 `prompts/` and `nodes/` untouched.
 
 </Step>
 <Step title="Edit the first component">
 
-Studio opens on **http://localhost:4108**. Open `rx/<your-project>/components/welcome/welcome.yaml`,
+Studio opens on **http://localhost:4108**. Open `design/<your-project>/components/welcome/welcome.yaml`,
 change the text, and save. Studio updates as you save.
 
 </Step>
@@ -94,7 +94,7 @@ wizard with nothing installed, and `npm install -g @unoverse-platform/studio` in
 Studio itself, as the `unoverse-studio` command.
 
 Run it again inside an existing project and it skips all that and opens straight away. It
-finds your project by looking for `rx/` in the current folder or any parent, so it works from
+finds your project by looking for `design/` in the current folder or any parent, so it works from
 anywhere inside it, and it will not offer to make a second project inside one you already
 have.
 

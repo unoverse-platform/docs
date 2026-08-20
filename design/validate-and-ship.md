@@ -11,7 +11,7 @@ Validation lives in **Studio**, because Studio is the only thing that publishes:
 
 ## Layer 1: The JSON Schema (as you type)
 
-`rx/_schema/unoverse.schema.json` validates every definition in your editor (wiring in [01](/design/quick-start)). Structural, zero false positives. It catches:
+`design/_schema/unoverse.schema.json` validates every definition in your editor (wiring in [01](/design/quick-start)). Structural, zero false positives. It catches:
 
 - missing envelope fields (`unoverse`, `kind`, `name`, `root`; components also need `category`: discovery meta lives in the **manifest**)
 - an unknown primitive `type` (the closed set is encoded)
@@ -25,9 +25,9 @@ One-off sweep of everything from the CLI, if you want it (needs `ajv` and `yaml`
 ```bash
 # from the repo root: validate every definition against the schema
 node -e 'const A=require("ajv"),Y=require("yaml");const fs=require("fs"),p=require("path");
-const v=new A({allErrors:true,strict:false}).compile(JSON.parse(fs.readFileSync("rx/_schema/unoverse.schema.json")));
+const v=new A({allErrors:true,strict:false}).compile(JSON.parse(fs.readFileSync("design/_schema/unoverse.schema.json")));
 const w=d=>fs.existsSync(d)?fs.readdirSync(d).flatMap(f=>{const q=p.join(d,f);return fs.statSync(q).isDirectory()?w(q):(f.endsWith(".yaml")&&f!=="manifest.yaml"&&!f.endsWith(".states.yaml")?[q]:[])}):[];
-let bad=0;for(const d of["rx/marketplace/components","rx/marketplace/atoms","rx"])for(const f of w(d))if(!v(Y.parse(fs.readFileSync(f,"utf8")))){bad++;console.log("✗",f,v.errors[0].instancePath,v.errors[0].message)}
+let bad=0;for(const d of["design/marketplace/components","design/marketplace/atoms","design"])for(const f of w(d))if(!v(Y.parse(fs.readFileSync(f,"utf8")))){bad++;console.log("✗",f,v.errors[0].instancePath,v.errors[0].message)}
 console.log(bad?bad+" invalid":"clean ✓")'
 ```
 

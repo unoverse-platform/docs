@@ -1,7 +1,7 @@
 # Unoverse Conformance (how the rules are enforced)
 
 > **Status**: 🟢 Live end-to-end (July 2026): schema + guards + the `./unoverse lint` CLI.
-> **Audience**: anyone authoring `rx/**` definitions, or maintaining the guards.
+> **Audience**: anyone authoring `design/**` definitions, or maintaining the guards.
 > **Companions**: [`UNOVERSE_AUTHORING.md`](./UNOVERSE_AUTHORING.md) (the rules),
 > [`UNOVERSE_LAYERS.md`](./UNOVERSE_LAYERS.md) (layouts/states/components), [`UNOVERSE_STATE_MODEL.md`](./UNOVERSE_STATE_MODEL.md) (§5 = the six rules).
 >
@@ -22,16 +22,16 @@ Four layers, by *when* they catch you:
 
 | Layer | When | Catches | Where |
 |---|---|---|---|
-| **JSON Schema** | **as you type** (editor) | shape rules: vocabulary, envelope, primitive completeness, condition form, style keys | `rx/_schema/unoverse.schema.json` |
-| **`./unoverse lint`** | **before deploy** (CLI, no deps, ships in the starter) | everything below, with doc-cited messages; 0 errors required | `packages/base/src/lint/rx/` (face: `scripts/lib/lint.mjs`) |
-| **Guard tests** | on `npm test` / CI | the same rules server-side, on the **composed** tree | `server/tests/rx/*.test.ts` |
+| **JSON Schema** | **as you type** (editor) | shape rules: vocabulary, envelope, primitive completeness, condition form, style keys | `design/_schema/unoverse.schema.json` |
+| **`./unoverse lint`** | **before deploy** (CLI, no deps, ships in the starter) | everything below, with doc-cited messages; 0 errors required | `packages/base/src/lint/design/` (face: `scripts/lib/lint.mjs`) |
+| **Guard tests** | on `npm test` / CI | the same rules server-side, on the **composed** tree | `server/tests/design/*.test.ts` |
 | **SDK closed-set** | on SDK build | the primitive set + the feature-free state machine are frozen | `unoverse/react/test/closed-set.test.mjs`, `core/test/state-model.test.mjs` |
 
 ---
 
 ## 2. The JSON Schema (editor guidance)
 
-**File:** `apps/unoverse/rx/_schema/unoverse.schema.json` · **Wired in:** `.vscode/settings.json`.
+**File:** `apps/unoverse/design/_schema/unoverse.schema.json` · **Wired in:** `.vscode/settings.json`.
 
 Inline, before you ever run anything: autocomplete of the 16 primitives; errors on an invalid
 `type`; a broken `Switch` (no `on`/`cases`), `Each` (needs `template` + literal `items: []` or
@@ -51,9 +51,9 @@ cross-platform vocabulary, incl. inside `hover` and `when[].apply`).
 
 ## 3. `./unoverse lint` + the guard tests (one rule set, two homes)
 
-The CLI (`./unoverse lint`; the rules live in `packages/base/src/lint/rx/`, the terminal
+The CLI (`./unoverse lint`; the rules live in `packages/base/src/lint/design/`, the terminal
 face in `scripts/lib/lint.mjs`) runs at authoring time and **mirrors** the server guards
-(`server/tests/rx/*.test.ts`), which re-check on CI against the composed tree. The rules:
+(`server/tests/design/*.test.ts`), which re-check on CI against the composed tree. The rules:
 
 | Rule | Level | Guard twin |
 |---|---|---|
@@ -92,7 +92,7 @@ face in `scripts/lib/lint.mjs`) runs at authoring time and **mirrors** the serve
 | **Surfaces select on the public axis**: a reaction surface's `select.where` field is
   `view` (legacy alias `defaultState`), never a component's internal key (warn); and it
   claims exactly ONE view with a string `eq`; `ne`/`in`/bare selects are errors
-  (`packages/base/src/lint/rx/walk.mjs`) | warn/error | none (lint-first) |
+  (`packages/base/src/lint/design/walk.mjs`) | warn/error | none (lint-first) |
 | **Deprecated bridge**: a component writing template state (`setTemplateValue` from a
   component = error; writing `defaultState` into template state = warn) | warn/error | none |
 | Theme token contract across orgs | CI only | `theme-contract.test.ts` |

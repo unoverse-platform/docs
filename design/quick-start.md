@@ -17,14 +17,14 @@ A `PriceCard` component: a card that shows a product name, a price, and a short 
 
 ## Step 1: Scaffold, then shape the definition
 
-> Throughout these docs, `rx/` means the design folder in your Studio project workspace. Studio reads it directly; publishing sends it to your universe.
+> Throughout these docs, `design/` means the design folder in your Studio project workspace. Studio reads it directly; publishing sends it to your universe.
 
 ```bash
-# In Studio: New Project → "acme": scaffolds rx/acme/ (components/, templates/,
+# In Studio: New Project → "acme": scaffolds design/acme/ (components/, templates/,
 # and a complete copy of the default token set in styles/)
 ```
 
-This creates `rx/acme/components/pricecard/pricecard.yaml`, already passing the linter: you fill the TODOs and shape the tree. Edited for our card:
+This creates `design/acme/components/pricecard/pricecard.yaml`, already passing the linter: you fill the TODOs and shape the tree. Edited for our card:
 
 ```yaml
 unoverse: "1.0"
@@ -76,15 +76,15 @@ What each part is:
 
 ## Step 2: Validate as you type
 
-The JSON Schema at `rx/_schema/unoverse.schema.json` catches structural mistakes (unknown primitive, missing `whenToUse`, a `Switch` without `cases`, an illegal condition) **in your editor**. Definitions are YAML, so wire it once through the YAML extension in `.vscode/settings.json` (the schema file itself stays JSON: it is the schema, not a definition):
+The JSON Schema at `design/_schema/unoverse.schema.json` catches structural mistakes (unknown primitive, missing `whenToUse`, a `Switch` without `cases`, an illegal condition) **in your editor**. Definitions are YAML, so wire it once through the YAML extension in `.vscode/settings.json` (the schema file itself stays JSON: it is the schema, not a definition):
 
 ```jsonc
 {
   "yaml.schemas": {
-    "./rx/_schema/unoverse.schema.json": [
-      "**/rx/**/components/**/*.yaml",
-      "**/rx/**/templates/**/*.yaml",
-      "**/rx/**/atoms/*.yaml"
+    "./design/_schema/unoverse.schema.json": [
+      "**/design/**/components/**/*.yaml",
+      "**/design/**/templates/**/*.yaml",
+      "**/design/**/atoms/*.yaml"
     ]
   }
 }

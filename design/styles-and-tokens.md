@@ -65,14 +65,14 @@ The threshold is `grid.stackBelow` in `semantic/grid.yaml` (starter: `space.120`
 style: { columns: "12", stackBelow: "160" }   # hold the shape until 40rem
 ```
 
-**It measures the grid, not the browser window.** A component reacts to the space it was actually given, so the same component stacks correctly in a 360px rail and lays out wide in a full panel, on any device. This is the same container-query mechanism as `hideBelow` / `hideAbove`, and it is why there are no device breakpoints anywhere in `rx/`.
+**It measures the grid, not the browser window.** A component reacts to the space it was actually given, so the same component stacks correctly in a 360px rail and lays out wide in a full panel, on any device. This is the same container-query mechanism as `hideBelow` / `hideAbove`, and it is why there are no device breakpoints anywhere in `design/`.
 
 ## A shared look belongs in an atom, not in every component
 
 If several components draw the same card, the card's style is written once, in an atom, and composed by `Ref`. Repeating `background` + `border` + `radius` + `padding` in ten definitions is the same duplication LAW 1 exists to prevent, one level up: a token stops a value being repeated, an atom stops a *combination* of them being repeated.
 
 ```yaml
-# rx/marketplace/atoms/card.yaml: the shape, once
+# design/marketplace/atoms/card.yaml: the shape, once
 name: card
 root:
   type: Box
@@ -97,7 +97,7 @@ root:
 ## The token layers
 
 ```
-rx/<project>/styles/
+design/<project>/styles/
 ├── base/        # raw scales: the only place raw values EXIST
 │   ├── color.yaml        # palettes
 │   ├── spacing.yaml      # the space scale (the closed step set: see LAW above)
@@ -142,9 +142,9 @@ Names are **optional**: raw CSS in `appWidth` is always valid, but prefer them: 
 
 ## Org scoping
 
-- **Components live in TWO tiers.** The design system (the installed marketplace package: generic, universal: cards, charts, media) is shared by every org and references token *names* only. An **org component** (`rx/<project>/components/`: the client's own microapp: their finder, their page) is **org-private**: it belongs to that client and is served under their org. Names are unique within a tier, and an org never shadows a design-system name (lint-enforced), so a bare reference resolves the design system or a uniquely-named org component; two orgs sharing a name each address theirs as `<org>/<name>`.
-- **Atoms are universal and authoring-time only**: `rx/marketplace/atoms/`, one copy; the server expands every `Ref` before serving (atoms are never served or enumerable).
-- **Templates and styles are org-scoped**: `rx/<project>/`. Each org gets its own complete token set and templates. There are **no overlays**: if two orgs need different looks from the *same* universal component, that difference is 100% in their `styles/`. A component only becomes an org component when it IS the client's product, not to restyle a shared one.
+- **Components live in TWO tiers.** The design system (the installed marketplace package: generic, universal: cards, charts, media) is shared by every org and references token *names* only. An **org component** (`design/<project>/components/`: the client's own microapp: their finder, their page) is **org-private**: it belongs to that client and is served under their org. Names are unique within a tier, and an org never shadows a design-system name (lint-enforced), so a bare reference resolves the design system or a uniquely-named org component; two orgs sharing a name each address theirs as `<org>/<name>`.
+- **Atoms are universal and authoring-time only**: `design/marketplace/atoms/`, one copy; the server expands every `Ref` before serving (atoms are never served or enumerable).
+- **Templates and styles are org-scoped**: `design/<project>/`. Each org gets its own complete token set and templates. There are **no overlays**: if two orgs need different looks from the *same* universal component, that difference is 100% in their `styles/`. A component only becomes an org component when it IS the client's product, not to restyle a shared one.
 
 Starting a new org: copy the neutral baseline and re-token it
 

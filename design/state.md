@@ -32,7 +32,7 @@ The contract is six rules (canon: `UNOVERSE_STATE_MODEL.md` §5). Learn them onc
 The component declares its states, and every state names the drawing that shows it:
 
 ```yaml
-# product-card.yaml (rx/sab/components/product-card, as shipped)
+# product-card.yaml (design/sab/components/product-card, as shipped)
 state:
   view:                      # the PUBLIC axis
     initial: products
@@ -76,7 +76,7 @@ Match: the template enters its own state of that name and that state's layout dr
 A template declares its own state tree in its manifest, and one declaration answers everything:
 
 ```yaml
-# manifest.yaml (rx/sab/templates/sab-chat-layout, as shipped)
+# manifest.yaml (design/sab/templates/sab-chat-layout, as shipped)
 states:
   main:                 # the base arrangement, always first
     states:

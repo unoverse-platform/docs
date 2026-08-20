@@ -166,7 +166,7 @@ one funnel.
 
 ## Where events go is not your decision
 
-You declare what happened. The destination is configured per customer, outside `rx/`.
+You declare what happened. The destination is configured per customer, outside `design/`.
 
 The reason is practical. The same template runs on a customer's site, in the Unoverse
 client, and inside an MCP app host. Each has a different destination, or none. A template

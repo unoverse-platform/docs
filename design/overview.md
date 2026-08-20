@@ -5,9 +5,9 @@ title: "Design Overview"
 
 **Build cross-platform, server-driven UI (SDUI) as pure data: components and templates that render natively on every channel, streamed by real agents over MCP.**
 
-You never write React, SwiftUI, or Compose. You write **neutral JSON definitions** in `rx/`, style them with **tokens**, drive them with a tiny **generic state model**, and view/test everything live in **Studio**. The platform turns each definition into a workflow node and serves it to every client as an **MCP App**.
+You never write React, SwiftUI, or Compose. You write **neutral JSON definitions** in `design/`, style them with **tokens**, drive them with a tiny **generic state model**, and view/test everything live in **Studio**. The platform turns each definition into a workflow node and serves it to every client as an **MCP App**.
 
-The folder is called `rx/` for **Relationship Experience**: the interfaces you define here are how your brand's Agents meet people.
+The folder is called `design/` for **Relationship Experience**: the interfaces you define here are how your brand's Agents meet people.
 
 ---
 
@@ -46,10 +46,10 @@ Work through these in order: each doc builds on the previous one.
 
 | I want to… | Build a… | Doc |
 |---|---|---|
-| Show a piece of streamed data (a card, a chart, a list) | **Component**: design-system tier (the installed marketplace package, org-neutral) or project tier (`rx/<project>/components/`, that org's own) | [03](/design/components) |
-| Reuse a small piece across components | **Atom** (`rx/marketplace/atoms/`: authoring-time only; the server expands it before serving) | [03](/design/components) |
-| Define a whole surface (chat, voice, dashboard) | **Template** (`rx/<project>/templates/`) | [05](/design/templates) |
-| Change colors / spacing / brand | **Tokens** (`rx/<project>/styles/`) | [06](/design/styles-and-tokens) |
+| Show a piece of streamed data (a card, a chart, a list) | **Component**: design-system tier (the installed marketplace package, org-neutral) or project tier (`design/<project>/components/`, that org's own) | [03](/design/components) |
+| Reuse a small piece across components | **Atom** (`design/marketplace/atoms/`: authoring-time only; the server expands it before serving) | [03](/design/components) |
+| Define a whole surface (chat, voice, dashboard) | **Template** (`design/<project>/templates/`) | [05](/design/templates) |
+| Change colors / spacing / brand | **Tokens** (`design/<project>/styles/`) | [06](/design/styles-and-tokens) |
 | Make UI react (tabs, wizard steps, expand/collapse) | **State + the four moves** | [04](/design/state) |
 | Fill a card with live data it did not arrive with | **Lifecycle hook** (`onStart`, or `onEnterView` when a view is opened) | [06b](/design/lifecycle-hooks) |
 
@@ -73,7 +73,7 @@ Work through these in order: each doc builds on the previous one.
 
 ```bash
 # 1. Scaffold a conformant definition, then shape it (schema validates as you type)
-# In Studio: New Project → "acme": scaffolds rx/acme/ with the default token set
+# In Studio: New Project → "acme": scaffolds design/acme/ with the default token set
 
 # 2. Lint (schema + token law + state rules, doc-cited messages), then deploy
 # Validation runs in Studio: the schema as you type, the full lint at publish

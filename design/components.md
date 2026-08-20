@@ -10,7 +10,7 @@ title: "Components"
 ## The anatomy
 
 ```
-rx/marketplace/components/product-card/
+design/marketplace/components/product-card/
 ├── product-card.yaml     # envelope: name, nodeSize, outputs, props, the STATE TREE, root
 ├── manifest.yaml         # the RENDER CONTRACT + discovery meta (see below)
 ├── layouts/              # the DRAWINGS: one file per state that owns an arrangement
@@ -27,20 +27,20 @@ A **flat component** (a simple card, a chart) is the reduced form: just `<name>.
 
 | Tier | Home | Scope | URI |
 |---|---|---|---|
-| **Design system** | `rx/marketplace/components/<name>/` | generic, org-neutral: any org can use it (cards, charts, markdown, media) | `unoverse://components/<name>` |
-| **Org** | `rx/<project>/components/<name>/` | **org-private**: that client's own components/microapps, usable and discoverable only inside that org's apps and conversations | `unoverse://components/<org>/<name>` |
+| **Design system** | `design/marketplace/components/<name>/` | generic, org-neutral: any org can use it (cards, charts, markdown, media) | `unoverse://components/<name>` |
+| **Org** | `design/<project>/components/<name>/` | **org-private**: that client's own components/microapps, usable and discoverable only inside that org's apps and conversations | `unoverse://components/<org>/<name>` |
 
 Names are **unique within a tier**: two orgs may ship the same component name (each addressed by its org URI), but an org may never **shadow a design-system name** (that collision is a lint error). Both address forms are first-class: the bare URI is the canonical address for a design-system component, the org URI (`unoverse://components/<org>/<name>`) for an org component. A bare ref still resolves an org component while its name is unique across orgs; once two orgs carry the name, the bare ref is a loud resolver error naming the qualified candidates, never a guess (docs/unoverse/UNOVERSE_COMPONENT_ORGS.md). Direction rule: org things may reference design-system things; **design-system things never reference org things** (lint-enforced, including template preview lists).
 
-- **Everything is kebab-case, and `name` IS the folder name** (`product-card`, `deal-page`, `form-field`): the folder, the `<name>.yaml` inside it, and the `name:` field all carry the same string. `name` is not a display label. The served URI is built from it, so a component named `InvestorApplication` in a folder named `investor-application` loads from disk, passes every other check, and then answers **"definition not found"** in Studio and every channel. Guard: `server/tests/rx/definition-naming.test.ts`.
-- **`components/` vs atoms:** a shape shared across *this component's* layouts → its own `components/` (`$include`). A shape shared across *many components* (a close button, a choice row) → a universal atom in `rx/marketplace/atoms/` (`Ref`). Used once → inline it. Atoms are **authoring-time only**: the server always expands them before serving (channels only ever receive fully-expanded primitive trees; atoms are never served, never enumerable, and have no **Studio** view). A `Ref`'s `props` remaps *fields*; its `with` passes *literals* into the atom: `{ type: Ref, ref: button, with: { label: Learn more, icon: arrowRight }, action: { … } }` hardcodes those attributes, and a truthy `with` key satisfies (drops) a matching `visibleWhen` guard, so unprovided pieces stay hidden.
+- **Everything is kebab-case, and `name` IS the folder name** (`product-card`, `deal-page`, `form-field`): the folder, the `<name>.yaml` inside it, and the `name:` field all carry the same string. `name` is not a display label. The served URI is built from it, so a component named `InvestorApplication` in a folder named `investor-application` loads from disk, passes every other check, and then answers **"definition not found"** in Studio and every channel. Guard: `server/tests/design/definition-naming.test.ts`.
+- **`components/` vs atoms:** a shape shared across *this component's* layouts → its own `components/` (`$include`). A shape shared across *many components* (a close button, a choice row) → a universal atom in `design/marketplace/atoms/` (`Ref`). Used once → inline it. Atoms are **authoring-time only**: the server always expands them before serving (channels only ever receive fully-expanded primitive trees; atoms are never served, never enumerable, and have no **Studio** view). A `Ref`'s `props` remaps *fields*; its `with` passes *literals* into the atom: `{ type: Ref, ref: button, with: { label: Learn more, icon: arrowRight }, action: { … } }` hardcodes those attributes, and a truthy `with` key satisfies (drops) a matching `visibleWhen` guard, so unprovided pieces stay hidden.
 
 ---
 
 ## The manifest: the render contract
 
 ```yaml
-# rx/marketplace/components/product-card/manifest.yaml
+# design/marketplace/components/product-card/manifest.yaml
 title: Product Card
 description: A compact product card, expandable to full product detail.   # what it IS, ≤120 chars
 whenToUse: Show one product or service a customer could take…             # the USER's words: findIntent ranks on this
@@ -112,7 +112,7 @@ props:
 
 ## The state tree: states own their layouts
 
-A stateful component declares a **state tree** on the `view` axis, and every state names the drawing that shows it. This is the spine of the whole design (`rx/sab/components/product-card`, as shipped):
+A stateful component declares a **state tree** on the `view` axis, and every state names the drawing that shows it. This is the spine of the whole design (`design/sab/components/product-card`, as shipped):
 
 ```yaml
 # product-card.yaml (envelope excerpt)
