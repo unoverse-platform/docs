@@ -117,41 +117,17 @@ a string in.
 
 ## What you actually write
 
-`node.yaml` gets the floor. `config.yaml` gets the two builder fields, and they are the same
-in every node, so copy them:
+`node.yaml` gets the floor. **That is all.** The builder's two controls are platform
+chrome: the platform injects them into every runnable node's settings form, after your
+own fields, so every box on every canvas carries them and no author writes them.
 
-```yaml config.yaml
-configSchema:
-  type: object
-  properties:
-    authRequired:
-      type: boolean
-      title: Require sign-in
-      description: >-
-        Only a signed-in caller may run this step. Leave off
-        and it runs for whoever the workflow's trigger
-        admitted, which is the usual answer.
-      default: false
-      "ui:widget": toggle
-    authRole:
-      type: string
-      title: Require role
-      description: >-
-        A claim the caller's account must carry, as noun:verb
-        (finance:approve, payments:refund). Leave blank to
-        require only that they are signed in.
-      default: ""
-      "ui:dependencies": { authRequired: true }
+The two field names, `authRequired` and `authRole`, are therefore **reserved**. A
+`config.yaml` declaring either is a lint error: the platform's definition supersedes a
+copy anyway, so the copy could only mislead whoever reads the file. If you are updating
+an older node that still carries them, delete both fields and their `ui:order` entries.
 
-ui:order: [model, prompt, authRequired, authRole]
-```
-
-Put both in `ui:order` too, at the end, after your own fields. They are settings about
-access rather than about the job, so they belong last.
-
-Lint checks all of it: both fields present, the right types, the toggle rendering as a
-toggle, the role box hidden until the toggle is on, and both defaulting to off. A node that
-gated by default would break every workflow already using it.
+(An annotation, a node with no inputs, no outputs and no api, gets no access section:
+it is never run, so there is nobody to authorize.)
 
 ## Where it is enforced
 

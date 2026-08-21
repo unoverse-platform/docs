@@ -228,21 +228,12 @@ configSchema:
       default: ""
       ui:field: template
 
-    # The same two fields on every node, so a workflow builder can gate this box.
-    # See who-can-run-it.md.
-    authRequired:
-      type: boolean
-      title: Require sign-in
-      default: false
-      "ui:widget": toggle
-    authRole:
-      type: string
-      title: Require role
-      default: ""
-      "ui:dependencies": { authRequired: true }
-
-"ui:order": [model, prompt, authRequired, authRole]
+"ui:order": [model, prompt]
 ```
+
+Every node's form also ends with two access controls ("Require sign-in", "Require role")
+that the platform injects; you never declare them, and their names (`authRequired`,
+`authRole`) are reserved. See [Who Can Run It](/nodes/who-can-run-it).
 
 `description` is the help text a person reads under the field. Say what the setting
 **does**, keep it short, and don't restate the label.

@@ -113,24 +113,11 @@ interface:
       type: string
       description: Who said it
 
-# This node has no settings of its own, but every node carries these two. They are the
-# WORKFLOW BUILDER's control over who may run this particular box on their canvas, which is
-# a different question from the `auth` block above (yours, and true of every copy).
-config:
-  configSchema:
-    type: object
-    properties:
-      authRequired:
-        type: boolean
-        title: Require sign-in
-        default: false
-        "ui:widget": toggle
-      authRole:
-        type: string
-        title: Require role
-        default: ""
-        "ui:dependencies": { authRequired: true }
-  "ui:order": [authRequired, authRole]
+# This node has no settings of its own, so it declares none. Every node's form still ends
+# with the two access controls ("Require sign-in", "Require role"): the platform injects
+# them, because they are the WORKFLOW BUILDER's per-box decision, which is a different
+# question from the `auth` block above (yours, and true of every copy). You never write
+# them, and their names are reserved.
 
 test:
   testData:

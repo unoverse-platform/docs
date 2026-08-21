@@ -221,28 +221,17 @@ configSchema:
       description: Say what the setting DOES, not what it is called
       default: ""
       ui:field: template      # template | code | textarea | password
-
-    # COMPULSORY, on every node, identical everywhere. The workflow builder's control over
-    # who may run THIS box. Lint checks the types, the widget, the dependency and both
-    # defaults. See who-can-run-it.md.
-    authRequired:
-      type: boolean
-      title: Require sign-in
-      default: false
-      "ui:widget": toggle
-    authRole:
-      type: string
-      title: Require role
-      default: ""
-      "ui:dependencies": { authRequired: true }
-"ui:order": [model, prompt, authRequired, authRole]
+"ui:order": [model, prompt]
 ```
 
-**Run authorization has two halves and they are not the same.** `node.yaml`'s `auth` is
-YOUR floor, true of every copy of the node. These two config fields are the BUILDER's, per
+**`authRequired` and `authRole` are RESERVED. Never declare them.** The builder's two
+access controls ("Require sign-in", "Require role") are platform chrome, injected into
+every runnable node's composed schema after your own fields. Declaring either in a
+manifest is a lint error. Run authorization still has two halves: `node.yaml`'s `auth` is
+YOUR floor, true of every copy of the node; the injected controls are the BUILDER's, per
 box on a canvas. The executor takes the stricter; neither can loosen the other. A role
-usually belongs in the config field, because `finance:approve` is a claim one deployment's
-identity provider mints and a published node cannot know it.
+usually belongs to the builder, because `finance:approve` is a claim one deployment's
+identity provider mints and a published node cannot know it. See who-can-run-it.md.
 
 `ui:widget` is `toggle` or `select`. `ui:dependencies` shows a field only when a sibling
 matches. `ui:hidden` keeps a field out of the form.

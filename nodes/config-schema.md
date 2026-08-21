@@ -263,37 +263,17 @@ timeout:
 Lint checks that every key names a real sibling field, so a rename cannot leave a field
 permanently hidden.
 
-## The two fields every node has
+## Two fields you never write
 
-Two of them are not yours to choose. They are identical in every node, and lint checks they
-are there:
+Every node's settings form ends with two access controls, "Require sign-in" and "Require
+role". You do not write them: the platform injects them into every runnable node's form,
+because they are chrome every box has, like its title bar and connectors.
 
-```yaml
-authRequired:
-  type: boolean
-  title: Require sign-in
-  description: >-
-    Only a signed-in caller may run this step. Leave off and it runs for whoever the
-    workflow's trigger admitted, which is the usual answer.
-  default: false
-  "ui:widget": toggle
-
-authRole:
-  type: string
-  title: Require role
-  description: >-
-    A claim the caller's account must carry, as noun:verb (finance:approve,
-    payments:refund). Leave blank to require only that they are signed in.
-  default: ""
-  "ui:dependencies": { authRequired: true }
-```
-
-These belong to the person building the workflow, not to you. The same node type faces staff
-on one canvas and customers on another, and only they know which. Your own floor goes in
-`node.yaml`, and the stricter of the two wins.
-
-Both default to off, because a node that gated by default would break every workflow already
-using it. [Who Can Run It](/nodes/who-can-run-it) covers the whole model.
+The names `authRequired` and `authRole` are therefore **reserved**, and declaring either
+in your schema is a lint error. They belong to the person building the workflow, not to
+you: the same node type faces staff on one canvas and customers on another, and only they
+know which. Your own floor goes in `node.yaml`, and the stricter of the two wins.
+[Who Can Run It](/nodes/who-can-run-it) covers the whole model.
 
 ## The rest of the vocabulary
 
