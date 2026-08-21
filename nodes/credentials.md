@@ -183,6 +183,7 @@ reachable by accident either.
 | `unoverse node test` names a missing variable | No key in your `.env` | Add it in the form above |
 | 401 from the service | The key is wrong, or the scheme is | Check the value in **Canvas**, then check `scheme` against the service's own docs |
 | points at credential id N, which does not exist in this universe | The workflow was copied from another universe, and a credential reference is a per-universe id, so it came over pointing at nothing | Open the node's settings in **Canvas**, re-select the credential, save the workflow |
+| needs a `<credential>` and none is attached | A pasted or newly placed node starts with no credential selected, and this node requires one | Open the node's settings in **Canvas**, select the credential, save the workflow |
 
 ---
 
