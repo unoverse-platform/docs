@@ -453,7 +453,7 @@ implements them.
 
 Available: member access, indexing, literals, spread, template strings, operators,
 ternaries, arrow callbacks, and `JSON`, `Math`, `Number`, `String`, `Boolean`, `parseInt`,
-`parseFloat`, `encodeURIComponent`, `Object.*` and `Array.*`. Plus two the platform adds,
+`parseFloat`, `encodeURIComponent`, `Object.*` and `Array.*`. Plus a few the platform adds,
 because without them a node could not be a manifest at all:
 
 - **`Date.now()` and `Date.iso(ms)`.** Half the APIs a node calls take a date range and want
@@ -461,6 +461,9 @@ because without them a node could not be a manifest at all:
   `YYYY-MM-DD`. There is no `new Date(...)`, because that is a construction the sandbox
   refuses.
 - **`sha256(value)`.** A stable id derived from content, which downstream dedup joins on.
+- **`toBase64(value)`.** Plain text as UTF-8 bytes in base64 — the form bytes take on the
+  way to an `encoding: binary` body. Storing text a workflow already holds (markdown back
+  to S3) is the case; the sandbox has no other encoder.
 
 Nothing mutates. Use `.at(-1)` and never `.pop()`, `.toSorted()` and never `.sort()`. The
 array you would be sorting is a live upstream output, so sorting it in place would reorder

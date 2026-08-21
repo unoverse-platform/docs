@@ -254,8 +254,9 @@ Helpers: `eq`, `contains`, `filter`, `toJSON`.
 
 An expression is sandboxed. No `process`, `require`, `fetch`, `eval`, `Function`, `new`,
 assignment or `constructor`. Available: `JSON`, `Math`, `Number`, `String`, `Boolean`,
-`parseInt`, `encodeURIComponent`, `Object.*`, `Array.*`, `Date.now()`, `Date.iso(ms)` and
-`sha256(value)`. Nothing mutates: `.at(-1)` not `.pop()`, `.toSorted()` not `.sort()`.
+`parseInt`, `encodeURIComponent`, `Object.*`, `Array.*`, `Date.now()`, `Date.iso(ms)`,
+`sha256(value)` and `toBase64(value)`. Nothing mutates: `.at(-1)` not `.pop()`,
+`.toSorted()` not `.sort()`.
 
 Dates: `Date.iso(Date.now() - 30 * 86400000).split('T')[0]` is thirty days ago as
 `YYYY-MM-DD`. There is no `new Date(...)`.
