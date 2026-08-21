@@ -92,7 +92,7 @@ resolves to nothing ([lifecycle hooks](/design/lifecycle-hooks)).
 
 1. Read the matching journey doc ([03](/design/components) component / [05](/design/templates) template / [06](/design/styles-and-tokens) styles); study the exemplars: `product-card` (component state tree), `sab-chat-layout` (template tree), `productfinder`/`planfinder` (wizards).
 2. Author to the anatomy in §2; put every shown thing in its ONE home (§3).
-3. **Publish from Studio: lint 0 errors required**; it enforces §2–§5 with doc-cited messages. Justify any warning.
+3. **Deploy from the terminal (`unoverse deploy studio`): lint 0 errors required**; it enforces §2–§5 with doc-cited messages. Justify any warning.
 4. Preview in **Studio**: mock (prop defaults + state picker + Inline/Focused toggle), then live. Debug order: stream log → state inspector → definition. Never edit on a guess.
 
 ## 7. Error → fix quick table
@@ -106,7 +106,7 @@ resolves to nothing ([lifecycle hooks](/design/lifecycle-hooks)).
 | Component invisible in a template | unknown state name + no matching surface = inline is where it went: check the flow slot exists |
 | Card shows mock image/tagline while title streams | prop name isn't the source's field name (hydration is by-name, no mapping): rename to the writer vocabulary (§3) |
 | Style ignored / element auto-sizes | raw value, unknown style key, or off-scale step: lint tells you which |
-| Edit does nothing | node contract changed (props/structure) → re-publish from Studio |
+| Edit does nothing | node contract changed (props/structure) → redeploy (`unoverse deploy studio`) |
 | AI never picks it | manifest `whenToUse` is selector-shaped or missing: write the user's words |
 
 Full table: [09, Troubleshooting](/design/troubleshooting).

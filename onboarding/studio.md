@@ -125,35 +125,42 @@ the settings, press **Run**, and the output appears beside them.
 Keys come from your own `.env` and are stored nowhere.
 [Testing Nodes](/nodes/testing-nodes) covers it.
 
-## Publish to a universe
+## Deploy to a universe
 
-Everything up to here is offline. No account, no network, no universe. Connecting is the
-one place Studio asks you for anything.
+Everything up to here is offline. No account, no network, no universe. Deploying is the
+one step that reaches one, and it happens in your terminal, not in Studio:
 
-**Connect.** Type the address of the universe you are publishing to. Studio asks that
-universe who authenticates it and signs you in against whatever the answer is, so it names
-no provider and assumes nothing about how your organisation logs in.
+```
+unoverse deploy studio
+```
 
-You can keep more than one, and switch between them.
+**Signing in happens by itself.** The first deploy asks which universe this workspace
+ships to (an address like `universe.example.com`, saved to `unoverse.yaml` so the whole
+team deploys to the same place) and opens your browser to sign in with whatever your
+organisation uses. Studio names no provider and holds no credential; the CLI keeps the
+session. `unoverse login` exists to sign in ahead of time, but you never need it first.
 
-<Frame caption="Connect a universe by address, then sign in with whatever your organisation uses.">
-  <img src="/images/onboarding/signin.png" alt="Studio's publish panel: connect a universe and sign in" />
-</Frame>
+**The deploy checks your work, then shows a plan.** Lint runs locally and blocks on any
+error, so you see the problem in your terminal rather than as a server rejection. Then a
+plan lists every item, what kind it is, and whether it is new or a change. Nothing is
+sent until you answer.
 
-**Publish.** Studio checks your work first: if a rule fails, the publish is blocked and you
-see the problem here rather than as an error from a server. Then it shows you a plan of what
-would be created and what would change, and nothing is sent until you confirm.
+```
+$ unoverse deploy studio
+  ~ design/cards/DealCard.yaml      (changed)
+  + design/atoms/StatusPill.yaml    (new)
+  ~ nodes/hubspot/node.yaml         (changed, lands PENDING review)
 
-<Frame caption="The publish plan: every item, what kind it is, and whether it is new or a change. Nothing moves until you confirm.">
-  <img src="/images/onboarding/publish.png" alt="Studio's publish plan listing the items about to be published" />
-</Frame>
+  3 items -> https://universe.example
+  Deploy? [y/N]
+```
 
-**A node then waits to be accepted**, because it is the only thing you publish that holds a
+**A node then waits to be accepted**, because it is the only thing you deploy that holds a
 URL and a key. Whoever runs the universe sees the hosts it wants to call and the credentials
-it needs before it can run. After that first acceptance you publish freely, and it only
+it needs before it can run. After that first acceptance you deploy freely, and it only
 pauses again if the node reaches for something new.
 
-Publishing needs permission on your account, and it is a specific one. Being able to build a
+Deploying needs permission on your account, and it is a specific one. Being able to build a
 workflow does not carry it, because pushing a node the whole universe can use is a different
 power. If you do not have it, whoever runs the universe grants it.
 

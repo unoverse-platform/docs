@@ -19,8 +19,8 @@ style: { padding: 12px, color: "#4F46E5", fontSize: 1.25rem }
 style: { padding: "4", color: text.primary, font: headline.sm }
 ```
 
-- No `px` / `rem` / `em` / `#hex` anywhere in any component, atom, or template definition. Studio's publish lint scans for exactly this and blocks ([08](/design/validate-and-ship)).
-- Sizes use the **space scale** (`"width": "8"` = 2rem, Tailwind-style: step N = N × 0.25rem), and only **real steps**: `0 1 1.5 2 3 4 5 6 7 8 10 12 16 20 24 28 40 50 75 90 100 120 140 160 180 200` (+ `full`/`auto`). An invented step (`"26"`, `"3.5"`) is NOT rounded: it falls through as broken CSS and the element silently reverts to auto sizing. Studio's publish lint rejects off-scale values.
+- No `px` / `rem` / `em` / `#hex` anywhere in any component, atom, or template definition. the deploy lint scans for exactly this and blocks ([08](/design/validate-and-ship)).
+- Sizes use the **space scale** (`"width": "8"` = 2rem, Tailwind-style: step N = N × 0.25rem), and only **real steps**: `0 1 1.5 2 3 4 5 6 7 8 10 12 16 20 24 28 40 50 75 90 100 120 140 160 180 200` (+ `full`/`auto`). An invented step (`"26"`, `"3.5"`) is NOT rounded: it falls through as broken CSS and the element silently reverts to auto sizing. the deploy lint rejects off-scale values.
 - **Page widths have NAMES** (`semantic/layout.yaml`): `compact` 30rem · `narrow` 35rem · `reading` 40rem · `page` 45rem · `wide` 50rem. They are aliases onto the same scale, so `maxWidth`/`hideBelow`/`stackBelow` read as what they are (`"maxWidth": "reading"`, not `"160"`). **The rule, so one value never gets two spellings:** a PAGE-level cap uses a name; an ELEMENT's own size (an image tile's height, a card's max) stays a scale step. An image tile is not a page.
 - ❌ No invented component-named tokens (`cardMin`, `wizardWidth`): use the generic scale steps. If the scale genuinely lacks a step, extend the scale in `styles/`, don't smuggle a value into a definition.
 
@@ -28,7 +28,7 @@ style: { padding: "4", color: text.primary, font: headline.sm }
 
 It's not just values: the set of style **keys** (`padding`, `direction`, `radius`, `hover`, …) is a closed vocabulary, exactly the neutral intents the SDK style interpreter maps, and the contract every renderer (web today; iOS, Android, React Native, Flutter as they land) implements. An unknown key is ignored by **every** renderer, so it is always a typo (`colour`) or a web-ism that would never port (`backdropFilter`, `gridTemplateColumns`).
 
-Both the schema (editor squiggle) and Studio's publish lint (error) enforce the key set, including inside `hover`/`active` and `when[].apply`. If a design genuinely needs an intent the vocabulary lacks, that's a platform conversation (a new key every renderer must implement): never a definition-side workaround.
+Both the schema (editor squiggle) and the deploy lint (error) enforce the key set, including inside `hover`/`active` and `when[].apply`. If a design genuinely needs an intent the vocabulary lacks, that's a platform conversation (a new key every renderer must implement): never a definition-side workaround.
 
 **Why so strict:** brand and dark-mode swaps must touch `styles/` only. One raw hex in one definition breaks that guarantee for the whole org.
 
