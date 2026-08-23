@@ -49,7 +49,7 @@ unoverse deploy    # pull latest images + restart
 | You changed | Do |
 |---|---|
 | A newly published node (from Studio) | nothing: live on the next workflow run |
-| An **existing** component/template's look (`design/`) | nothing: definitions are read live; hard-refresh the client |
+| An **existing** component/app's look (`design/`) | nothing: definitions are read live; hard-refresh the client |
 | A **new** component, or props/structure changes (`design/`) | `unoverse build` |
 | A skill or prompt block (`prompts/`) | `unoverse build` |
 
@@ -103,8 +103,8 @@ docker compose exec -T unoverse node -e \
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
-| New component not in **Canvas** | unoverse not restarted since the definition was added | `unoverse build` |
-| Node shows in **Canvas** but errors | Package not built | `unoverse build` |
+| New component not in **canvas** | unoverse not restarted since the definition was added | `unoverse build` |
+| Node shows in **canvas** but errors | Package not built | `unoverse build` |
 | Component renders old version | Client caching | hard-refresh the browser |
 | `nodes: 0` in status | unoverse didn't load packages | Check `docker compose logs unoverse` |
 | Build fails | Dependencies missing | `npm install`, then `unoverse build` |

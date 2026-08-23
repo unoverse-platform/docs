@@ -1,15 +1,15 @@
 ---
-sidebarTitle: "Unoverse Markdown"
-title: "Unoverse Markdown"
+sidebarTitle: "unoverse Markdown"
+title: "unoverse Markdown"
 ---
 
-**Markdown is a language for formatting text. Unoverse Markdown is a language for streaming UI.**
+**Markdown is a language for formatting text. unoverse Markdown is a language for streaming UI.**
 
 Both are things a model writes. Markdown carries prose and nothing else, so it cannot say
 "these four figures are a comparison" or "these six paragraphs are a sequence". The reader
 gets a wall of text, and each surface guesses at the structure differently.
 
-Unoverse Markdown is written the same way, by a model, in one pass. What comes back is a
+unoverse Markdown is written the same way, by a model, in one pass. What comes back is a
 list of typed sections rather than a string. The model says what shape each part is, the
 design system draws each shape as a real component, and each one renders as it arrives.
 
@@ -17,7 +17,7 @@ design system draws each shape as a real component, and each one renders as it a
 
 ## Two languages, side by side
 
-| | Markdown | Unoverse Markdown |
+| | Markdown | unoverse Markdown |
 |---|---|---|
 | Written by | a model, in one pass | a model, in one pass |
 | What it produces | one string | a list of typed sections |
@@ -27,7 +27,7 @@ design system draws each shape as a real component, and each one renders as it a
 | Restyling it | find and replace | swap a token |
 | On another surface | rewrite the renderer | the same closed list, drawn again |
 
-Markdown styles characters. Unoverse Markdown names meaning, and meaning is what a designer
+Markdown styles characters. unoverse Markdown names meaning, and meaning is what a designer
 can act on. A figure the model marks as a key fact becomes a figure the design system knows
 how to present, in every place that record appears.
 
@@ -89,7 +89,7 @@ structure reads as a dashboard.
 
 ## Two ways to produce one
 
-| | Unoverse Markdown | Unoverse Markdown Template |
+| | unoverse Markdown | unoverse Markdown App |
 |---|---|---|
 | Who chooses the components | the model | a designer, up front |
 | What the model does | composes and fills | fills |

@@ -3,9 +3,9 @@ sidebarTitle: "4. Ingest Content to Spatial"
 title: "Ingest Content to Spatial"
 ---
 
-**Spatial** is where your Agents find what they need. In this challenge you ingest your own content, build the map, and give an Agent search over it.
+**spatial** is where your Agents find what they need. In this challenge you ingest your own content, build the map, and give an Agent search over it.
 
-**Spatial** has two parts:
+**spatial** has two parts:
 
 | Part | Job |
 | --- | --- |
@@ -20,14 +20,14 @@ You ingest through the Content Engine, then train the map. After that, both you 
 
 ## Before you begin
 
-The platform is running (`unoverse start`) and **Canvas** is open at http://localhost:3001. You have a content source to ingest; the connector table below lists what each source needs.
+The platform is running (`unoverse start`) and **canvas** is open at http://localhost:3001. You have a content source to ingest; the connector table below lists what each source needs.
 
 ## Build your space
 
 <Steps>
 <Step title="Open Spatial">
 
-In **Canvas**, click the **Spatial** button in the header. The 3D space opens; it's empty until you ingest. Its two neighbors matter in this challenge too: the database icon opens the **Content Library**, and the magnifier opens **Search**.
+In **canvas**, click the **spatial** button in the header. The 3D space opens; it's empty until you ingest. Its two neighbors matter in this challenge too: the database icon opens the **Content Library**, and the magnifier opens **Search**.
 
 ![The Spatial button and its neighbors: Content Library, Spatial, Search](../images/onboarding/spatialButton.png)
 
@@ -56,7 +56,7 @@ Each connector brings content in from a different place, and the list keeps grow
 | **Cloudinary** | Images from your Cloudinary library | A Cloudinary credential |
 | **Google Sheets** | Rows from a public spreadsheet | A Google API credential |
 
-Add the credential first in **Canvas** under **Credentials**, the same flow as [Create Your First Agent](/onboarding/create-your-first-agent).
+Add the credential first in **canvas** under **Credentials**, the same flow as [Create Your First Agent](/onboarding/create-your-first-agent).
 
 </Step>
 <Step title="Import">
@@ -88,7 +88,7 @@ The map is built with the UMAP algorithm. For further reading, see the [umap-lea
 </Step>
 <Step title="Search it">
 
-Open **Search** in the header. **Spatial** has exactly two searches, and the toggle switches between them. They answer different questions:
+Open **Search** in the header. **spatial** has exactly two searches, and the toggle switches between them. They answer different questions:
 
 <CardGroup cols={2}>
 <Card title="Intent" icon="crosshair">
@@ -108,9 +108,9 @@ One query shows the difference. Imagine a travel brand searching *family holiday
 - **Intent** returns the Mauritius items, ranked by match.
 - **Discovery** stands you in the family-getaway region of the map and lights up what lives there: the kids-club resorts, the waterpark day, the Seychelles alternative, the family excursion, the flight. The things the user didn't ask for but wants.
 
-A ranked list can never give you that neighborhood. The map can, and it is why **Spatial** exists.
+A ranked list can never give you that neighborhood. The map can, and it is why **spatial** exists.
 
-This pair is the heart of **Spatial**. Precision when the user names what they want; exploration when the user names a topic and the Agent should see what surrounds it. Agents in unoverse make great use of both: seeing the neighborhood, not just the match, is what lets an Agent make the optimal decision for the user.
+This pair is the heart of **spatial**. Precision when the user names what they want; exploration when the user names a topic and the Agent should see what surrounds it. Agents in unoverse make great use of both: seeing the neighborhood, not just the match, is what lets an Agent make the optimal decision for the user.
 
 Keep queries short: name the thing or the topic. Try both modes on the same query and compare what comes back. The stats under the results show how far each search reached and what it scanned.
 
@@ -121,12 +121,17 @@ Keep queries short: name the thing or the topic. Try both modes on the same quer
 
 Agents get access to the same two key search options, **Intent** and **Discovery**, and choose between them dynamically based on the goal and the task at hand.
 
-<span className="node-chip">Spatial Search</span> is an MCP service node: it doesn't sit in the data flow. Connect it to any agent node with a service edge, and the Agent gains **Spatial** as a set of tools:
+<span className="node-chip">Spatial Search</span> is an MCP service node: it doesn't sit in the data flow. Connect it to any agent node with a service edge, and the Agent gains **spatial** as a set of tools:
 
 | Tool | What the Agent gets |
 | --- | --- |
 | `findIntent` | The precision search: exactly what the user named |
 | `discoverRelated` | The neighborhood: related items and options around a topic |
+| `readSkill` | A skill's instructions in full. Mandatory when a result is a skill, because skills carry behaviour that overrides the Agent's own |
+| `readSkillFile` | A document a skill points at |
+
+The two searches return lean rows, and the three read tools fetch the detail behind one. That
+is what keeps context small: the Agent sees everything, and pulls only what it needs.
 
 **And it searches in batch.** One call can carry up to eight queries at once. Planning a family trip means the hotel, the dinner, the activities, and the flight; the Agent searches all of them in a single round trip, and every result comes back tagged with the query it answers. One call, all the material for an optimal answer.
 
@@ -148,7 +153,7 @@ Close the loop with your own site and your Challenge 2 Agent:
 
 ## Next steps
 
-<Card title="Components and templates" icon="palette" href="/onboarding/components-and-templates" horizontal>
+<Card title="Create a component" icon="palette" href="/onboarding/create-a-component" horizontal>
 Design the interfaces your Agents speak through.
 </Card>
 

@@ -6,7 +6,7 @@ title: "Connectors & Signals"
 Connectors are the dots on a node. Inputs on the left, outputs on the right, and the lines
 you draw between them are how data moves through a workflow.
 
-You declare them in `interface.yaml`, and **Canvas** draws one dot per entry.
+You declare them in `interface.yaml`, and **canvas** draws one dot per entry.
 
 ```yaml interface.yaml
 inputs:
@@ -87,7 +87,7 @@ A downstream node reads an upstream output by name:
 signal.<nodeId>.<output>.<field>
 ```
 
-`quote1` is the id **Canvas** gives the node on the canvas, and `quote` is the output
+`quote1` is the id **canvas** gives the node on the canvas, and `quote` is the output
 connector. So `signal.quote1.quote` is the quote text.
 
 Give outputs names worth reading. They become the reference someone types into a template

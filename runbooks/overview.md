@@ -99,18 +99,18 @@ terraform.tfvars  ──apply──▶  ground (VM, LB+TLS, firewall, Postgres, 
                                  └─▶  rendered env  ──unoverse deploy──▶  /opt/gravity/.env on the server
 ```
 
-The rendered env lands at `.env.production` (gitignored) as a deploy artifact: `unoverse deploy` re-renders it from your applied ground whenever it's missing. Two things are worth knowing about it, and only two:
+The production env is never a file in your universe. Every deploy renders it from the applied ground (`terraform output -raw env_production`), ships it, and deletes it. Two things are worth knowing, and only two:
 
-- **It holds the master `CREDENTIAL_ENCRYPTION_KEY`.** Keep a safe copy with your database backups: a database backup is unreadable without it.
-- **Never edit it.** To change any production value, edit terraform.tfvars, `terraform apply`, delete the file, and redeploy.
+- **Your ground holds the master `CREDENTIAL_ENCRYPTION_KEY`.** Terraform generates it and keeps it in state, so back up your Terraform state alongside your database. A database backup is unreadable without that key, and no backup can bring it back.
+- **There is nothing to edit.** To change any production value, edit `terraform.tfvars` and run `unoverse deploy <cloud>` again. It re-renders in full.
 
-**How `DOMAIN` drives **Canvas** URLs:**
+**How `DOMAIN` drives **canvas** URLs:**
 When `DOMAIN=yourdomain.com` is set, `docker-compose.yml` automatically derives:
 
 - `VITE_API_URL=https://api.yourdomain.com`
 - `VITE_SERVER_WS_URL=wss://api.yourdomain.com`
 
-When `DOMAIN` is unset (local dev), set `API_URL=http://localhost:4105` in `.env`, **Canvas** calls the platform's public listener (unoverse `:4105`) directly.
+When `DOMAIN` is unset (local dev), set `API_URL=http://localhost:4105` in `.env`, **canvas** calls the platform's public listener (unoverse `:4105`) directly.
 
 ---
 
@@ -118,4 +118,4 @@ When `DOMAIN` is unset (local dev), set `API_URL=http://localhost:4105` in `.env
 
 - Terraform 1.5+ and your cloud CLI (doctl or aws) on your machine
 - Ansible installed locally (`pip install ansible`)
-- DOCR token for pulling images (from your Unoverse admin)
+- DOCR token for pulling images (from your unoverse admin)

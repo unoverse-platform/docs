@@ -23,7 +23,7 @@ about running it depends on our availability.
 ## Authentication
 
 **Authentication is always on.** There is no deployment mode that turns it off, because
-**Canvas** and **Studio** sign in against it.
+**canvas** and **studio** sign in against it.
 
 The gate is default-deny and lives in the application, at the single public listener. Tokens
 are verified against your provider's published keys, checking both issuer and audience. A
@@ -52,7 +52,7 @@ permission to a role rather than editing anyone's account. A node's `requires.ro
 against permissions, so a deployment can invent `finance:approve` without the platform
 knowing it exists.
 
-**How each ground provides it.** With `byo-oidc` the provider already models both — an Auth0
+**How each ground provides it.** With `byo-oidc` the provider already models both, an Auth0
 tenant has roles containing permissions, and Terraform touches none of it. Cognito has only
 one level, groups, so the AWS ground holds the role-to-permission map and the pre-token
 Lambda applies it: your Cognito **groups are the roles**, and the Lambda expands them into
@@ -60,13 +60,13 @@ the permissions claim.
 
 Flattening the two is a real failure mode rather than a tidiness argument. A pool built from
 permission-shaped groups gives an administrator every permission the platform grants and no
-`admin` role — so every gate passes except the one deciding whether Canvas opens at all, and
+`admin` role, so every gate passes except the one deciding whether Canvas opens at all, and
 the person is refused by the surface they own.
 
 <Note>
 **One inconsistency, stated rather than hidden.** Canvas gates on the `admin` **role**, while
-every other surface gates on a permission. The permission for it already exists —
-`admin:access` — and nothing reads it. Checking that instead would let a deployment grant
+every other surface gates on a permission. The permission for it already exists , 
+`admin:access`, and nothing reads it. Checking that instead would let a deployment grant
 Canvas to a `platform-operator` role without making somebody an administrator, which is the
 whole point of separating the two.
 </Note>
@@ -90,7 +90,7 @@ other's keys, whatever either of them writes, because credentials are addressed 
 rather than discovered.
 
 Nothing an author writes ever contains a value. The manifest names the credential; the value
-is entered once in **Canvas** and lives only in the database.
+is entered once in **canvas** and lives only in the database.
 
 ## What a node is allowed to do
 
@@ -113,7 +113,7 @@ that reaches for something new pauses again.
 
 ## Network posture
 
-Only 443 is open to the internet. SSH, **Canvas** and the log viewer are restricted to an
+Only 443 is open to the internet. SSH, **canvas** and the log viewer are restricted to an
 address you nominate, and the builder surface binds to loopback so it is not routable at
 all.
 

@@ -7,7 +7,7 @@ Most nodes pass data along a workflow. Some instead offer a capability that othe
 on demand, like turning text into a vector.
 
 A service connector is that arrangement. One node offers, another calls, and they are joined
-by a service edge on the **Canvas** rather than a data edge.
+by a service edge on the **canvas** rather than a data edge.
 
 ## Two channels, and they never cross
 
@@ -87,7 +87,7 @@ serviceConnectors:
       - createEmbedding
 ```
 
-On the **Canvas**, drag from the provider's `service` handle to the consumer's
+On the **canvas**, drag from the provider's `service` handle to the consumer's
 `serviceConsumer` handle.
 
 Whether anything is wired is a run-time fact, and templates read it through the `services`

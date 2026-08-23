@@ -34,7 +34,7 @@ Four layers, by *when* they catch you:
 **File:** `apps/unoverse/design/_schema/unoverse.schema.json` · **Wired in:** `.vscode/settings.json`.
 
 Inline, before you ever run anything: autocomplete of the 16 primitives; errors on an invalid
-`type`; a broken `Switch` (no `on`/`cases`), `Each` (needs `template` + literal `items: []` or
+`type`; a broken `Switch` (no `on`/`cases`), `Each` (needs `app` + literal `items: []` or
 `bind.items`), `Ref` (no `ref`), `ComponentSlot` (no `select`); a bad condition
 (`and`/`or`/arithmetic: only `eq`/`ne`/`in`/truthy); an **unknown style key** (the closed
 cross-platform vocabulary, incl. inside `hover` and `when[].apply`).
@@ -64,7 +64,7 @@ face in `scripts/lib/lint.mjs`) runs at authoring time and **mirrors** the serve
 | **Component tiers**: names unique within a home, and an org component never shadows a
   design-system name (two orgs MAY share a name, each addressed `<org>/<name>`,
   per UNOVERSE_COMPONENT_ORGS.md); design-system definitions never reference
-  org components (incl. template preview lists) | error | `component-tiers.test.ts` |
+  org components (incl. app preview lists) | error | `component-tiers.test.ts` |
 | A `Switch` case never re-guards its own discriminant | error | `self-guard.test.ts` |
 | **Microapp three homes**: all `props` are `input: true`; the `state` block is **scalar
   view-state only** (an array/object/URL in `state` is slop); the ONE admitted object is a
@@ -73,32 +73,32 @@ face in `scripts/lib/lint.mjs`) runs at authoring time and **mirrors** the serve
   root on **`view`**; a legacy component switches on `defaultState` (never both, never
   neither); cases `$include layouts/<state>`; the arrival state is declared (tree
   `initial`, or legacy `manifest.defaultState` / `state.defaultState`) | error | `microapp-structure.test.ts` |
-| **The template tree**: the served ladder (`def.stateOrder`) ≡ the manifest tree's top
+| **The app tree**: the served ladder (`def.stateOrder`) ≡ the manifest tree's top
   level minus the base, in declared order; a declared base substate is CONTAINED by
   compilation (its subtree exists in the base arrangement and is stripped from every
   other layout, no hand guards); substates rank after the ladder, first = the viewer's
-  landing default | error | `template-tree.test.ts` |
+  landing default | error | `app-tree.test.ts` |
 | **State Model v2 behavior**: the six rules as executable law over the portable core:
   the LADDER (declared order outranks recency), PRIVACY (an internal key never moves the
-  template), the ALIAS (`view` wins over legacy `defaultState`; either satisfies a
+  app), the ALIAS (`view` wins over legacy `defaultState`; either satisfies a
   claim), the RETRACT law (every reset lands on the slice's declared initial, `inline`
   only as the legacy fallback), the RESTING RAIL (a pinned lower state takes over only
   by the guest's tap), CANCELLATION (`cancelBelow`: a higher state retracts every lower
   claim, so release lands on BASE), and PINNED (only a guest write displaces a pin) | error (CI) | `state-model-v2.test.ts` |
-| **Reaction coverage**: a template claims every REACHABLE public state: from every
+| **Reaction coverage**: an app claims every REACHABLE public state: from every
   claimed view, follow each hosted component's own `setValue` targets on the public
-  axis; a target another org template claims must be claimed here too, or the click
-  dead-ends (targets claimed nowhere = sanctioned self-close views, exempt) | error | `template-reaction-coverage.test.ts` |
+  axis; a target another org app claims must be claimed here too, or the click
+  dead-ends (targets claimed nowhere = sanctioned self-close views, exempt) | error | `app-reaction-coverage.test.ts` |
 | **Surfaces select on the public axis**: a reaction surface's `select.where` field is
   `view` (legacy alias `defaultState`), never a component's internal key (warn); and it
   claims exactly ONE view with a string `eq`; `ne`/`in`/bare selects are errors
   (`packages/base/src/lint/design/walk.mjs`) | warn/error | none (lint-first) |
-| **Deprecated focus bridge**: `setTemplateValue` writing `defaultState` (from a
-  component = error; from a template = warn). Other chrome keys are allowed anywhere | warn/error | none |
+| **Deprecated focus bridge**: `setAppValue` writing `defaultState` (from a
+  component = error; from an app = warn). Other chrome keys are allowed anywhere | warn/error | none |
 | Theme token contract across orgs | CI only | `theme-contract.test.ts` |
 
-*Legacy twin:* templates without a `stateOrder`/tree keep the v1 recency semantics under
-their own guard (`template-layout-sync.test.ts`) until they migrate.
+*Legacy twin:* apps without a `stateOrder`/tree keep the v1 recency semantics under
+their own guard (`app-layout-sync.test.ts`) until they migrate.
 
 ---
 

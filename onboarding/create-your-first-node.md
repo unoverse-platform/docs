@@ -18,7 +18,7 @@ There is nothing to compile and no package to install. You write the files, run 
 
 The platform is running (`unoverse start`). You've built the workflow from [Create Your First Agent](/onboarding/create-your-first-agent); you'll extend it to test your node.
 
-Here is the node you are about to build, as **Canvas** will draw it:
+Here is the node you are about to build, as **canvas** will draw it:
 
 <div style={{ position: "relative", width: "240px", margin: "1.75rem 0", borderRadius: "12px", border: "1px solid rgb(229 231 235)", background: "#fff", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)", fontFamily: "inherit" }}>
   <div style={{ padding: "13px 16px", borderRadius: "12px 12px 0 0", background: "#7c5cff", lineHeight: 1.25 }}>
@@ -53,6 +53,10 @@ Four small files, and none of them is code.
 </div>
 
 [Anatomy of a Node](/nodes/manifest-nodes) covers each of those in full.
+
+**Read a working one first.** Your project ships with sample nodes in `nodes/samples`, and
+**studio** lists them beside your own. Open one to see the same files you are about to write,
+already filled in.
 
 <Steps>
 <Step title="Create the package">
@@ -129,7 +133,7 @@ test:
       author: "return output.author.length > 0"
 ```
 
-Each entry in `outputs` becomes a connector on the node. Downstream nodes read them as `signal.quote1.quote` and `signal.quote1.author`, where `quote1` is the id **Canvas** gives the node when you drag it in.
+Each entry in `outputs` becomes a connector on the node. Downstream nodes read them as `signal.quote1.quote` and `signal.quote1.author`, where `quote1` is the id **canvas** gives the node when you drag it in.
 
 A bigger node splits `interface` and `test` into their own files. This one is small, so they stay here.
 
@@ -171,41 +175,18 @@ Create `quote/nodes/Quote/api/events.yaml`. One row per output connector, in the
 This API returns an array with one object in it, so `response[0].q` is the quote text. Read this file and you know everything the node emits, without opening another one.
 
 </Step>
-<Step title="Check it">
-
-```bash Check the node
-unoverse node lint
-```
-
-Every message names the rule it broke and the page that explains it. Leave out the fixture above and it tells you so, rather than letting you find out later in a workflow.
-
-</Step>
 <Step title="Run it against the real API">
 
-```bash Run the node
-unoverse node test Quote
-```
+Open **studio** and go to the **Nodes** tab. Your node is listed there. Load its sample, press
+**Run**, and the output appears beside the settings.
 
-```
-Quote  (quote/Quote, PromiseNode)
-GET https://zenquotes.io/api/random   transport: json
-
-── outputs ──
-  quote        Less is more.
-  author       Robert Browning
-── expect ──
-  ✓ quote  return output.quote.length > 0
-  ✓ author  return output.author.length > 0
-
-✓ Quote ran in 893ms
-```
-
-The platform doesn't need to be running for this. It is your node, your machine, the real API.
+This calls the real API. No platform is running, the keys come from your own `.env`, and
+nothing is published. [Testing nodes](/nodes/testing-nodes) covers it in full.
 
 </Step>
 <Step title="Use it in a workflow">
 
-Deploy the node, and <span className="node-chip">Quote</span> is in the node library in **Canvas**.
+Deploy the node, and <span className="node-chip">Quote</span> is in the node library in **canvas**.
 
 Open your workflow from [Create Your First Agent](/onboarding/create-your-first-agent), drag <span className="node-chip">Quote</span> in, and connect <span className="node-chip">Input Trigger</span> to it.
 
@@ -239,7 +220,7 @@ Then the request uses it:
     token: "{{ credentials.yourServiceCredential.apiKey }}"
 ```
 
-You enter the key once in **Canvas**, under Credentials. The platform encrypts it, and supplies it to the node at the moment it runs. The value is never in your files, never in git, and never in the node you hand to someone else.
+You enter the key once in **canvas**, under Credentials. The platform encrypts it, and supplies it to the node at the moment it runs. The value is never in your files, never in git, and never in the node you hand to someone else.
 
 A node carries no keys, so sharing one never shares a secret. [Credentials](/nodes/credentials) covers the full pattern.
 
@@ -247,32 +228,28 @@ A node carries no keys, so sharing one never shares a secret. [Credentials](/nod
 
 Your node runs from the files in your repo, which is all you need while you build.
 
-To give it to anyone else, you publish it from **Studio**. Publishing writes the node into a universe as a record: no build, no package, nothing to download.
+To give it to anyone else, ship it from your terminal with `unoverse deploy studio`. That writes the node into a universe as a record: no build, no package, nothing to download.
 
 A node arrives pending, because it is the only thing you publish that holds a URL and a key. Whoever runs the universe sees the hosts it wants to call and the credentials it needs, and accepting it makes it live. After that you publish freely, and it only pauses again if the node reaches for something new.
-
-<Note>
-Publishing from **Studio** is not available yet. Until it is, a node lives in the repo it was written in.
-</Note>
 
 ## Have Claude Code build it
 
 <div className="skill-callout">
 <img className="skill-logo" src="/images/onboarding/claude-logo.png" alt="Claude" />
-<div className="skill-eyebrow">Claude Code skill · ships with your repo</div>
-<div className="skill-title">/unoverse-create</div>
+<div className="skill-eyebrow">Installed by unoverse update</div>
+<div className="skill-title">unoverse-create</div>
 
-Claude Code already knows everything on this page. Open your repo in Claude Code and describe the node you want:
+Claude Code already knows everything on this page. Open your project and describe the node you want:
 
 > Create a node that fetches the top story from a news API.
 
-The skill writes the files, adds the host to `allowedHosts`, checks it, and runs it against the real API.
-
-Not sure everything is wired up? Type `/mcp` in Claude Code: the `unoverse-builder` server should show as connected.
+The skill writes the files, adds the host to `allowedHosts`, and follows the same rules this page just walked through.
+<br /><br />
+[How the skills work](/onboarding/skills).
 
 </div>
 
-Using a different AI assistant? Point it at the node reference in your repo at `docs/nodes/`. It is the same material as the [Nodes](/nodes/overview) tab of these docs.
+Using a different AI assistant? Point it at [docs.unoverse.ai/nodes](/nodes/overview). Every page there is fetchable as raw markdown by adding `.md` to the URL.
 
 ## Next steps
 
@@ -280,6 +257,6 @@ Using a different AI assistant? Point it at the node reference in your repo at `
 Ground your Agent's answers in your own content.
 </Card>
 
-<Card title="Components and templates" icon="palette" href="/onboarding/components-and-templates" horizontal>
+<Card title="Create a component" icon="palette" href="/onboarding/create-a-component" horizontal>
 Design the interfaces your Agents speak through.
 </Card>

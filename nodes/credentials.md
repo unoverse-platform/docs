@@ -10,12 +10,12 @@ how yours gets it.
 commented out. Your node names the credential it needs, and that name is all your YAML ever
 holds.
 
-Someone enters the real value once in **Canvas**. The platform stores it encrypted, and
+Someone enters the real value once in **canvas**. The platform stores it encrypted, and
 hands it to your node at the moment it runs, and only to your node.
 
-That is what makes a node safe to commit, and safe to hand to someone else. It is also what
-makes it publishable: the same node runs in someone else's universe, against their account,
-with nothing of yours in it.
+A node holding no secret is safe to commit and safe to hand to someone else. It is also
+what makes it publishable: the same node runs in someone else's universe, against their
+account, with nothing of yours in it.
 
 A node that calls a public API declares no credential at all, and skips all of this.
 
@@ -32,7 +32,7 @@ Picture a refund step on a canvas.
 | About | Your node and the service it calls | The person, and this box in this workflow |
 | Direction | Outbound | Inbound |
 | You write | `credentials:` in `interface.yaml` | `auth:` in `node.yaml` |
-| Someone else supplies | The key, once, in **Canvas** | The sign-in and role settings, per box |
+| Someone else supplies | The key, once, in **canvas** | The sign-in and role settings, per box |
 | Getting it wrong looks like | A 401 from the service | Anyone who reaches the node can issue refunds |
 
 **The key is always there.** Once an admin has entered it, every run of that node can spend
@@ -93,7 +93,7 @@ credentials:
     displayName: Example API
 ```
 
-**Canvas** reads this and asks for the credential on the node's settings. A node with
+**canvas** reads this and asks for the credential on the node's settings. A node with
 `required: true` and no credential selected tells you before it runs.
 
 ### 3. Use it
@@ -181,9 +181,9 @@ reachable by accident either.
 | Lint: needs credential `x` but no `credentials/x.yaml` exists | The node asks for a credential its package never described | Add the credential file, or correct the name in `interface.yaml` |
 | Lint: credential is declared elsewhere with different fields | Two packages describe the same credential differently. They share one entry at run time, so they have to agree | Make the `properties` match, or give yours its own name |
 | `unoverse node test` names a missing variable | No key in your `.env` | Add it in the form above |
-| 401 from the service | The key is wrong, or the scheme is | Check the value in **Canvas**, then check `scheme` against the service's own docs |
-| points at credential id N, which does not exist in this universe | The workflow was copied from another universe, and a credential reference is a per-universe id, so it came over pointing at nothing | Open the node's settings in **Canvas**, re-select the credential, save the workflow |
-| needs a `<credential>` and none is attached | A pasted or newly placed node starts with no credential selected, and this node requires one | Open the node's settings in **Canvas**, select the credential, save the workflow |
+| 401 from the service | The key is wrong, or the scheme is | Check the value in **canvas**, then check `scheme` against the service's own docs |
+| points at credential id N, which does not exist in this universe | The workflow was copied from another universe, and a credential reference is a per-universe id, so it came over pointing at nothing | Open the node's settings in **canvas**, re-select the credential, save the workflow |
+| needs a `<credential>` and none is attached | A pasted or newly placed node starts with no credential selected, and this node requires one | Open the node's settings in **canvas**, select the credential, save the workflow |
 
 ---
 

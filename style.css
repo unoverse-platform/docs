@@ -110,7 +110,7 @@
 #content-area .code-block {
   --u-surface: #1e212b;
   --u-header: #2b3040;
-  --u-hairline: #3a4055;
+  --u-hairline: rgb(109 93 246 / 0.22);
 
   /* The theme paints its inner surface from this variable. Redefining it here is what
      actually changes the colour; overriding backgrounds alone leaves the ring behind. */
@@ -156,6 +156,69 @@
    colour is overridden the fade shows as a pale smear, so it goes. */
 #content-area .code-block-fade-overlay {
   display: none;
+}
+
+/* Step numbers: the brand mark on a walkthrough. The theme renders them grey on grey,
+   which reads as disabled next to the bold step title. Brand tint, brand number.
+   `.group\/step-indicator` is the circle itself (Mintlify Steps). */
+#content-area [class*="step-indicator"] {
+  background: rgb(109 93 246 / 0.1) !important;
+  color: #4c3fd1 !important;
+}
+
+.dark #content-area [class*="step-indicator"] {
+  background: rgb(139 126 248 / 0.16) !important;
+  color: #8b7ef8 !important;
+}
+
+/* Concept callout: a panel for an idea the reader has not met before, so a new concept
+   reads as a thing to absorb rather than another paragraph.
+   BRAND COLOURS ONLY (docs.json: #6D5DF6 / #8B7EF8 / #4C3FD1). It differs from
+   .skill-callout by SHAPE, not hue: a quiet surface with an accent rule down the left,
+   where the skill panel is a filled indigo gradient. */
+#content-area .concept-callout {
+  position: relative;
+  margin: 1.75rem 0;
+  padding: 1.4rem 1.75rem 1.4rem 1.9rem;
+  border: 1px solid rgb(109 93 246 / 0.2);
+  border-left: 3px solid #6d5df6;
+  border-radius: 0.5rem 1rem 1rem 0.5rem;
+  background: linear-gradient(180deg, rgb(252 252 255), rgb(249 248 255));
+}
+
+.dark #content-area .concept-callout {
+  border-color: rgb(139 126 248 / 0.28);
+  border-left-color: #8b7ef8;
+  background: linear-gradient(180deg, rgb(24 24 34), rgb(20 20 29));
+}
+
+#content-area .concept-callout .concept-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #6d5df6;
+  margin-bottom: 0.4rem;
+}
+
+.dark #content-area .concept-callout .concept-eyebrow {
+  color: #8b7ef8;
+}
+
+#content-area .concept-callout .concept-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: rgb(17 24 39);
+  margin-bottom: 0.55rem;
+}
+
+.dark #content-area .concept-callout .concept-title {
+  color: rgb(243 244 246);
+}
+
+#content-area .concept-callout p {
+  max-width: none;
 }
 
 /* Skill callout: feature panel for the Claude Code skill */

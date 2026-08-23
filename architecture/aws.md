@@ -9,7 +9,7 @@ control. There is no hosted control plane and the universe does not call home.
 
 <div className="figure-wide">
 <Frame caption="Everything Terraform creates in your AWS account. Click to enlarge.">
-  <img src="/images/architecture-aws.svg" alt="Everything Terraform creates in your AWS account. Click to enlarge." />
+ <img src="/images/architecture-aws.svg" alt="Everything Terraform creates in your AWS account. Click to enlarge." />
 </Frame>
 </div>
 
@@ -43,7 +43,7 @@ control. There is no hosted control plane and the universe does not call home.
 | | |
 | --- | --- |
 | Compute | An EC2 instance with an elastic IP, in two security groups |
-| Data | RDS Postgres 16 and ElastiCache Redis 7, each with a generated password. **Always created — see below** |
+| Data | RDS Postgres 16 and ElastiCache Redis 7, each with a generated password. **Always created, see below** |
 | Identity | A Cognito user pool, an SPA client, a hosted domain, one group per role, and the first administrator |
 | Claims | A pre-token Lambda, so email and roles reach the token |
 | AI | An IAM user scoped to Bedrock |
@@ -78,7 +78,7 @@ AWS is the one ground where the platform can own the identity provider, and that
 
 Terraform creates the user pool, creates one group per role you listed, creates the first
 administrator and puts them in every group. The roles exist because the apply ran. Cognito
-emails that administrator a temporary password **and the address to use it at** — the
+emails that administrator a temporary password **and the address to use it at**, the
 default invitation is credentials with no link, so the template names your Canvas URL. It is
 sent when the account is created, once. Deploying again never re-sends it and never changes
 a password.
@@ -95,7 +95,7 @@ carries the role-to-permission map: Cognito has one level where the platform nee
 Lambda expands them into the permissions claim. `admin` and `developer` are always created;
 anything in `roles` is a deployment's own and grants itself.
 
-Every other ground reaches the same contract by configuring their own provider — an Auth0
+Every other ground reaches the same contract by configuring their own provider, an Auth0
 tenant already has roles containing permissions, and Terraform touches none of it.
 
 ## What you need before the first apply
@@ -121,7 +121,7 @@ deploy, and nothing is destroyed.
 <Note>
 **The domain has to be in Route 53** for this to be two lines. AWS proves you own it by
 writing a DNS record, which it can only do in a zone it controls. A domain hosted elsewhere
-still works — the module prints the validation records for you to create once — but that is
+still works, the module prints the validation records for you to create once, but that is
 a manual step and a wait, rather than a variable.
 </Note>
 

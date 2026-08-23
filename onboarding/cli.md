@@ -105,3 +105,17 @@ Available inside a universe folder.
 | `unoverse where` | Prints your universe's addresses, local and deployed, probed live. |
 | `unoverse destroy` | Takes the deployment down, showing what goes and what stays. Name the ground when you have two: `unoverse destroy aws`. |
 | `unoverse db-allow` | Lets this machine reach the database. Run it when your network changes. |
+
+## Next steps
+
+<Card title="Open studio" icon="palette" href="/onboarding/studio" horizontal>
+Build components, apps, skills and nodes, and preview them as you save.
+</Card>
+
+<Card title="Get the skills" icon="sparkles" href="/onboarding/skills" horizontal>
+Teach your AI tooling how to build on unoverse.
+</Card>
+
+<Card title="Run unoverse" icon="server" href="/onboarding/platform" horizontal>
+Stand up a universe of your own, locally or on your infrastructure.
+</Card>

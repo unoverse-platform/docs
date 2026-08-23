@@ -31,7 +31,7 @@ is the discriminated-union doctrine (STATE_MODEL §0) applied to files.
 
 ### States nest: the same primitive all the way down
 
-A template has states; a template state's layout holds components; a component has
+An app has states; an app state's layout holds components; a component has
 states; a component state's layout holds its content. Every node owns its own
 discriminant. A thing can also carry several orthogonal axes (a widget with `view`
 and, inside one state, `step`), each its own Switch.
@@ -39,7 +39,7 @@ and, inside one state, `step`), each its own Switch.
 ### State selects the drawing; data fills it
 
 Switching states never touches data. Data arrives the standard way (`COMPONENT_DATA`,
-props, template state) and whichever layout is active binds it. One dataset, many
+props, app state) and whichever layout is active binds it. One dataset, many
 projections: the same course as a rail card or a full page. Data itself chooses
 nothing (STATE_MODEL §7: DATA → STATE → UI, one direction).
 
@@ -47,7 +47,7 @@ nothing (STATE_MODEL §7: DATA → STATE → UI, one direction).
 
 ## 2. Public vs private: the one placement decision
 
-The top level of the `view` axis is the component's **public menu**: what templates
+The top level of the `view` axis is the component's **public menu**: what apps
 and hosts can see, place at spawn, and react to. Everything nested below is
 **private**: invisible outside the component. The boundary is structural (where a
 state sits in the tree), not a judgment call. The old VIEW test (three questions) is
@@ -56,8 +56,8 @@ superseded as MECHANISM only: ownership lives in the tree, while the axis prefix
 survives as the naming convention for step drawings (the same-name bullet, below). The
 rearrange rule survives as its guide:
 
-> **If the template must rearrange to show it, make it a PUBLIC state.
-> If the template wouldn't move, NEST it privately.**
+> **If the app must rearrange to show it, make it a PUBLIC state.
+> If the app wouldn't move, NEST it privately.**
 
 The corollary from STATE_MODEL §5 rule 6, because it bites: an ignored public state
 does not stay put, it falls inline. A step that must never move the page (an apply
@@ -66,11 +66,11 @@ on the menu.
 
 And the third question survives from v1 unchanged: **"does it collect input?"** Then
 it is neither a public nor a private state of the component. A composer, an edit
-form, a picker is TEMPLATE CHROME: one input tool, owned by the template; a card's
+form, a picker is APP CHROME: one input tool, owned by the app; a card's
 Edit stages its data into it. Never an `edit` face on a component. (Learned twice on
 docreview.)
 
-Direction is locked with it: components stream into the template and the TEMPLATE
+Direction is locked with it: components stream into the app and the APP
 REACTS TO COMPONENTS, never the reverse (post-spawn; the spawn-time placement scan is
 STATE_MODEL §5 rule 3).
 
@@ -86,9 +86,9 @@ picks the mechanism, and there are only three:
    component substates named for those VALUES, plus a preview prop so Studio can
    drive them (exemplar: `voice-chat`).
 3. **It is DERIVED from conversation facts** (`isEmpty` / `hasMessages`) → the
-   TEMPLATE tier owns it: a condition-guarded mood of the base (the
+   APP tier owns it: a condition-guarded mood of the base (the
    welcome-substate pattern), or condition-guarded drawings inside an embedded
-   component reacting to the same facts. The template has the state; components
+   component reacting to the same facts. The app has the state; components
    just react. NEVER model a derived mood as component named substates (no field
    carries the design's names), and NEVER borrow another field's values
    (`lifecycle`'s thinking/streaming) as state names: state names come from the
@@ -99,12 +99,12 @@ picks the mechanism, and there are only three:
 
 ## 3. The structure: the root declares the tree
 
-A rich thing (a component or template that actually has states) is organized as:
+A rich thing (a component or app that actually has states) is organized as:
 
 ```
 <thing>/
   <thing>.yaml     ROOT: declares the state tree; carries any always-on shell
-  manifest.yaml    templates only (the app: binding, stateOrder, preview)
+  manifest.yaml    apps only (the app: binding, stateOrder, preview)
   layouts/         the DRAWINGS: one file per state that owns an arrangement
   components/      OPTIONAL: shapes shared by 2+ layouts; each lives ONCE
 ```
@@ -147,7 +147,7 @@ the only choices inside it, addressed by their state names.
 - The v1 `states/` folder (thin state files at the component tier) is absorbed by the
   tree: a private substate is a tree entry owning a layout, not a sibling file
   convention.
-- **The TEMPLATE tier declares the same tree**: a `states:` block in the manifest
+- **The APP tier declares the same tree**: a `states:` block in the manifest
   (built at the checkpoint, 2026-08-08). Top-level order is the priority ladder
   (base first, then reaction states; `stateOrder` is DERIVED, no longer authored);
   nesting is containment, ENFORCED BY COMPILATION: a declared base substate
@@ -167,7 +167,7 @@ focused:
 
 Variants bind the SAME fields and differ only in arrangement; anything that changes
 meaning or bound data is a second state (lint-enforced). The component picks its
-variant by the space it finds itself in (container queries); templates influence it
+variant by the space it finds itself in (container queries); apps influence it
 only by controlling the container. Container queries (`hideBelow`/`hideAbove`) also
 remain for fine adjustments INSIDE one layout; they never pick the state.
 
@@ -198,20 +198,20 @@ Its corollaries, all surviving v1:
 
 | Kind | Example | Has a state tree? |
 |---|---|---|
-| **Dumb shell**: a bare mount point | a passthrough template (one `ComponentSlot`) | ❌ one file, nothing to organize |
-| **Rich thing**: owns states | a stateful widget · a chat template | ✅ yes |
+| **Dumb shell**: a bare mount point | a passthrough app (one `ComponentSlot`) | ❌ one file, nothing to organize |
+| **Rich thing**: owns states | a stateful widget · a chat app | ✅ yes |
 
 The richness lives in one place and is portable: a stateful component carries its
 tree wherever it streams. Dropped in a dumb shell it IS the surface; streamed into a
-rich template, that template's own states frame it (or don't, and it rides inline).
-The component owns its states; the template owns whether and how to react to the
+rich app, that app's own states frame it (or don't, and it rides inline).
+The component owns its states; the app owns whether and how to react to the
 public ones.
 
 ### 5a. Sizing: the component owns it
 
-A dumb template has no size opinion; it responds to whatever the component's active
+A dumb app has no size opinion; it responds to whatever the component's active
 state reports. **Size is a property of the active state**: `inline` is a small card,
-`focused` is a full panel. A rich template frames on top but still responds, never
+`focused` is a full panel. A rich app frames on top but still responds, never
 force-fills. Same law as the SDK boundary: don't make the container force the size.
 
 ### 5b. Cap the height, scroll inside: a full-panel best practice
@@ -234,7 +234,7 @@ stepper, footer), and make only the content region `overflow: auto`:
 `minHeight: 0` on both the column and the scroll region is the piece people forget;
 without it a flex child refuses to shrink and the `overflow` never engages. Scroll
 the body only, never the whole layout. This is the component's job, not the
-template's (§5a): the component promises never to report more than fits.
+app's (§5a): the component promises never to report more than fits.
 
 ---
 
@@ -248,10 +248,10 @@ Both are driven by a discriminant; pick by relationship:
 | **Stacked**: one sits on top | a modal surface over a base | a `position: absolute` block, `visibleWhen` the discriminant value; base stays underneath |
 
 **A STACKED reaction state is still a ladder entry** (learned live, 2026-08-08): a
-template's fullscreen overlay (a finder taking over the screen) may draw as a
+app's fullscreen overlay (a finder taking over the screen) may draw as a
 `states/<name>` slot inside the shared chrome instead of owning a layout, but it
 MUST be declared at the tree's top level like any reaction state. Presence is not
-activation: a reaction surface opens only while its state is the template's ACTIVE
+activation: a reaction surface opens only while its state is the app's ACTIVE
 state, so an undeclared stacked state can never open (the component falls inline).
 The lint accepts either drawing for a declared reaction state: `layouts/<name>` (a
 full arrangement) or `states/<name>` (a stacked overlay).
@@ -289,12 +289,12 @@ extraction reuse didn't earn.
 The §3 tree, hosted: `sab-chat` declares `stateOrder: [focus, product,
 products]`, reaction states only; its welcome/conversation moods are private
 substates of the base arrangement, guarded inside it, never ladder entries. Eight
-product cards stream in; each declares `initial: products` and the template has a
+product cards stream in; each declares `initial: products` and the app has a
 `products` state, so placement honors the initial and the rail draws. A user taps one open: that card sets
 `view: product`, the ladder walk now finds `product` higher than `products`, the
-template rearranges to the pinned page. Inside it the card flips `detail` ↔ `apply`
-privately and the template never moves. The card's ✕ sets its view back; the walk
-drops the template to `products` again. Every moment is the same two mechanisms:
+app rearranges to the pinned page. Inside it the card flips `detail` ↔ `apply`
+privately and the app never moves. The card's ✕ sets its view back; the walk
+drops the app to `products` again. Every moment is the same two mechanisms:
 name-match and the ladder.
 
 ---
@@ -311,7 +311,7 @@ hand-maintained fixture and no drift:
   is always on), and one drawing is not a choice: a single-layout state shows
   nothing below. No `visibleWhen` archaeology, no Switch-scanning. The viewer
   renders the declaration and nothing else.
-- **Ordering** comes from tree order (and `stateOrder` at the template tier); no
+- **Ordering** comes from tree order (and `stateOrder` at the app tier); no
   `order` fields, no `01-` prefixes.
 - **The served manifest** (`loadAppManifest`) injects the same enumeration as
   `manifest.states` (name + how to activate it), so any MCP caller knows the public

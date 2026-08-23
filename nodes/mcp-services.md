@@ -4,7 +4,7 @@ title: "MCP Services"
 ---
 
 MCP is how an Agent gets tools. A node offers tools, an Agent node calls them, and the two
-are joined by a service edge on the **Canvas**.
+are joined by a service edge on the **canvas**.
 
 There are two sides to build, and they are separate jobs.
 
@@ -146,7 +146,7 @@ Include it when:
 5. **Keep it short.** Under a hundred lines, because it is in the prompt on every turn.
 
 Instructions follow the same lifecycle as the tools they came with. Wired on the canvas, they
-last the session. Discovered through **Spatial**, they are replaced when a new search returns
+last the session. Discovered through **spatial**, they are replaced when a new search returns
 a different set.
 
 Agent skills are a different thing, authored in `prompts/skills/` and discovered at run time.

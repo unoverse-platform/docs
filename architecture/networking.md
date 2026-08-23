@@ -43,7 +43,7 @@ inside the application, so swapping one terminator for another is always a conta
 | Port | Open to | Why |
 | --- | --- | --- |
 | 443 | The internet, at the load balancer | The single public surface |
-| 3001 | Your operator address. Plus the load balancer fronting Canvas, when `canvas_public` is on | **Canvas** |
+| 3001 | Your operator address. Plus the load balancer fronting Canvas, when `canvas_public` is on | **canvas** |
 | 22 | Your operator address | SSH, deploys, issuing publish keys |
 | 8080 | Your operator address | The log viewer, on small deployments |
 | 4106 | Loopback on the VM | The builder surface. Never routable, by construction |

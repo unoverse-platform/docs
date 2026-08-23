@@ -5,11 +5,11 @@
 > surface (§9) still implements the v1 mechanics it describes, and the v1 terms it uses
 > (name-sync, `defaultState`) are called out as legacy where they appear.
 > **Companion to**: [`UNOVERSE_SPEC.md`](./UNOVERSE_SPEC.md) (rendering),
-> [`UNOVERSE_MCP_TEMPLATE_PROTOCOL.md`](./UNOVERSE_MCP_TEMPLATE_PROTOCOL.md) (transport),
+> [`UNOVERSE_MCP_APP_PROTOCOL.md`](./UNOVERSE_MCP_APP_PROTOCOL.md) (transport),
 > [`UNOVERSE_LAYERS.md`](./UNOVERSE_LAYERS.md) (how states organize files).
 >
 > **One line:** a component is a small state machine whose states own their layouts; a
-> streamed component is a spawned actor; the template subscribes to its public state and
+> streamed component is a spawned actor; the app subscribes to its public state and
 > reacts by name. Data fills, state selects, one direction, at every tier.
 
 ---
@@ -51,11 +51,11 @@ you have overshot the borrow.
 The SDK `core` is a **generic engine**. It knows about *messages* and *generic state
 buckets*, never about features. The strings `faq`, `suggestions`, `voice`, `tab`,
 `wizard`, and yes, `focus`, must not appear in `core`. The engine routes incoming data
-into the right bucket; **templates and components project that state into UI**. All UX
+into the right bucket; **apps and components project that state into UI**. All UX
 lives in data (definitions), not in the engine.
 
 This rule survives v2 untouched, and v2 strengthens it: even the priority of "focus"
-over other reactions is data (the order of a list in the template's manifest), not a
+over other reactions is data (the order of a list in the app's manifest), not a
 protocol concept.
 
 ---
@@ -66,12 +66,12 @@ protocol concept.
 |---|---|---|---|
 | **Conversation** | the timeline of turns (user + assistant); each assistant turn points at the components it produced; the turn's status (streaming / complete); the voice transcript | the conversation | the stream; the voice service (transcript) |
 | **Component state** | one slice per component: its live data, its **view** (the public state), and its private state keys | the component's unique id (`chatId:nodeId`) | streamed `COMPONENT_DATA`, or locally via the `setValue` action |
-| **Template state** | the active template's own bag: **draft** plus any keys the dev names (panels, suggestion data, voice call state) | the active template | the workflow; `setTemplateValue` actions; producer services |
+| **App state** | the active app's own bag: **draft** plus any keys the dev names (panels, suggestion data, voice call state) | the active app | the workflow; `setAppValue` actions; producer services |
 
 ### The whole write API: two generic actions
 
 - **`setValue`** → write the dev's keys into a **component's own slice**
-- **`setTemplateValue`** → write the dev's keys into **template state**
+- **`setAppValue`** → write the dev's keys into **app state**
 
 That is the entire surface. The SDK hardcodes no UI concept: `openPanel`, a tab, a
 wizard step are all just keys the dev names, written via these two actions. Adding a
@@ -82,7 +82,7 @@ feature is data, never a new bucket, action, or `case` in `core`.
 The component's **public state** lives in its slice under the key **`view`**. The old
 name `defaultState` was wrong twice over: the field holds the CURRENT state, not a
 default, and the same word also names an unrelated app-level manifest field (the load
-state, `UNOVERSE_MCP_TEMPLATE_PROTOCOL.md` §4b). During migration the SDK reads
+state, `UNOVERSE_MCP_APP_PROTOCOL.md` §4b). During migration the SDK reads
 `defaultState` as a legacy alias for `view`; new authoring writes `view`.
 
 ---
@@ -93,7 +93,7 @@ state, `UNOVERSE_MCP_TEMPLATE_PROTOCOL.md` §4b). During migration the SDK reads
 conversation already tracks each turn's status; `lifecycle` is read off the
 conversation and projected as flags (`isStreaming`, …). It is a *view* of the
 conversation, not its own state. (This is React's "derive, don't store" rule; the
-template's own active state in §5 is derived by exactly the same principle.)
+app's own active state in §5 is derived by exactly the same principle.)
 
 What flips a turn streaming → complete: that run's `WORKFLOW_STATE` message, arriving
 on the MCP `/stream` lane. If `WORKFLOW_COMPLETED` never reaches the stream the turn
@@ -114,12 +114,12 @@ It is not a fourth kind of state.
 | Voice piece | Nature | Lands in |
 |---|---|---|
 | mic / speaker / WS audio frames | native I/O | the service (`useVoiceService`) |
-| call state (connecting / speaking / muted) | UI state of the voice template | **template state**, as the derived `callState` value (`idle` · `active` · `speaking` · `listening`) |
+| call state (connecting / speaking / muted) | UI state of the voice app | **app state**, as the derived `callState` value (`idle` · `active` · `speaking` · `listening`) |
 | transcript (the words said) | conversation content | **conversation** |
 
-The service is instantiated by the shared renderer (`StreamedUnoverseTemplate`), its
-flat state written via `mergeTemplateState`, its actions (`startCall` / `endCall` /
-`toggleMute`) answered in that same renderer. A template branches its call phases off
+The service is instantiated by the shared renderer (`StreamedUnoverseApp`), its
+flat state written via `mergeAppState`, its actions (`startCall` / `endCall` /
+`toggleMute`) answered in that same renderer. An app branches its call phases off
 `callState` like any other discriminant. No voice name exists in `core`.
 
 > **The rule services follow:** a service may own native I/O, but its state lives in
@@ -183,17 +183,17 @@ focused:
 Variants must bind the SAME fields and differ only in arrangement; anything that
 changes meaning or bound data is a second state, not a variant (lint-enforced). The
 COMPONENT picks its variant (by the space it finds itself in, container queries);
-the template never requests one. Templates influence arrangement only by controlling
+the app never requests one. Apps influence arrangement only by controlling
 the container, exactly like CSS.
 
 **Naming.** The component is the THING, not one rendering of it: `course`, never
 `courseCard`. "Card" is a layout's name, not an identity.
 
-### Rule 2. Public states are the template's whole vocabulary
+### Rule 2. Public states are the app's whole vocabulary
 
 The top-level states of the `view` axis are **public**: they are the component's entire
 interface to the outside. Everything nested below is **private**: not addressable by
-templates, not addressable by senders, invisible in the snapshot. In the example above
+apps, not addressable by senders, invisible in the snapshot. In the example above
 the public menu is `inline · products · product`; `detail` and `apply` do not exist
 outside the component.
 
@@ -201,70 +201,70 @@ This boundary is STRUCTURAL, decided by where a state sits in the tree. It repla
 v1 VIEW test (three judgment questions) with one placement decision, and the old
 rearrange rule remains as the guide for making it:
 
-> **If the template must rearrange to show it, make it a public state.
-> If the template wouldn't move, nest it privately.**
+> **If the app must rearrange to show it, make it a public state.
+> If the app wouldn't move, nest it privately.**
 
 Promotion is the deliberate act; privacy is the default. When a private step one day
-needs the template to react (an apply step becoming a full takeover), you promote it to
-the public level and the reacting templates grow a matching state.
+needs the app to react (an apply step becoming a full takeover), you promote it to
+the public level and the reacting apps grow a matching state.
 
 ### Rule 3. Arrival: nobody sends a state; the host places the actor
 
 A streamed component is a **spawned actor**. Three separate things exist at spawn:
 
 1. **The data**: just facts. A course has no opinion about how it is shown.
-2. **The placement**: the host template picks the starting face, in two steps.
+2. **The placement**: the host app picks the starting face, in two steps.
    First, the component's **declared initial** stands whenever the host can honor it:
-   a card whose initial is `products`, arriving into a template with a `products`
+   a card whose initial is `products`, arriving into an app with a `products`
    state, starts in `products`. Only when the host has no state for that initial does
-   the **scan** run: the template walks **its own states, in its declared order**
+   the **scan** run: the app walks **its own states, in its declared order**
    (rule 5's same list) and takes the first name the component's public menu also
-   has. That is how a component whose initial is `inline` still lands in a template's
+   has. That is how a component whose initial is `inline` still lands in an app's
    `focus` surface. (Refined during the sab pilot, 2026-08-08: a scan that ignored
-   the initial placed every arriving card at the template's most prominent state.)
+   the initial placed every arriving card at the app's most prominent state.)
 3. **The component's declared initials**: the fallback. No overlap between the
-   template's states and the component's public menu, and the component wakes in its
+   app's states and the component's public menu, and the component wakes in its
    own `initial` chain (`inline` by convention) and renders inline in the flow.
 
 Spawn-time placement by the host is orthodox actor practice (the parent supplies input
-at spawn). What remains forbidden is everything after: **the template never writes a
+at spawn). What remains forbidden is everything after: **the app never writes a
 component's state post-spawn.** Not to promote it, not to retract it, not to close it.
 
 This collapses v1's three competing arrival emitters (manifest seed, tool-call seed,
-and the deprecated `TEMPLATE_DATA { defaultState }` bridge) into one owner: the host's
+and the deprecated `APP_DATA { defaultState }` bridge) into one owner: the host's
 scan.
 
-### Rule 4. Runtime: the component drives; the template reacts by name
+### Rule 4. Runtime: the component drives; the app reacts by name
 
 After spawn, the component's `view` changes exactly two ways, both the same write: a
 user interaction (`setValue { view: "product" }`), or the component's own chrome (its
-expanded face carries its own ✕ that sets `view` back; template chrome never writes a
-component's slice). Whenever the `view` changes, every hosting template asks one
+expanded face carries its own ✕ that sets `view` back; app chrome never writes a
+component's slice). Whenever the `view` changes, every hosting app asks one
 question:
 
 > **"Do I have a state with that name?"**
 
-Match: the template enters its own state of that name, that state's layout draws, its
+Match: the app enters its own state of that name, that state's layout draws, its
 slot renders the component. No match: rule 6. Name-match is the DEFAULT convention (a
-template state named `product` reacts to a component view named `product`, zero
+app state named `product` reacts to a component view named `product`, zero
 ceremony, exactly the old name-sync developer experience); an explicit mapping on the
-template state (`reactsTo: someOtherName`) exists only as the escape hatch for
+app state (`reactsTo: someOtherName`) exists only as the escape hatch for
 vocabulary mismatches, and is expected to be rare.
 
-The template's own active state is **derived, never stored** (same law as §3): it is a
-pure function of the snapshots of the components it hosts. `template` remains the one
-reserved name at the protocol level (swap the whole shell, safe because the template
+The app's own active state is **derived, never stored** (same law as §3): it is a
+pure function of the snapshots of the components it hosts. `app` remains the one
+reserved name at the protocol level (swap the whole shell, safe because the app
 owns nothing).
 
-### Rule 5. The template's declared order is its priority ladder
+### Rule 5. The app's declared order is its priority ladder
 
-A template can be in ONE state at a time, so when its hosted components sit in
-different views, the template's own **declared state order** decides. The template
+An app can be in ONE state at a time, so when its hosted components sit in
+different views, the app's own **declared state order** decides. The app
 walks its list top-down and enters the first of its states that ANY hosted component
 currently matches:
 
 ```yaml
-# template manifest: THE TEMPLATE TREE (one declaration, everything follows)
+# app manifest: THE APP TREE (one declaration, everything follows)
 states:
   main:                 # the base arrangement
     states:
@@ -276,15 +276,15 @@ states:
 
 The ladder (`stateOrder`) is DERIVED from the tree: the top level minus the base, in
 declared order. An authored `stateOrder` remains only as the legacy form for
-templates without a tree. The ladder lists REACTION states only: states components
-can put the template in.
-A template's own condition-guarded moods (a welcome hero on an empty conversation,
+apps without a tree. The ladder lists REACTION states only: states components
+can put the app in.
+An app's own condition-guarded moods (a welcome hero on an empty conversation,
 the conversation itself) are private substates of its base arrangement, guarded
-inside it, never ladder entries: the template does not rearrange between them, so
+inside it, never ladder entries: the app does not rearrange between them, so
 by rule 2's own logic they are nested, not public. (Caught on the sab pilot: listing
 them in the ladder let the welcome hero draw inside reaction states.)
 
-One component in `focus` and seven in `products`: `focus` is higher, so the template
+One component in `focus` and seven in `products`: `focus` is higher, so the app
 enters `focus`. The finder ARRIVED, so the seven release their claim (rule 4). When the
 focused component sets itself back, the walk re-runs, finds nothing below, and lands on
 the BASE. It does not land on the rail those seven used to hold.
@@ -302,7 +302,7 @@ stale rail waiting behind every focus surface, so rule 4 clears again. One princ
 priority, stated as the complete behavioral law:
 
 1. Every component says what state it is in.
-2. The template has a priority list; top wins. No word is special.
+2. The app has a priority list; top wins. No word is special.
 3. The screen always shows the highest state that has a component in it.
 4. When a DELIVERY takes a higher state, the states below it are CLEARED. Every
    component sitting in a lower-ranked state releases its claim and retracts to
@@ -322,8 +322,8 @@ priority, stated as the complete behavioral law:
    "two lifetimes" chat-layer wipe) is deleted: only arrivals move the screen and
    only closings release it. A wizard mid-flow survives the guest's next message.
 
-The declared-initial retract survives for the GUEST CLOSE (template-chrome ✕,
-`closeSurfaces`) and the template swap. Those are closings, which rule 6 governs.
+The declared-initial retract survives for the GUEST CLOSE (app-chrome ✕,
+`closeSurfaces`) and the app swap. Those are closings, which rule 6 governs.
 
 **No word is special.** `focus` outranks `products` because of list position, nothing
 else. Rename it freely; the engine only matches names and walks the list. This is §1
@@ -331,13 +331,13 @@ applied: even priority is data.
 
 ### Rule 6. Unmatched view = inline. Always.
 
-No state, a view the template has no state for, or a template with no reaction states
+No state, a view the app has no state for, or an app with no reaction states
 at all: the component renders inline in the conversation flow. Always, always, always.
-The flow is the placeholder every component can fall back to; a matched template state
+The flow is the placeholder every component can fall back to; a matched app state
 lifts the instance out of the flow into its slot (one instance, one placeholder, never
 two paintings of the same actor), and losing the match releases it back.
 
-**The authoring corollary:** only make a state public if templates should rearrange
+**The authoring corollary:** only make a state public if apps should rearrange
 for it. An ignored public state does not "stay put", it FALLS INLINE. If a component
 mid-flow switches to a public view no host maps (an `apply` form promoted for no
 reason), the surface collapses into the flow in front of the user. Steps that should
@@ -363,12 +363,12 @@ starts empty and refills as the workflow re-emits.
 ### 6a. Size & eviction
 
 The store only grows during a session; growth vectors are the timeline, the component
-data map, and the transcript. Template state is replace/merge, O(1).
+data map, and the transcript. App state is replace/merge, O(1).
 
 **The rule: hold at most the last `N` turns (default `N = 100`).** Over `N`: drop the
 oldest turns and delete the component slices they point at (the timeline holds
 pointers; evicting a turn must free its data or the map leaks). One number,
-oldest-out-first, no LRU, no priorities. Keep template state strictly replace/merge;
+oldest-out-first, no LRU, no priorities. Keep app state strictly replace/merge;
 the transcript rides the conversation and is evicted with it. Safe because the server
 holds the real conversation memory; the client only needs recent history.
 
@@ -381,7 +381,7 @@ holds the real conversation memory; the client only needs recent history.
                                                   (data never picks a layout;
                                                    a layout never holds state)
 
-   component tier                     template tier
+   component tier                     app tier
    ┌──────────────────────────┐       ┌────────────────────────────────┐
    │ view axis (PUBLIC)       │       │ stateOrder (priority ladder)   │
    │   products ─ layout      │ snap- │   focus      ─ layout          │
@@ -394,7 +394,7 @@ holds the real conversation memory; the client only needs recent history.
 ```
 
 The three buckets of §2 are unchanged underneath: the component's `view` and private
-keys live in its slice, the template's own keys (draft, panels) in template state, and
+keys live in its slice, the app's own keys (draft, panels) in app state, and
 the timeline in the conversation. Services sit outside and write in, as producers.
 
 ---
@@ -404,11 +404,11 @@ the timeline in the conversation. Services sit outside and write in, as producer
 The doctrine above is decided; this is what implements it (the concrete file map lives
 in the migration plan, not here):
 
-1. **One shared derivation.** The template's active state derives in exactly one place
-   (`core/templates.ts`), by the rule-5 ladder walk. v1 shipped three copies of the
+1. **One shared derivation.** The app's active state derives in exactly one place
+   (`core/apps.ts`), by the rule-5 ladder walk. v1 shipped three copies of the
    "latest surfaced view wins" recency rule (active view, app width, Studio preview)
    and they diverged once already; the ladder replaces all three.
-2. **Ordered claims.** The template's declared state order becomes a first-class
+2. **Ordered claims.** The app's declared state order becomes a first-class
    ordered list (today's `stateOrder` promoted from picker hint to contract); layout
    filenames stop being claims.
 3. **State-owns-layout resolution.** The active layout resolves from the state's
@@ -421,7 +421,7 @@ in the migration plan, not here):
 7. **Lint + guards move in lockstep** (`UNOVERSE_CONFORMANCE.md` §5): the
    case-name-equals-layout-filename rules die, the surfaces-select-on-the-public-axis
    rule survives renamed, reaction coverage becomes "every reachable public state
-   appears in the template's declared order".
+   appears in the app's declared order".
 
 Until this list lands, the SDK below (§9) implements v1 semantics.
 
@@ -438,7 +438,7 @@ Until this list lands, the SDK below (§9) implements v1 semantics.
 |---|---|
 | **Conversation** | `addUserMessage` · `startResponse` · `completeResponse` · `getTimeline` / `getResponses` / `latestResponse` |
 | **Component state** | `apply({COMPONENT_INIT\|COMPONENT_DATA})` (merge at `chatId:nodeId`) · `get(chatId,nodeId)` · `getType` |
-| **Template state** | `getTemplateState` / `mergeTemplateState` plus `getDraft`/`setDraft` (the one named convenience) |
+| **App state** | `getAppState` / `mergeAppState` plus `getDraft`/`setDraft` (the one named convenience) |
 | **Lifecycle** (derived) | `getLifecycle`/`setLifecycle` |
 | **Reactivity / size** | `subscribe`/`getVersion` · `new ComponentStore({maxTurns=100})` + internal `evict()` |
 
@@ -448,10 +448,10 @@ No feature-named member exists.
 
 | Message | Effect |
 |---|---|
-| `COMPONENT_INIT` | place pointer + seed data (or, if a template directive, `setActiveTemplate`) |
+| `COMPONENT_INIT` | place pointer + seed data (or, if an app directive, `setActiveApp`) |
 | `COMPONENT_DATA` / `OBJECT_DATA` | merge at `chatId:nodeId` |
-| `WORKFLOW_STATE` | open/complete the turn + `lifecycle` + template selection |
-| `TEMPLATE_DATA` | `mergeTemplateState(msg.data)` |
+| `WORKFLOW_STATE` | open/complete the turn + `lifecycle` + app selection |
+| `APP_DATA` | `mergeAppState(msg.data)` |
 | `SESSION_READY` | stream-live signal |
 
 **Turn identity (model semantic, every port implements this):** `conversationId` names
@@ -466,17 +466,17 @@ data-only merge.
 
 **Which lane:** every message above is run-scoped and arrives on the MCP `/stream`. The
 SDK WS lane carries only audio + global cross-MCP state (two-lane split,
-`UNOVERSE_MCP_TEMPLATE_PROTOCOL.md` §5b).
+`UNOVERSE_MCP_APP_PROTOCOL.md` §5b).
 
 ### Action verbs (`core/src/actions.ts` → `dispatchAction`)
 
 Exactly two writes + a server route: `setValue` / `input` → the component's own slice;
-`setTemplateValue` → template state; any other type → the server, as a native MCP call
+`setAppValue` → app state; any other type → the server, as a native MCP call
 (send = fire-and-forget `tools/call` on the trigger tool; submit-to-waiting-app =
 native `elicitation`; typing = local `draft`). No bespoke REST; every host shares this
 one SDK path.
 
-### Template derivations (`core/templates.ts`): pure, portable, the ONE home
+### App derivations (`core/apps.ts`): pure, portable, the ONE home
 
 | Function | Derives | v2 |
 |---|---|---|
@@ -496,9 +496,9 @@ translates `core/` and only `core/`.
 - `UnoverseComponent` renders ONE component from either data source (`uri` + `data`
   with a local slice, or `store` + `chatId` + `nodeId`); no view injection either way.
   `StreamedUnoverseComponent` remains a deprecated alias.
-- `StreamedUnoverseTemplate` roots template scope, routes `setTemplateValue`,
+- `StreamedUnoverseApp` roots app scope, routes `setAppValue`,
   instantiates the voice service for `service: "voice"` apps and answers its actions.
-- `useVoiceService` is the native voice service; its call state flows into template
+- `useVoiceService` is the native voice service; its call state flows into app
   state as a producer (§4).
 
 ---

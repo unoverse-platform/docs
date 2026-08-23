@@ -1,15 +1,15 @@
 ---
-sidebarTitle: "Templates"
-title: "Templates"
+sidebarTitle: "Apps"
+title: "Apps"
 ---
 
-**A template declares a STATE TREE in its manifest: top-level order is its priority ladder, nesting is containment, and each state owns the layout that draws it.**
+**An app declares a STATE TREE in its manifest: top-level order is its priority ladder, nesting is containment, and each state owns the layout that draws it.**
 
-Components render pieces; a **template** is the shell around them: the chat layout, the voice surface. It owns **nothing**: conversation and component data live in the store, so templates are swappable mid-conversation.
+Components render pieces; an **app** is the shell around them: the chat layout, the voice surface. It owns **nothing**: conversation and component data live in the store, so apps are swappable mid-conversation.
 
-The connection between components and templates is **one rule**:
+The connection between components and apps is **one rule**:
 
-> **A component enters a public view → the template walks its declared states top-down and enters the first one any hosted component matches. That state's layout draws.**
+> **A component enters a public view → the app walks its declared states top-down and enters the first one any hosted component matches. That state's layout draws.**
 > No match → the base arrangement, and the component renders inline. Nothing is stored, nothing is wired: names match, order decides.
 
 ---
@@ -17,28 +17,28 @@ The connection between components and templates is **one rule**:
 ## The anatomy: manifest-only
 
 ```
-design/<project>/templates/acmechatlayout/
+design/<project>/apps/acmechatlayout/
 ├── manifest.yaml        # THE ENVELOPE: everything about the app, incl. the state tree
 ├── layouts/             # the ARRANGEMENTS: one per state (same-name default)
 │   ├── main.yaml        #   the base: the core chat alone
 │   ├── products.yaml    #   a card entered "products" → core + the cards rail
 │   └── detail.yaml      #   a card entered "detail"   → core + the pinned page
-├── components/          # template-local partials (core, header, composer-bar, turns, …)
+├── components/          # app-local partials (core, header, composer-bar, turns, …)
 └── (no states/ folder — retired 2026-08-22: every drawing lives in layouts/)
 ```
 
-There is **no `<name>.yaml`**: the manifest is the single contract file. Same grammar as components ([03](/design/components)): a component declares a `view` tree; a template declares a `states:` tree. Each layout is a complete arrangement: typically `{ "$include": "components/core" }` plus that state's slot, so shared chrome lives once in `components/` and every layout includes it.
+There is **no `<name>.yaml`**: the manifest is the single contract file. Same grammar as components ([03](/design/components)): a component declares a `view` tree; an app declares a `states:` tree. Each layout is a complete arrangement: typically `{ "$include": "components/core" }` plus that state's slot, so shared chrome lives once in `components/` and every layout includes it.
 
 ```yaml
-# manifest.yaml: the whole app in one file (design/sab/templates/sab-chat, as shipped)
+# manifest.yaml: the whole app in one file (design/sab/apps/sab-chat, as shipped)
 name: sab-chat
 description: The SAB customer-support chat, with a route to live support.
 whenToUse: Ask SAB a banking question or get general help from customer support…   # utterance-shaped: selection text
 category: Assistant
 version: 1.0.0
-defaultState: template                    # the app's LOAD state: "template" = the full surface
+defaultState: app                    # the app's LOAD state: "app" = the full surface
 
-# THE TEMPLATE TREE: one declaration, everything follows.
+# THE APP TREE: one declaration, everything follows.
 states:
   main:                 # the base arrangement, always first
     states:
@@ -57,18 +57,18 @@ inputSchema:
     message: { type: string, description: "The user's request" }
 binding: { workflow: wf-r4jzo7, trigger: inputtrigger9 }    # the app OWNS its workflow
 autoTrigger: false
-# a voice template adds: service: voice  (the channel instantiates the native service)
+# a voice app adds: service: voice  (the channel instantiates the native service)
 ```
 
 What the tree means, line by line:
 
-- **Top-level order IS the priority ladder.** The base comes first; the rest are reaction states in priority order. When hosted components sit in different views, the template enters the FIRST of its states any component matches ([04](/design/state) rule 4). A higher state cancels the claims below it, so release always lands on the base. `stateOrder` is **derived** from this tree; it is no longer authored (*legacy:* an authored `stateOrder` list survives only for templates without a tree).
+- **Top-level order IS the priority ladder.** The base comes first; the rest are reaction states in priority order. When hosted components sit in different views, the app enters the FIRST of its states any component matches ([04](/design/state) rule 4). A higher state cancels the claims below it, so release always lands on the base. `stateOrder` is **derived** from this tree; it is no longer authored (*legacy:* an authored `stateOrder` list survives only for apps without a tree).
 - **Nesting IS containment.** `welcome` exists only inside `main`: the compiler strips a declared base substate from every non-base arrangement, so no hand-written guard polices it. The substate's own file keeps its condition (`visibleWhen: isEmpty`); the first declared substate is the viewer's landing default.
 - **The shell is not declared.** The conversation timeline is `main`'s own content, included by the shared chrome and legitimately drawn beside the rail, the page, and under focus. Declaring a state CONTAINS it: declare only what should exist in the base alone.
-- **Each state owns its layout, same-name default.** `focus: {}` draws `layouts/focus`; write `layout:` only when the filename differs. A template with a single state is simply always in it.
+- **Each state owns its layout, same-name default.** `focus: {}` draws `layouts/focus`; write `layout:` only when the filename differs. An app with a single state is simply always in it.
 - Reaction is by **name-match** with the hosted component's public views; `reactsTo: <otherName>` on a state is the rare escape hatch for vocabulary mismatches.
 
-**States vs the base's moods: the rearrange rule.** *If a component causes the template to rearrange, it's a top-level state. If the template itself knows it and wouldn't move, it's a contained substate of the base.* Local moods (`welcome` on an empty conversation, a voice layout's call phases on `callState`) branch inside the base via the normal condition vocabulary ([04](/design/state)); listing them on the ladder is wrong twice: they'd outrank reactions, and they'd draw inside reaction states.
+**States vs the base's moods: the rearrange rule.** *If a component causes the app to rearrange, it's a top-level state. If the app itself knows it and wouldn't move, it's a contained substate of the base.* Local moods (`welcome` on an empty conversation, a voice layout's call phases on `callState`) branch inside the base via the normal condition vocabulary ([04](/design/state)); listing them on the ladder is wrong twice: they'd outrank reactions, and they'd draw inside reaction states.
 
 ---
 
@@ -111,7 +111,7 @@ The rules (all lint-enforced):
 
 ---
 
-## Template-only primitives
+## App-only primitives
 
 - **`Timeline`**: renders the conversation (you supply the `user`/`assistant` turn subtrees; per-turn scope carries `text`, `streaming`, …). The conversation bucket is locked to the stream ([04](/design/state)).
 - **`ComponentSlot`**: where components render. Two forms:
@@ -121,7 +121,7 @@ The rules (all lint-enforced):
 - type: ComponentSlot
   select: {}
 
-# 2. a REACTION slot: renders whichever component put the template in this state
+# 2. a REACTION slot: renders whichever component put the app in this state
 - type: ComponentSlot
   select: { from: all, where: { field: view, eq: detail }, limit: 1 }
   frame: { }    # the chrome the selected component renders inside
@@ -131,8 +131,8 @@ Rules that bite:
 - ✅ Slots select on the **public axis** (`where { field: "view" }`; *legacy alias:* `defaultState`), ❌ never by component type, ❌ never by a component's private state key. Both are lint-flagged.
 - ✅ **A state's layout surfaces its own view.** The layout a state owns must contain a slot selecting that state's view: the tree claims the instance; the slot renders it (guard-enforced).
 - ✅ **A slot's single occupant fills the slot.** A `limit: 1` slot gives its occupant the frame's full height automatically, zero per-layout height styling. Multi-occupant slots (a rail) keep content-sized instances.
-- ✅ **One instance → one placeholder.** While a component's view matches a template state, it renders in that state's slot: lifted out of the flow, never painted twice. Its own ✕ switches it back and it returns to the flow.
-- ❌ Never size or restyle a component from the template: a component owns its states ([03](/design/components)); the template owns only the framing.
+- ✅ **One instance → one placeholder.** While a component's view matches an app state, it renders in that state's slot: lifted out of the flow, never painted twice. Its own ✕ switches it back and it returns to the flow.
+- ❌ Never size or restyle a component from the app: a component owns its states ([03](/design/components)); the app owns only the framing.
 
 **In-layout slots without a state of their own** are still normal: an overlay (e.g. a wizard in a focus overlay over the chat) lives inside the core, claims its view, and changes no width. Reach for a top-level state when the *arrangement* changes; keep an overlay in-core when only a layer appears.
 
@@ -140,7 +140,7 @@ Rules that bite:
 
 ---
 
-## Voice templates
+## Voice apps
 
 Declare `"service": "voice"` in the manifest; the channel instantiates the native service, which projects **`callState`** into scope. The call phases (`layouts/idle … layouts/user-speaking`) are drawings of the base, branching inside its layouts: typically a wide core in the base and a slim core beside a card slot, both including the same files. Cards streaming in during a call are placed by the ladder exactly as in chat. Audio is never wired in a definition.
 
@@ -149,11 +149,11 @@ Declare `"service": "voice"` in the manifest; the channel instantiates the nativ
 ## Naming & discoverability: how the AI picks the app
 
 > **Canonical guide: `docs/nodes/node-discoverability.md`**, every rule there applies to
-> templates and components verbatim, at *higher* stakes: apps are ranked against the
+> apps and components verbatim, at *higher* stakes: apps are ranked against the
 > **user's own words** (`findIntent`), not a planner's task query. Bad meta makes an
 > entire app invisible. This section is the design-side summary.
 
-**The formula.** **Spatial** embeds exactly `` `title. whenToUse||description [category]` ``
+**The formula.** **spatial** embeds exactly `` `title. whenToUse||description [category]` ``
 and ranks it against what the user literally types/says. Three consequences:
 - **`whenToUse` IS the selection text**: when present it *replaces* description in the ranking.
 - **The opening words dominate the embedding.** Lead with the user's vocabulary for the
@@ -194,7 +194,7 @@ one plain line about what it is? Does the category name the domain, not the buil
 
 ---
 
-## Template checklist
+## App checklist
 
 - [ ] Manifest-only: no `<name>.yaml`; the manifest declares the `states:` tree, base first, reactions in priority order; `layout` names the base layout
 - [ ] One layout per state (same-name default), each surfacing its own view; shared chrome in `components/`, included by every layout
@@ -203,7 +203,7 @@ one plain line about what it is? Does the category name the domain, not the buil
 - [ ] `binding.workflow` + `binding.trigger` real (the app owns them); `preview` seeds each state's mock
 - [ ] Flow slot generic (`select: {}`); reaction slots select on the public axis (`view`), never `type`
 - [ ] `whenToUse` utterance-shaped; `description` ≤120 chars
-- [ ] Preview in **Studio**: state pills, then live ([07](/design/studio)); publish passes lint with 0 errors
+- [ ] Preview in **studio**: state pills, then live ([07](/design/studio)); publish passes lint with 0 errors
 
 ---
 

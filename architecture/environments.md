@@ -46,7 +46,7 @@ UAT tested" is a fact rather than a hope.
 
 **Authored assets** move by publishing. Components, templates, skills and prompt blocks are
 rows in a universe's database, and promoting one means publishing it to the next universe.
-That is the same mechanism a developer uses from **Studio**, pointed at a different address.
+That is the same mechanism a developer uses from **studio**, pointed at a different address.
 
 ## What never moves
 

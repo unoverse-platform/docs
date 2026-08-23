@@ -3,11 +3,12 @@ sidebarTitle: "Deployment"
 title: "Deployment"
 ---
 
-Deploy Unoverse to production VMs.
+Deploy unoverse to production VMs.
 
 ## Overview
 
-Production deployment uses `unoverse deploy`, which reads your ground's rendered configuration and runs Ansible playbooks to install and configure services on your VM.
+One command builds the infrastructure and ships the platform onto it. `deploy` takes the
+cloud as its target: `unoverse deploy aws`, or `unoverse deploy digitalocean`.
 
 ## Prerequisites
 
@@ -16,27 +17,30 @@ Production deployment uses `unoverse deploy`, which reads your ground's rendered
 - Terraform and your cloud CLI are handled: `unoverse deploy` installs Terraform when it is
   missing, and offers to install `doctl`.
 
-## The cloud API token
+## Your cloud credential
 
-Deploying creates infrastructure in **your** cloud account: server, load balancer,
-DNS, Postgres, Redis. That takes one credential, asked for once, when `unoverse
-deploy` first runs:
+Deploying creates infrastructure in **your** cloud account: server, load balancer, DNS,
+Postgres, Redis. It uses whichever credential your cloud CLI already holds, so there is
+nothing new to paste into unoverse.
 
-- Generate it at [cloud.digitalocean.com/account/api/tokens](https://cloud.digitalocean.com/account/api/tokens)
-- Scope: **Full Access** (Read Only cannot create infrastructure)
-- It stays on your machine and is never shared
+| Cloud | Where the credential comes from |
+|---|---|
+| DigitalOcean | `doctl`, or `DIGITALOCEAN_TOKEN`. Generate a **Full Access** token at [cloud.digitalocean.com](https://cloud.digitalocean.com/account/api/tokens); Read Only cannot create infrastructure. |
+| AWS | Your usual profile: `aws sso login`, `aws configure`, or the access-key environment variables. `export AWS_PROFILE=<name>` picks one. |
 
-(The registry token you pasted at `unoverse create` is different and already
-done: your Unoverse admin issued it, and it only pulls platform images.)
+It stays on your machine and is never shared.
+
+The registry token you pasted at `unoverse create` is a different thing and already done.
+Your unoverse admin issued it, and it only pulls platform images.
 
 ## Quick Deploy (Single VM)
 
 ```bash
-unoverse deploy
+unoverse deploy aws
 ```
 
-That is the whole thing. With no server yet it asks which cloud, connects your cloud
-account, completes the Terraform inputs, and shows you the plan in plain English with a
+That is the whole thing. Name the ground, because an unnamed deploy refuses to guess when
+two are configured. With no server yet it connects your cloud account, completes the Terraform inputs, and shows you the plan in plain English with a
 monthly estimate. Creating billable infrastructure is still your own explicit act: the
 plan's yes is the gate, `d` prints the full technical plan, and the saved plan is what
 runs. Then it installs the platform on what was built, migrations included.
@@ -78,10 +82,11 @@ For detailed step-by-step guides, see the [Runbooks](/runbooks/overview):
 
 ## Deploying Your Own Work
 
-Content does not ride `unoverse deploy` (that moves platform images only). Your work reaches the server three ways:
+Content does not ride `unoverse deploy`, which moves platform images only. Your work reaches
+the server two ways, and neither needs a deploy or a restart:
 
-- **Studio publish**: publishes straight to the universe over the API. It lands in the universe's database and needs no deploy, no restart.
-- **Marketplace items**: installed per item from Studio's Marketplace tab; database-driven, no restart.
+- **Your own work**: `unoverse deploy studio` from your project, which lints it, shows a plan, and writes it into the universe's database over the API.
+- **Marketplace items**: installed one at a time in your universe. Open **studio**, then **Marketplace**.
 
 ## Start on a Test Domain, Swap Later
 
@@ -89,14 +94,20 @@ The domain is a Terraform input, not a commitment. Deploy today under any domain
 
 The swap:
 
-1. Change `domain` in `terraform.tfvars`, then `terraform apply`. A new certificate and DNS records are created; the VM, database, Redis, and everything in them are untouched.
-2. Redeploy: delete `.env.production` at the repo root and run `unoverse deploy`, it re-renders from the applied ground.
+1. Change `domain` in `infra/<cloud>/terraform.tfvars`.
+2. Run `unoverse deploy <cloud>` again. It plans the ground change, creates a new certificate and DNS records, and ships. The VM, database, Redis and everything in them are untouched.
 3. Update your IdP: add the new origins and callback URLs in Auth0 or Cognito. This is the only manual step, and the one people forget.
 
 Swap before handing URLs to real users: browser sessions and shared links reference the old hostname, and that is the entire cost of the move.
 
 Working with no domain at all also gets you surprisingly far: `http://IP:3001` and `http://IP:4105` prove a deployment is healthy. You just cannot log in until HTTPS exists, because OIDC providers refuse plain-IP redirect flows.
 
-## Challenge Complete
+## Next steps
 
-Your platform is deployed to production.
+<Card title="Runbooks" icon="server" href="/runbooks/overview" horizontal>
+Operating a live universe: database, hardening, health checks.
+</Card>
+
+<Card title="Provisioning with Terraform" icon="layers" href="/architecture/terraform" horizontal>
+The inputs your ground takes, and what each one creates.
+</Card>

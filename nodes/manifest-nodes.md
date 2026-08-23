@@ -3,14 +3,14 @@ sidebarTitle: "Anatomy of a Node"
 title: "Anatomy of a Node"
 ---
 
-A node is a service you drag onto the **Canvas**. It connects an Agent to another system.
+A node is a service you drag onto the **canvas**. It connects an Agent to another system.
 
 There is a marketplace of nodes. When none of them suits your situation, you build your own.
 
 A node you build is a folder of YAML files. You describe the API call, and the platform
 makes it.
 
-You build it in **Studio**, run it against the real service, then publish it. Once it is
+You build it in **studio**, run it against the real service, then publish it. Once it is
 accepted, the node is in the node library alongside every other node.
 
 ## What belongs to you, and what belongs to the platform
@@ -26,7 +26,7 @@ capability that does not exist, so you find out while you write rather than at r
 
 ## Build it in Studio, then publish it
 
-You build a node in **Studio**, on your own machine. Studio reads your files straight off
+You build a node in **studio**, on your own machine. Studio reads your files straight off
 disk, so there is no server to start and no database to connect to while you work. That is
 why it works offline.
 
@@ -36,7 +36,7 @@ you keep your files before that is your business.
 
 | Step | Where |
 |---|---|
-| Write the node | **Studio**, on your own files |
+| Write the node | **studio**, on your own files |
 | Check and run it | your machine, against the real service |
 | Publish it | a record in the universe you chose |
 
@@ -57,7 +57,7 @@ type.
 So the list in `allowedHosts` is not paperwork. It is the thing somebody says yes to, and it
 is why they can say yes quickly.
 
-> Publishing from **Studio** is not available yet. Today you write, check and run nodes
+> Publishing from **studio** is not available yet. Today you write, check and run nodes
 > locally with the two commands on this page.
 
 ## One folder is one node
@@ -142,7 +142,7 @@ write it.
 
 `cacheable` opts the node into memoization: the engine may serve a prior run's output when
 nothing that matters has changed, instead of re-executing. `true` is for idempotent,
-side-effect-free reads (search, scrape, fetch-by-id) — never for anything effectful or
+side-effect-free reads (search, scrape, fetch-by-id), never for anything effectful or
 non-deterministic. Nodes that read content through a **volatile URL** (a presigned link
 that changes every run) use the object form and declare the content's real identity
 instead:
@@ -341,15 +341,15 @@ produced it.
 than node outputs:
 
 - **Every tool call** becomes a bar on the execution timeline the moment it returns, with
-  its arguments, its result, its duration, and whether it succeeded.
+ its arguments, its result, its duration, and whether it succeeded.
 - **Token usage** is read straight off the vendor's reply and summed across the turns of a
-  run, detail blocks included (reasoning tokens, cached tokens). The runtime checks the
-  three places a wire carries it (`usage` on the body or final chunk, `response.usage` on a
-  Responses stream, `metadata.usage` on a Bedrock stream), so a node on any of those wires
-  fills the execution's Token Usage view with nothing declared. A vendor that reports usage
-  anywhere else will not be picked up automatically: that is a platform gap to raise, not
-  something to work around in the node. A connector named `usage` in the example above is a different thing: that is
-  the node choosing to hand the block downstream as data.
+ run, detail blocks included (reasoning tokens, cached tokens). The runtime checks the
+ three places a wire carries it (`usage` on the body or final chunk, `response.usage` on a
+ Responses stream, `metadata.usage` on a Bedrock stream), so a node on any of those wires
+ fills the execution's Token Usage view with nothing declared. A vendor that reports usage
+ anywhere else will not be picked up automatically: that is a platform gap to raise, not
+ something to work around in the node. A connector named `usage` in the example above is a different thing: that is
+ the node choosing to hand the block downstream as data.
 
 Both are fire and forget: recording never slows a run and never fails one, and a node test,
 which has no execution to attach to, records nothing.
@@ -357,9 +357,9 @@ which has no execution to attach to, records nothing.
 For a streaming node, two controls matter:
 
 - `accumulate: true` emits the running total instead of the fragment. A consumer wants the
-  text so far, not one word.
+ text so far, not one word.
 - `throttleMs` or `throttleChars` bound how often a row emits. Nothing held back is
-  dropped; it is flushed when the run ends.
+ dropped; it is flushed when the run ends.
 
 ```yaml
 - emit: stream
@@ -457,13 +457,13 @@ ternaries, arrow callbacks, and `JSON`, `Math`, `Number`, `String`, `Boolean`, `
 because without them a node could not be a manifest at all:
 
 - **`Date.now()` and `Date.iso(ms)`.** Half the APIs a node calls take a date range and want
-  an ISO string. `Date.iso(Date.now() - 30 * 86400000).split('T')[0]` is thirty days ago as
-  `YYYY-MM-DD`. There is no `new Date(...)`, because that is a construction the sandbox
-  refuses.
+ an ISO string. `Date.iso(Date.now() - 30 * 86400000).split('T')[0]` is thirty days ago as
+ `YYYY-MM-DD`. There is no `new Date(...)`, because that is a construction the sandbox
+ refuses.
 - **`sha256(value)`.** A stable id derived from content, which downstream dedup joins on.
-- **`toBase64(value)`.** Plain text as UTF-8 bytes in base64 — the form bytes take on the
-  way to an `encoding: binary` body. Storing text a workflow already holds (markdown back
-  to S3) is the case; the sandbox has no other encoder.
+- **`toBase64(value)`.** Plain text as UTF-8 bytes in base64, the form bytes take on the
+ way to an `encoding: binary` body. Storing text a workflow already holds (markdown back
+ to S3) is the case; the sandbox has no other encoder.
 
 Nothing mutates. Use `.at(-1)` and never `.pop()`, `.toSorted()` and never `.sort()`. The
 array you would be sorting is a live upstream output, so sorting it in place would reorder

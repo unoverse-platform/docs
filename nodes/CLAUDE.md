@@ -34,7 +34,7 @@ say so rather than reaching for code.
 1. **`api` is always a folder.** `api.yaml` and an inline `api:` block are lint errors.
 2. **`api/run.yaml` is a LIST**, even for one call. Each entry has a `name`.
 3. **`api/events.yaml` is one row per output connector, in the order `interface.yaml`
-   declares them.** Lint enforces coverage and order.
+ declares them.** Lint enforces coverage and order.
 4. **A section is defined in ONE place.** Inline in `node.yaml` or its own file, never both.
 5. **Declare every host in `allowedHosts`.** Deny by default, https only.
 6. **Never put a credential value in a file.** Declare the shape, reference it by name.
@@ -99,7 +99,7 @@ a real run of the workflow; there is no flag that lets a test perform it.
 
 Set it whenever the effect cannot be undone. Deleting a scratch row can be undone and does
 not need it. If in doubt, set it: a withheld node costs a build nothing, an unwanted send
-costs someone something. Only ever set it to `true` — omitting it is the default.
+costs someone something. Only ever set it to `true`, omitting it is the default.
 
 This is the positive half of what `cacheable: false` already implies. Saying "do not cache
 me" describes an effectful node only by omission, which the engine cannot act on.
@@ -117,12 +117,12 @@ capabilities:
     key: [etag]           # input leaf fields that identify the content
 ```
 
-`ignore` names top-level resolved-config fields that are transport, not identity — every
+`ignore` names top-level resolved-config fields that are transport, not identity, every
 other config field still busts the cache. `key` names input leaf fields matched by dot
 suffix against the resolved inputs (wiring-independent: `etag` matches
 `file.<anyUpstreamNode>.file.etag`), and their collected values become the content's
-identity in the fingerprint. If a key field collects nothing on a run — a hand-typed URL
-with no upstream etag — that run is simply not cached: no identity, no reuse. Declaring
+identity in the fingerprint. If a key field collects nothing on a run, a hand-typed URL
+with no upstream etag, that run is simply not cached: no identity, no reuse. Declaring
 the object form is itself the opt-in.
 
 ## `interface.yaml`

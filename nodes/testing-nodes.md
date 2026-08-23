@@ -3,7 +3,7 @@ sidebarTitle: "Testing Nodes"
 title: "Testing Nodes"
 ---
 
-Run your node against the real service before you put it in a workflow. **Studio** has a
+Run your node against the real service before you put it in a workflow. **studio** has a
 Nodes tab for exactly that, and nothing has to be published first.
 
 ## In Studio
@@ -14,7 +14,7 @@ Open the **Nodes** tab and pick your node. You get three panes.
 `whenToUse` you wrote. Any credential it needs is named here too, so a node asking for
 something you have not set up says so before you run it.
 
-**The settings**, rendered from your `config.yaml`. This is the same form **Canvas** shows,
+**The settings**, rendered from your `config.yaml`. This is the same form **canvas** shows,
 built from the same file, so a field that reads badly here reads badly everywhere.
 
 **The output**, empty until you press Run.

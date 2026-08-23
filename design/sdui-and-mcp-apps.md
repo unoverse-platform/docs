@@ -12,10 +12,10 @@ title: "SDUI & MCP Apps"
 ```
   YOU WRITE (data)                 THE PLATFORM PROVIDES (code)
 ┌──────────────────────┐        ┌─────────────────────────────────┐
-│ design/ definitions      │        │ SDK renderer (per platform)     │
+│ design/ definitions  │        │ SDK renderer (per platform)     │
 │  components/ atoms/  │  MCP   │  web · Flutter · iOS · Android  │
 │  orgs/<org>/         │ ─────► │  dumb, generic, style-free      │
-│    templates/ styles/│ stream │                                 │
+│    apps/ styles/     │ stream │                                 │
 │    components/       │        │                                 │
 └──────────────────────┘        │ Engine: workflows stream data   │
    JSON + tokens only           │ into your components            │
@@ -34,7 +34,7 @@ title: "SDUI & MCP Apps"
 | **One definition, every platform** | The same JSON renders as React on web and native views elsewhere. You never fork per platform. |
 | **Agents can drive UI** | Because UI is data, a workflow/agent can select, stream, and update it at runtime: the whole point of the platform. |
 | **Rebrand = data** | All styling is tokens; a theme swap touches `styles/` only ([06](/design/styles-and-tokens)). |
-| **Provable dev loop** | **Studio** renders through the exact production path: what you preview is what ships ([07](/design/studio)). |
+| **Provable dev loop** | **studio** renders through the exact production path: what you preview is what ships ([07](/design/studio)). |
 
 ---
 
@@ -56,18 +56,18 @@ Definitions compose ONLY these. The set is frozen: adding to it is an SDK change
 
 ## MCP Apps: the standard
 
-**A template is an MCP App.** This is not an integration detail; it is the contract every client and every tool in the ecosystem shares:
+**An app is an MCP App.** This is not an integration detail; it is the contract every client and every tool in the ecosystem shares:
 
 | Concern | The MCP-standard answer |
 |---|---|
 | **How definitions reach clients** | Served as **MCP resources** (`unoverse://` URIs). Clients subscribe; `resources/updated` notifications ARE hot reload: in dev *and* prod. |
-| **How the app binds to logic** | The template's `manifest.yaml` names its **workflow**. The app owns its workflow: clients pull the app; nothing is pushed by name. |
+| **How the app binds to logic** | The app's `manifest.yaml` names its **workflow**. The app owns its workflow: clients pull the app; nothing is pushed by name. |
 | **How a user message is sent** | `tools/call` on the app's trigger tool. Fire-and-forget: results come back over the component stream, never the call result. |
 | **How a form/wizard answers** | Native MCP **elicitation** resolving the held `tools/call`: the agent is literally waiting on the user's answer. |
-| **How UI state arrives** | Run-scoped messages (`COMPONENT_INIT/DATA`, `TEMPLATE_DATA`, `WORKFLOW_STATE`) on the MCP **`/stream`**. |
+| **How UI state arrives** | Run-scoped messages (`COMPONENT_INIT/DATA`, `APP_DATA`, `WORKFLOW_STATE`) on the MCP **`/stream`**. |
 | **How themes arrive** | Served live as MCP resources (`unoverse://theme/<name>`), never baked into an SDK bundle. |
 
-**The rule:** a host must NEVER hand-roll its own transport, no bespoke REST send, no custom `user_action` message, no side-channel state push. The SDK owns the one interaction path; every consumer (**Studio**, a native app, an external MCP client) shares it. If your channel needs something the path doesn't do, that's a platform gap to raise: not a workaround to build.
+**The rule:** a host must NEVER hand-roll its own transport, no bespoke REST send, no custom `user_action` message, no side-channel state push. The SDK owns the one interaction path; every consumer (**studio**, a native app, an external MCP client) shares it. If your channel needs something the path doesn't do, that's a platform gap to raise: not a workaround to build.
 
 ### The org endpoint + its default app (the front door)
 
@@ -78,7 +78,7 @@ https://api.<domain>/mcp          → all orgs (flattened)
 https://api.<domain>/mcp/<org>    → only that org's apps, as one connector
 ```
 
-Within an org, **exactly one app's `manifest.yaml` sets `default: true`**, the org's **home** (typically its chat template, e.g. `acmechatlayout`). The endpoint tags that tool with `_meta["unoverse/default"]`, so a client knows which app to open first as the conversation's entry point. A lint rule enforces **at most one `default` per org**.
+Within an org, **exactly one app's `manifest.yaml` sets `default: true`**, the org's **home** (typically its chat app, e.g. `acmechatlayout`). The endpoint tags that tool with `_meta["unoverse/default"]`, so a client knows which app to open first as the conversation's entry point. A lint rule enforces **at most one `default` per org**.
 
 MCP is pull-based (no "auto-open on connect"): our SDK reads that flag and opens the home app immediately, rendering its arrival `defaultState`; a foreign host (ChatGPT) surfaces it when the user first engages. `default` only answers *"which app is the front door"*: the app's own `defaultState`/`autoTrigger`/`binding` behave exactly as usual. (The old per-app `expose` flag is removed: org scoping is the boundary now.)
 
@@ -86,7 +86,7 @@ MCP is pull-based (no "auto-open on connect"): our SDK reads that flag and opens
 
 | Lane | Carries | Scope |
 |---|---|---|
-| **MCP `/stream`** | components, template data, workflow lifecycle: everything that renders | **run-scoped** (this conversation, this app) |
+| **MCP `/stream`** | components, app data, workflow lifecycle: everything that renders | **run-scoped** (this conversation, this app) |
 | **SDK WebSocket** | audio frames (voice) + global cross-app state | global / native I/O |
 
 Everything you author reads from the first lane. The second lane belongs to native **services** (like voice): covered in [04, State](/design/state), because it's where "locked" state comes from.
@@ -95,32 +95,32 @@ Everything you author reads from the first lane. The second lane belongs to nati
 
 ## The four ways a component renders
 
-Every design component reaches the chat by one of **four paths**: two in the workflow world, two discovered natively from **Spatial**. **Every path ends identically:** the SDK renders your definition into the conversation. Knowing which path you're on tells you *where the data comes from* and *whether a workflow is involved*. (Canonical: `docs/unoverse/UNOVERSE_MCP_TEMPLATE_PROTOCOL.md` §"The four ways UI reaches the chat".)
+Every design component reaches the chat by one of **four paths**: two in the workflow world, two discovered natively from **spatial**. **Every path ends identically:** the SDK renders your definition into the conversation. Knowing which path you're on tells you *where the data comes from* and *whether a workflow is involved*. (Canonical: `docs/unoverse/UNOVERSE_MCP_APP_PROTOCOL.md` §"The four ways UI reaches the chat".)
 
 | # | Way to render | Where the data comes from | Workflow? |
 |---|---|---|---|
-| **A** | **Template app**: you bind a workflow to a template; the workflow drives the whole surface (the app shell, `binding` in the manifest, [05](/design/templates)). | the bound workflow | ✅ |
-| **B** | **Self-contained component app**: the component **is its own MCP app** (a tool + `ui://`); **Spatial** surfaces it, the agent reacts natively, and the SDK renders it **as-is**. It carries its own `state`. | the component itself | ❌ |
-| **C** | **Node-hydrated component**: a **Spatial** **data node** carries an assigned component **URI** (a card shell); on discovery the node **hydrates** that component with its data and the SDK renders the filled card. | a **Spatial** data node | ❌ |
+| **A** | **Workflow-bound app**: you bind a workflow to an app; the workflow drives the whole surface (the app shell, `binding` in the manifest, [05](/design/apps)). | the bound workflow | ✅ |
+| **B** | **Self-contained component app**: the component **is its own MCP app** (a tool + `ui://`); **spatial** surfaces it, the agent reacts natively, and the SDK renders it **as-is**. It carries its own `state`. | the component itself | ❌ |
+| **C** | **Node-hydrated component**: a **spatial** **data node** carries an assigned component **URI** (a card shell); on discovery the node **hydrates** that component with its data and the SDK renders the filled card. | a **spatial** data node | ❌ |
 | **D** | **Streamed component**: a workflow node emits `COMPONENT_INIT`/`DATA` mid-run and the component **streams in** (the classic runtime paint path for **A**). | the running workflow | ✅ |
 
 **Two worlds:**
 - **A + D: the workflow world.** Assign a workflow; it drives the surface (A) and streams its pieces in (D). Streaming is the standard runtime paint path, not a legacy one.
-- **B + C: the native-MCP-from-spatial world.** The component is **discovered**, not pushed. **B** carries its own data; **C** is a reusable card shell a **Spatial** node fills.
+- **B + C: the native-MCP-from-spatial world.** The component is **discovered**, not pushed. **B** carries its own data; **C** is a reusable card shell a **spatial** node fills.
 
 **The one rule that keeps B + C pure:** a component is never a callable primitive. The discovered unit is a standard **MCP app** (a tool with a `ui://` resource); the agent does an ordinary `tools/call`, the result carries the UI, and the **SDK** renders it. Nothing component-specific is invented.
 
-**This axis is orthogonal to *presentation*.** The four ways are only *how the data arrives*. Once a component is in the store: by **any** of the four, how it's **shown** is the **reaction contract**: the component is a small state machine whose public states are its whole interface (`view`); the hosting template places it at spawn, then reacts by name in its own declared priority order, and never reaches into the component. So a **streamed (D)** product card can write `view: "detail"` and a chat template with a `detail` state enters it and frames the card, exactly the same way a **self-contained (B)** one would. Which of the four delivered it, and how a template presents it, are independent choices: see [04, State](/design/state).
+**This axis is orthogonal to *presentation*.** The four ways are only *how the data arrives*. Once a component is in the store: by **any** of the four, how it's **shown** is the **reaction contract**: the component is a small state machine whose public states are its whole interface (`view`); the hosting app places it at spawn, then reacts by name in its own declared priority order, and never reaches into the component. So a **streamed (D)** product card can write `view: "detail"` and a chat app with a `detail` state enters it and frames the card, exactly the same way a **self-contained (B)** one would. Which of the four delivered it, and how an app presents it, are independent choices: see [04, State](/design/state).
 
 ---
 
 ## One path, dev and prod
 
-**Studio** is **not a special harness**. It is just another MCP client: it subscribes to the same definition resources, receives the same component stream, and runs the same native renderers as production channels. That's why:
+**studio** is **not a special harness**. It is just another MCP client: it subscribes to the same definition resources, receives the same component stream, and runs the same native renderers as production channels. That's why:
 
-- "Works in **Studio**" provably means "works in production."
-- Hot reload in **Studio** is the same `resources/subscribe` mechanism that live-updates production channels.
-- Live mode in **Studio** is literally production, pointed at local renderers.
+- "Works in **studio**" provably means "works in production."
+- Hot reload in **studio** is the same `resources/subscribe` mechanism that live-updates production channels.
+- Live mode in **studio** is literally production, pointed at local renderers.
 
 ---
 

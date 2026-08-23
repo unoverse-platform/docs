@@ -19,7 +19,7 @@ style: { padding: 12px, color: "#4F46E5", fontSize: 1.25rem }
 style: { padding: "4", color: text.primary, font: headline.sm }
 ```
 
-- No `px` / `rem` / `em` / `#hex` anywhere in any component, atom, or template definition. the deploy lint scans for exactly this and blocks ([08](/design/validate-and-ship)).
+- No `px` / `rem` / `em` / `#hex` anywhere in any component, atom, or app definition. the deploy lint scans for exactly this and blocks ([08](/design/validate-and-ship)).
 - Sizes use the **space scale** (`"width": "8"` = 2rem, Tailwind-style: step N = N × 0.25rem), and only **real steps**: `0 1 1.5 2 3 4 5 6 7 8 10 12 16 20 24 28 40 50 75 90 100 120 140 160 180 200` (+ `full`/`auto`). An invented step (`"26"`, `"3.5"`) is NOT rounded: it falls through as broken CSS and the element silently reverts to auto sizing. the deploy lint rejects off-scale values.
 - **Page widths have NAMES** (`semantic/layout.yaml`): `compact` 30rem · `narrow` 35rem · `reading` 40rem · `page` 45rem · `wide` 50rem. They are aliases onto the same scale, so `maxWidth`/`hideBelow`/`stackBelow` read as what they are (`"maxWidth": "reading"`, not `"160"`). **The rule, so one value never gets two spellings:** a PAGE-level cap uses a name; an ELEMENT's own size (an image tile's height, a card's max) stays a scale step. An image tile is not a page.
 - ❌ No invented component-named tokens (`cardMin`, `wizardWidth`): use the generic scale steps. If the scale genuinely lacks a step, extend the scale in `styles/`, don't smuggle a value into a definition.
@@ -125,7 +125,7 @@ Definitions speak **semantic**. Themes remap semantic → base per brand or mode
 
 ### Standard app sizes (`semantic/app-sizes.yaml`)
 
-The named width blocks a template's `appWidth` can reference ([05: Sizing](/design/templates)). The starter set:
+The named width blocks an app's `appWidth` can reference ([05: Sizing](/design/apps)). The starter set:
 
 | Name | Starter value | Meant for |
 |---|---|---|
@@ -136,7 +136,7 @@ The named width blocks a template's `appWidth` can reference ([05: Sizing](/desi
 
 Every size carries a **viewport ceiling** (`min(100vw, …)`): the full designed width on desktop, never wider than the screen on mobile. (Panels side-by-side can still exceed a phone's width together: the dedicated mobile layout pass will decide stacking/overlay behavior; the ceiling keeps each panel individually safe until then.)
 
-Names are **optional**: raw CSS in `appWidth` is always valid, but prefer them: every template in the org stays on the same scale, and retuning a size is one edit here. Add org-specific names freely (the linter validates that any name a template uses is declared). Unlike every other token home these values are raw host-facing CSS on purpose: they size the app's outer panel, which the embedding page applies, they are never inner styles.
+Names are **optional**: raw CSS in `appWidth` is always valid, but prefer them: every app in the org stays on the same scale, and retuning a size is one edit here. Add org-specific names freely (the linter validates that any name an app uses is declared). Unlike every other token home these values are raw host-facing CSS on purpose: they size the app's outer panel, which the embedding page applies, they are never inner styles.
 
 ---
 
@@ -144,7 +144,7 @@ Names are **optional**: raw CSS in `appWidth` is always valid, but prefer them: 
 
 - **Components live in TWO tiers.** The design system (the installed marketplace package: generic, universal: cards, charts, media) is shared by every org and references token *names* only. An **org component** (`design/<project>/components/`: the client's own microapp: their finder, their page) is **org-private**: it belongs to that client and is served under their org. Names are unique within a tier, and an org never shadows a design-system name (lint-enforced), so a bare reference resolves the design system or a uniquely-named org component; two orgs sharing a name each address theirs as `<org>/<name>`.
 - **Atoms are universal and authoring-time only**: `design/marketplace/atoms/`, one copy; the server expands every `Ref` before serving (atoms are never served or enumerable).
-- **Templates and styles are org-scoped**: `design/<project>/`. Each org gets its own complete token set and templates. There are **no overlays**: if two orgs need different looks from the *same* universal component, that difference is 100% in their `styles/`. A component only becomes an org component when it IS the client's product, not to restyle a shared one.
+- **Apps and styles are org-scoped**: `design/<project>/`. Each org gets its own complete token set and apps. There are **no overlays**: if two orgs need different looks from the *same* universal component, that difference is 100% in their `styles/`. A component only becomes an org component when it IS the client's product, not to restyle a shared one.
 
 Starting a new org: copy the neutral baseline and re-token it
 

@@ -7,18 +7,18 @@ A quick map before you start building. The **Architecture** section has the full
 
 ## Two ways to use unoverse
 
-The platform is the same either way, and so is authoring. You build in **Studio** and
+The platform is the same either way, and so is authoring. You build in **studio** and
 publish over the API. What changes is who runs the universe.
 
 | | **Connect to a universe** | **Run your own** |
 | --- | --- | --- |
 | Who runs it | someone else | you |
 | Where it runs | their account | AWS, DigitalOcean, Azure, GCP, on-premises |
-| What you install | **Studio** | **Studio**, and the platform |
+| What you install | **studio** | **studio**, and the platform |
 | What you need | an address and an account | a registry token, and somewhere to run it |
 | Right when | the universe already exists | the deployment has to be yours |
 
-**Connecting is the faster start.** You point **Studio** at a universe that is already
+**Connecting is the faster start.** You point **studio** at a universe that is already
 deployed. That might be a hosted unoverse you have an account on, or your own company's
 deployment you have permissions for. Your components, templates, skills and nodes publish
 into that universe's database, and authoring never requires a deployment of your own.
@@ -123,9 +123,9 @@ Native, Flutter, iOS and Android follow as those SDKs land.
 - **unoverse** is the engine. Your Agents run here, your workflows execute here, and the MCP
   surface is served from here. It is the only service the internet reaches, and every
   request on it is authenticated.
-- **Canvas** is where you build and observe Agents. It is an operator tool, not a public
+- **canvas** is where you build and observe Agents. It is an operator tool, not a public
   page.
-- **Spatial ML** maintains the semantic map behind **Spatial**.
+- **Spatial ML** maintains the semantic map behind **spatial**.
 - **Memory** keeps user profiles and open tasks, so an Agent can reason about the same
   person across weeks.
 
@@ -151,7 +151,7 @@ you author lives in your universe's database and arrives by publishing.
 You author in **[Studio](/onboarding/studio)**: components, templates, skills and nodes. It is
 not one of the platform services. It is a developer tool you install from npm, it runs on
 your own machine against your own files, and it sends your work to a universe over the API
-when you publish. Nothing of **Studio** is deployed with the platform.
+when you publish. Nothing of **studio** is deployed with the platform.
 
 ![Your code and the platform](../images/architecture-code-separation.png)
 

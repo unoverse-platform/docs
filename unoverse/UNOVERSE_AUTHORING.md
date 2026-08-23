@@ -1,4 +1,4 @@
-# Unoverse: Authoring Components & Templates (the complete guide)
+# Unoverse: Authoring Components & Apps (the complete guide)
 
 > **Status**: 🟢 Guide (June 2026). The single source of truth for *writing definitions*.
 > **Audience**: anyone creating or reviewing `apps/unoverse/design/**` definitions.
@@ -13,7 +13,7 @@
 > UI in `design/` data and **never edit the SDK**.
 >
 > **Use this doc two ways:** read §1–§8 to *build*; run §9 (the **conformance checklist**) to
-> *audit* an existing component or template.
+> *audit* an existing component or app.
 
 ---
 
@@ -32,7 +32,7 @@ never *how to move between states* (that's just `setValue` writing a field, then
 | re-render on change | the store notifies → the renderer **redraws the whole tree** |
 | `{cond && <X/>}` | **`visibleWhen`** |
 | `switch (x) { case … }` | the **`Switch`** node (`on` + `cases`) |
-| `items.map(...)` | **`Each`** (`template` + literal `items: []`, or `bind.items` for workflow-fed lists) |
+| `items.map(...)` | **`Each`** (`app` + literal `items: []`, or `bind.items` for workflow-fed lists) |
 | `<Button/>` (a shared component) | a **`Ref`** to an atom |
 | extracting `<StepX/>` to a file | `{ "$include": "step-x" }` |
 | a conditional `className` | **`style.when`** |
@@ -41,12 +41,12 @@ never *how to move between states* (that's just `setValue` writing a field, then
 
 ## 2. Anatomy of a definition
 
-Every component, template, and atom is one JSON file with the same envelope:
+Every component, app, and atom is one JSON file with the same envelope:
 
 ```jsonc
 {
   "unoverse": "1.0",
-  "kind": "component",          // "component" | "template" | "atom"
+  "kind": "component",          // "component" | "app" | "atom"
   "name": "Card",               // display name (independent of the filename)
   "category": "Content",        // grouping in the palette
   "description": "…",           // what it is
@@ -65,7 +65,7 @@ Every component, template, and atom is one JSON file with the same envelope:
   |---|---|---|
   | component (design system) | `design/marketplace/components/<name>/<name>.json` + optional `manifest.json` (discovery) + `layouts/` (one file per state that owns an arrangement) + optional `components/` (shapes 2+ layouts share) | flat `design/marketplace/components/<name>.json` for a simple one-layout card; **generic + org-neutral: any org can use it**. Addressed `unoverse://components/<name>` |
   | component (org) | `design/orgs/<org>/components/<name>/`: same anatomy; **org-private** (the client's own microapp). Addressed `unoverse://components/<org>/<name>`; the server injects `org` from the folder. Names unique within the org; never shadow a design-system name (lint-enforced); two orgs may share a name | the client's finders/pages, never a restyle of a shared component (that's the theme's job) |
-  | template | `design/orgs/<org>/templates/<name>/`, **manifest-only**: `manifest.json` IS the envelope; it declares the template tree in `states:`; root = `layouts/<manifest.layout>.json` (+ `states/` for the base's contained substate files, + `components/`) | org-scoped; no `<name>.json` |
+  | app | `design/orgs/<org>/apps/<name>/`, **manifest-only**: `manifest.json` IS the envelope; it declares the app tree in `states:`; root = `layouts/<manifest.layout>.json` (+ `states/` for the base's contained substate files, + `components/`) | org-scoped; no `<name>.json` |
   | atom | `design/marketplace/atoms/<name>.json` | shared partials, **authoring-time only**: the server always expands them before serving (never served, never enumerable, no Studio view) |
 
 ### The state tree: the root declares the machine (State Model v2)
@@ -93,15 +93,15 @@ state:
 - **Each state owns its layout(s); `layout:` is OPTIONAL.** A state with no
   declaration draws the layout of its own name; `{}` is a complete state. Write
   `layout:` only when the filename differs.
-- **Top level = the public menu; nesting = privacy.** Templates react only to the
+- **Top level = the public menu; nesting = privacy.** Apps react only to the
   top-level names; a nested step never moves the page. Promote a step to the top
-  level only when templates must rearrange for it (the rearrange rule, LAYERS §2).
+  level only when apps must rearrange for it (the rearrange rule, LAYERS §2).
 - **Who owns a mood: the DRIVER decides** (LAYERS §2). What WRITES the discriminant
   picks the mechanism: the component's own `setValue` → private-axis substates, names
   from the design (`course-application`); a service projecting a NAMED value
   (`callState`) → substates named for those values + a preview prop (`voice-chat`);
-  DERIVED conversation facts (`isEmpty`/`hasMessages`) → the TEMPLATE tier owns the
-  mood (condition-guarded; the template has the state, components just react) — never
+  DERIVED conversation facts (`isEmpty`/`hasMessages`) → the APP tier owns the
+  mood (condition-guarded; the app has the state, components just react) — never
   component named substates, never another field's values as state names (bpp
   `text-chat`).
 - **The root still composes a `Switch` on `view`** whose cases `$include` the state
@@ -109,11 +109,11 @@ state:
   (`publicStates`, `initialView`, `stateTree`).
 - **The `states/` folder role changed per tier** (LAYERS §3): at the COMPONENT tier
   the v1 `states/` folder is absorbed by the tree (a private substate is a tree entry
-  owning a layout, not a sibling file). At the TEMPLATE tier `states/` still holds
+  owning a layout, not a sibling file). At the APP tier `states/` still holds
   the files for the base arrangement's contained substates (a welcome hero), which
   the manifest's `states:` tree declares and the compiler contains (§8).
 
-- **Tier rules.** An org pack is `design/orgs/<org>/{templates, styles, components}`. Component
+- **Tier rules.** An org pack is `design/orgs/<org>/{apps, styles, components}`. Component
   names are **unique within a tier**: two orgs may ship the same name (each addressed by
   its org URI), but an org may never shadow a design-system name (that collision is a
   lint error, per UNOVERSE_COMPONENT_ORGS.md). Both address forms are first-class: the bare URI
@@ -122,7 +122,7 @@ state:
   still resolves an org component while its name is unique across orgs; once two orgs
   carry it, the bare ref errors loudly, listing the qualified candidates.
   Direction: org definitions may reference design-system ones;
-  **design-system definitions never reference org ones** (lint-enforced, including template
+  **design-system definitions never reference org ones** (lint-enforced, including app
   preview lists). An org component is never a restyle of a shared one. That's the theme's job.
 
 ---
@@ -183,7 +183,7 @@ A node reads a prop with **`bind`** (`targetProp → dataField`):
 { "type": "Text",   "bind": { "value": "title" } }
 { "type": "Image",  "bind": { "src": "image", "alt": "title" } }
 { "type": "Button", "bind": { "label": "callToAction" } }
-{ "type": "Each",   "bind": { "items": "accounts" }, "template": { /* per-row */ } }
+{ "type": "Each",   "bind": { "items": "accounts" }, "app": { /* per-row */ } }
 { "type": "Icon",   "bind": { "name": "iconField" } }   // or literal "icon": "expand"
 ```
 
@@ -197,7 +197,7 @@ component should be discoverable in Spatial** (indexed into the 3D knowledge map
 ranked against user intent by findIntent). The manifest's **presence IS the
 capability**: there is no flag inside it, and nothing else grants it.
 
-> **What "discoverable" means, precisely (native MCP, see `UNOVERSE_MCP_TEMPLATE_PROTOCOL.md`
+> **What "discoverable" means, precisely (native MCP, see `UNOVERSE_MCP_APP_PROTOCOL.md`
 > §0.1 paths B/C).** A discoverable component is published as a standard **MCP app**: it
 > registers a tool whose `_meta.ui.resourceUri` is a `ui://` shell that renders this
 > component. When findIntent surfaces it, the LLM does an ordinary `tools/call`, the result
@@ -229,7 +229,7 @@ The manifest carries only discovery meta:
   ("Find the right card for me: which card should I get…"), never selector-shaped
   dev framing ("Pick when the user asks to…", guard-rejected). When present it
   replaces `description` in the embedded text. Full contract:
-  `packages/docs/nodes/node-discoverability.md` (the templates/skills section
+  `packages/docs/nodes/node-discoverability.md` (the apps/skills section
   applies to components verbatim).
 - The manifest is the **single home** for this meta: the envelope must not
   duplicate `description`/`whenToUse` (guard-enforced). The server merges the
@@ -237,7 +237,7 @@ The manifest carries only discovery meta:
 - Exposure is **two toggles, both off by default**: the manifest makes the Studio
   "Spatial" toggle appear on the component (Level 1: workbench eligibility); the
   Content Engine then opts it onto a specific workflow's map (Level 2: presence),
-  where it's indexed and trained like any skill or template.
+  where it's indexed and trained like any skill or app.
 
 ---
 
@@ -257,14 +257,14 @@ never a separate file, never a prompt anywhere else:
   "brief": { "description": "Order as the day is lived. Variety of kind over similarity.",
              "minItems": 3, "maxItems": 5 },
   "bind": { "items": "sections" },
-  "template": { "$include": "components/story-section" } }   // its binds = the item shape
+  "app": { "$include": "components/story-section" } }   // its binds = the item shape
 ```
 
 - **Vocabulary = JSON Schema's own words** (`description`, `maxLength`, `minItems`,
   `maxItems`): the brief IS the schema fragment it compiles to. String shorthand = just
   the description. A brief on an unbound node (a face/partial root) = composition
   context (ordering, refinement rules). Shape is closed and lint-enforced.
-- **The pipeline is 100% native MCP** (deep spec: `UNOVERSE_MCP_TEMPLATE_PROTOCOL.md`
+- **The pipeline is 100% native MCP** (deep spec: `UNOVERSE_MCP_APP_PROTOCOL.md`
   §Briefed components): the server compiles briefs → the app tool's `inputSchema` (with
   a recipe description: "the page IS your answer: search spatial, fill from results,
   call"); the server **referees** every call (invalid/empty args → an instructive
@@ -279,7 +279,7 @@ never a separate file, never a prompt anywhere else:
 - **Two doors, one engine** (August 2026): the same compiled briefs also serve a
   Component node's MCP service port on the canvas (`getSchema`/`read`/`fill`), so a
   WORKFLOW agent can hydrate the page mid-run. Spec + the termination contract that door
-  still owes: `UNOVERSE_MCP_TEMPLATE_PROTOCOL.md` §The workflow door.
+  still owes: `UNOVERSE_MCP_APP_PROTOCOL.md` §The workflow door.
 
 ---
 
@@ -408,7 +408,7 @@ config)` (run a workflow node, credentials resolved server-side), NOT raw run-of
 access. "Bring anything it wants" means anything *within* this sandbox, like a page's
 script runs in the browser sandbox, not on the machine.
 
-**Security (deep spec: `UNOVERSE_MCP_TEMPLATE_PROTOCOL.md` §onEnter/lifecycle invariants).**
+**Security (deep spec: `UNOVERSE_MCP_APP_PROTOCOL.md` §onEnter/lifecycle invariants).**
 - Handler code is **trusted-author** (same trust as a node), never injected by an end
   user or the AI. One file per component, one narrow entry point each.
 - The **caller** decides *what* runs (server resolves the lifecycle → handler from the
@@ -487,7 +487,7 @@ A focusable card that expands inline → focused. File: `design/marketplace/comp
 That's a complete, stateful component. The `state.view` tree declares the two states it
 can be in and which one it arrives in; the `Switch` draws whichever is current; `setValue`
 moves between them and the renderer redraws. Both names are PUBLIC (top level of the tree),
-so a template may rearrange for either. Drop the folder in `design/marketplace/components/` and it's
+so an app may rearrange for either. Drop the folder in `design/marketplace/components/` and it's
 discoverable immediately (no registration).
 
 ---
@@ -532,7 +532,7 @@ bindings take the literal value.
 
 ```jsonc
 { "type": "Each", "bind": { "items": "beneficiaries" },
-  "template": { "type": "Ref", "ref": "account-row", "props": { "label": "name" } } }
+  "app": { "type": "Ref", "ref": "account-row", "props": { "label": "name" } } }
 ```
 
 **Rule of thumb:** shared look → **atom**; whole alternate view → **`$include` + `Switch`**;
@@ -548,7 +548,7 @@ A "state" is just field values in one of three buckets (full detail:
 | Bucket | Holds | Write with |
 |---|---|---|
 | **Component state** | one slice per component, carrying data **and** its view-state: the public `view` (legacy alias `defaultState`) + private keys (`step`) | `setValue` (or streamed `COMPONENT_DATA`) |
-| **Template state** | the template's bag: `draft` + dev-named keys (`openPanel`) | `setTemplateValue` |
+| **App state** | the app's bag: `draft` + dev-named keys (`openPanel`) | `setAppValue` |
 | **Conversation** | the turn timeline; `isStreaming`/`isEmpty` are **derived**, not stored | the stream |
 
 You pick the key **and** the bucket. The SDK hardcodes no UI concept.
@@ -598,7 +598,7 @@ the node sends `steps: [{ label, active }]` and you `Each` over them:
 
 ```jsonc
 { "type": "Each", "bind": { "items": "steps" },
-  "template": { "type": "Box",
+  "app": { "type": "Box",
     "style": { "background": "surface.sunken",
                "when": [{ "field": "active", "eq": true, "apply": { "background": "status.success" } }] },
     "children": [{ "type": "Text", "bind": { "value": "label" } }] } }
@@ -607,11 +607,11 @@ Six hand-written blocks → one templated dot.
 
 ---
 
-## 8. Your first template
+## 8. Your first app
 
-A template is a **state machine over a layout shell**: its manifest declares a tree of
+An app is a **state machine over a layout shell**: its manifest declares a tree of
 states, each state owns the arrangement that draws it, and hosted components move it
-between states by name (STATE_MODEL §5). Two template-only primitives place content:
+between states by name (STATE_MODEL §5). Two app-only primitives place content:
 
 - **`ComponentSlot`** pulls streamed components out of the store. A **reaction
   surface** selects by the component's PUBLIC state, claiming exactly ONE view:
@@ -622,7 +622,7 @@ between states by name (STATE_MODEL §5). Two template-only primitives place con
   ```
   A surface selects on the public axis (`view`; lint warns on any other field: a
   component's internal keys are private) and claims one view with a string `eq`
-  (lint errors on `ne`/`in`/bare selects: they make the template's active state
+  (lint errors on `ne`/`in`/bare selects: they make the app's active state
   ambiguous). Ties go to the most recent write (`limit: 1` law). Per-turn slots
   inside a `Timeline` need no `where`: they render whatever that turn streamed.
   *Legacy note:* v1 taught type-pinned global slots (`select.type`); reaction
@@ -637,18 +637,18 @@ between states by name (STATE_MODEL §5). Two template-only primitives place con
     "assistant": { "$include": "assistant-turn" } }
   ```
 
-**The app manifest** (in the template folder) declares the template tree, binds the app
+**The app manifest** (in the app folder) declares the app tree, binds the app
 to a workflow, and describes it. The sab pilot, as shipped:
 
 ```yaml
-# design/sab/templates/sab-chat/manifest.yaml
+# design/sab/apps/sab-chat/manifest.yaml
 name: sab-chat
 description: The SAB customer-support chat, with a route to live support.
 whenToUse: "Ask SAB a banking question or get general help…"   # SELECTION text: below
 category: Assistant
 version: 1.0.0
-defaultState: template        # APP-LEVEL load state (protocol §4b), NOT the component axis
-# THE TEMPLATE TREE (STATE_MODEL v2): one declaration, everything follows.
+defaultState: app        # APP-LEVEL load state (protocol §4b), NOT the component axis
+# THE APP TREE (STATE_MODEL v2): one declaration, everything follows.
 states:
   main:                       # the base arrangement (named for `layout:` below)
     states:
@@ -672,10 +672,10 @@ layout: main                  # the base arrangement = layouts/main
 What the tree gives you, with nothing else authored:
 
 - **The ladder is DERIVED**: `stateOrder` = the tree's top level minus the base, in
-  declared order (`focus, products, detail` above). The template walks it top-down
+  declared order (`focus, products, detail` above). The app walks it top-down
   and enters the first state ANY hosted component's view matches; a higher state
   CANCELS the claims below it, so release lands on the base (STATE_MODEL §5 rule 5).
-  An authored `stateOrder` remains only as the legacy form for templates without a
+  An authored `stateOrder` remains only as the legacy form for apps without a
   tree.
 - **Nesting is containment, compiled**: a declared base substate (`welcome`, its file
   in `states/welcome`) is STRIPPED from every non-base arrangement at compose time.
@@ -688,15 +688,15 @@ What the tree gives you, with nothing else authored:
   a component state.
 
 **`defaultState` in the manifest is a DIFFERENT axis**: it is the app-level load state
-the channel router branches on (`template` = swap the whole surface; `focus` = stream
-into the current template and open in focus; see `UNOVERSE_MCP_TEMPLATE_PROTOCOL.md`
+the channel router branches on (`app` = swap the whole surface; `focus` = stream
+into the current template and open in focus; see `UNOVERSE_MCP_APP_PROTOCOL.md`
 §4b). It is unrelated to the component `view` axis despite the shared word. The legacy
 `type` + `fluidHeight` + `previewComponents` manifest fields are derived from or
 superseded by `defaultState` + `preview`.
 
-### Template discoverability: `whenToUse` (essential, like nodes)
+### App discoverability: `whenToUse` (essential, like nodes)
 
-Templates are added to spatial and discovered by intent (`findIntent`), exactly like MCP
+Apps are added to spatial and discovered by intent (`findIntent`), exactly like MCP
 tools and nodes. Discovery embeds `` `${title}. ${whenToUse || description} [${category}]` ``
 which is the **same contract as the node catalog**, so the same writing rules apply
 (`packages/docs/nodes/node-discoverability.md`):
@@ -704,11 +704,11 @@ which is the **same contract as the node catalog**, so the same writing rules ap
 - **`whenToUse` is the selection text**: when present it *replaces* `description` in the
   embedding. Write it **outcome-first in the user's vocabulary** ("Transfer or send money:
   pay a beneficiary or move funds…"), never mechanism-first ("Two-column split layout…" ranks
-  near layout concepts, not near what users ask for, so the template becomes invisible).
+  near layout concepts, not near what users ask for, so the app becomes invisible).
 - **`description` stays the human "what it is"** (the Content library list line).
-- Disqualify by **property**, never by naming a sibling template.
-- The manifest wins over the template def for every meta field; the reconcile warns for any
-  enabled template missing `whenToUse`. Registry items embed their authored meta **AS-IS**
+- Disqualify by **property**, never by naming a sibling app.
+- The manifest wins over the app def for every meta field; the reconcile warns for any
+  enabled app missing `whenToUse`. Registry items embed their authored meta **AS-IS**
   (no LLM convert-to-need). Editing `whenToUse` changes the content hash → re-ingests on the
   next train.
 
@@ -720,7 +720,7 @@ Run each definition against these. A "no" is a finding to fix.
 
 **Envelope & placement**
 - [ ] Has `unoverse`, `kind`, `name`, `category`, `description`; components also have `whenToUse`.
-- [ ] Lives in the right dir (`components`/`templates`/`atoms`); folder form when it uses `$include`.
+- [ ] Lives in the right dir (`components`/`apps`/`atoms`); folder form when it uses `$include`.
 - [ ] `whenToUse` is generic and selection-focused (no hardcoded agent/workflow names).
 
 **Values (LAW 1: own zero values)**
@@ -737,13 +737,13 @@ Run each definition against these. A "no" is a finding to fix.
       level, private steps nested, an `initial` at every level with substates.
 - [ ] Each state **owns its layout**; `layout:` is written only when the filename differs
       from the state name (same-name is the default; `{}` is a complete state).
-- [ ] A state is **public only if templates should rearrange for it**: an ignored public
+- [ ] A state is **public only if apps should rearrange for it**: an ignored public
       state falls inline (STATE_MODEL §5 rule 6); steps that never move the page nest.
 - [ ] Other state is a **few shallow discriminants** (`step`), not a soup of booleans.
 - [ ] **Whole-view swaps use `Switch`** (one place), **not** N siblings each with `visibleWhen eq`.
 - [ ] **Conditional styling uses `style.when`**: **no element cloned** under opposite
       `eq`/`ne` `visibleWhen`s just to change a style.
-- [ ] Conditions only **read** fields; nothing is **computed** in the template.
+- [ ] Conditions only **read** fields; nothing is **computed** in the app.
 - [ ] Anything derived (is-active, totals, formatted values, chosen colour) is computed in the
       **node** and sent as a plain field.
 
@@ -768,7 +768,7 @@ Run each definition against these. A "no" is a finding to fix.
       (scrollbar only when needed). Never let content overflow the frame and clip
       (`UNOVERSE_LAYERS.md` §4b).
 
-**Templates only**
+**Apps only**
 - [ ] Uses `ComponentSlot`/`Timeline` for streamed components + conversation (doesn't hardcode them).
 - [ ] The manifest declares a **`states:` tree** (§8): base first, reaction states in
       priority order; the ladder is derived, never authored alongside the tree.

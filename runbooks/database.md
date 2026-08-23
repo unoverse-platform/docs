@@ -60,7 +60,7 @@ With `byo_postgres_url`, the ground manages nothing about your database, so the 
 | ------------------ | -------------------------- | ------------------------------------------ |
 | Connection refused | Firewall blocking          | Managed modes: `terraform apply` maintains trusted sources. BYO: add the VM IP yourself |
 | SSL required       | Missing `?sslmode=require` | BYO only: add SSL mode to your URL        |
-| Auth failed        | Wrong credentials          | `terraform apply`, delete `.env.production`, redeploy (deploy re-renders it) |
+| Auth failed        | Wrong credentials          | Fix `terraform.tfvars`, then `unoverse deploy <cloud>`: it re-renders the env from the ground |
 | Extension denied   | Provider gates extensions  | BYO only: allow `vector` in your provider's console |
 
 ## Relocating Data Between Databases

@@ -70,8 +70,7 @@
               "onboarding/create-your-first-agent",
               "onboarding/create-your-first-node",
               "onboarding/ingest-content-to-spatial",
-              "onboarding/components-and-templates",
-              "onboarding/create-a-mcp",
+              "onboarding/create-a-component",
               "onboarding/create-a-client-app"
             ]
           },
@@ -101,7 +100,7 @@
             "pages": [
               "design/components",
               "design/state",
-              "design/templates",
+              "design/apps",
               "design/styles-and-tokens",
               "design/lifecycle-hooks",
               "design/analytics",
@@ -249,11 +248,15 @@
     },
     {
       "source": "/onboarding/05-components-and-templates",
-      "destination": "/onboarding/components-and-templates"
+      "destination": "/onboarding/create-a-component"
+    },
+    {
+      "source": "/onboarding/components-and-templates",
+      "destination": "/onboarding/create-a-component"
     },
     {
       "source": "/onboarding/06-create-a-mcp",
-      "destination": "/onboarding/create-a-mcp"
+      "destination": "/onboarding/create-a-client-app"
     },
     {
       "source": "/onboarding/07-create-a-client-app",
@@ -289,7 +292,11 @@
     },
     {
       "source": "/design/05-templates",
-      "destination": "/design/templates"
+      "destination": "/design/apps"
+    },
+    {
+      "source": "/design/templates",
+      "destination": "/design/apps"
     },
     {
       "source": "/design/06-styles-and-tokens",
@@ -382,6 +389,14 @@
     {
       "source": "/onboarding/update-unoverse",
       "destination": "/onboarding/cli"
+    },
+    {
+      "source": "/onboarding/components-and-apps",
+      "destination": "/onboarding/create-a-component"
+    },
+    {
+      "source": "/onboarding/create-a-mcp",
+      "destination": "/onboarding/create-a-client-app"
     }
   ]
 }

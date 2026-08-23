@@ -20,7 +20,7 @@ A `PriceCard` component: a card that shows a product name, a price, and a short 
 > Throughout these docs, `design/` means the design folder in your Studio project workspace. Studio reads it directly; publishing sends it to your universe.
 
 ```bash
-# In Studio: New Project → "acme": scaffolds design/acme/ (components/, templates/,
+# In Studio: New Project → "acme": scaffolds design/acme/ (components/, apps/,
 # and a complete copy of the default token set in styles/)
 ```
 
@@ -66,7 +66,7 @@ What each part is:
 |---|---|
 | `unoverse` / `kind` / `name` | The **envelope**: marks this file as a component definition |
 | `whenToUse` | **Required for components**: the AI reads this to pick your component. Outcome-first, in the user's vocabulary. See [08](/design/validate-and-ship) |
-| `props` | The **data contract**: every field the definition reads, with a default (the **Studio** mock). `input: true` = fed by the workflow at runtime, mark **all** workflow-fed props |
+| `props` | The **data contract**: every field the definition reads, with a default (the **studio** mock). `input: true` = fed by the workflow at runtime, mark **all** workflow-fed props |
 | `root` | The UI tree, built only from **primitives** ([02](/design/sdui-and-mcp-apps)) |
 | `bind` | An object mapping the primitive's target → your data field: `{ value: title }`, `{ src: image }` |
 | `visibleWhen` | A bare field name is a truthy test: the description row hides when empty |
@@ -83,7 +83,7 @@ The JSON Schema at `design/_schema/unoverse.schema.json` catches structural mist
   "yaml.schemas": {
     "./design/_schema/unoverse.schema.json": [
       "**/design/**/components/**/*.yaml",
-      "**/design/**/templates/**/*.yaml",
+      "**/design/**/apps/**/*.yaml",
       "**/design/**/atoms/*.yaml"
     ]
   }
@@ -99,7 +99,7 @@ Now a typo like `type: Bax` or a missing `description` is a red squiggle, not a 
 Two mechanisms, both already in your file:
 
 - **Prop `default`s ARE the mock.** Studio renders the component from them with no backend: that's why every prop carries a realistic default, not an empty string.
-- **The `states/` folder is the state picker.** If your component has multiple layers (a `Switch` on a discriminant: wizard steps, inline↔focused), enumerate each layer as `states/<layer>.yaml` and **Studio** automatically shows a pill per state; clicking one sets the discriminant and that layer draws itself ([07](/design/studio)). PriceCard is single-view, so it needs none.
+- **The `states/` folder is the state picker.** If your component has multiple layers (a `Switch` on a discriminant: wizard steps, inline↔focused), enumerate each layer as `states/<layer>.yaml` and **studio** automatically shows a pill per state; clicking one sets the discriminant and that layer draws itself ([07](/design/studio)). PriceCard is single-view, so it needs none.
 
 ---
 
@@ -113,20 +113,20 @@ unoverse build    # nodes synthesize from your definitions at boot
 
 Component nodes are **definition-backed**: one universal executor serves every component, and the platform synthesizes a node per definition at boot, there is no code generation. The restart just picks up your new definition. Your `PriceCard` is now:
 
-- a **node** any workflow can use: copy it from **Studio** (**⧉ Copy for Canvas**) and paste (`Cmd+V`) onto the **Canvas**, wire data into its props, and
-- an **MCP resource** every channel (web, native, **Studio**) renders natively.
+- a **node** any workflow can use: copy it from **studio** (**⧉ Copy for Canvas**) and paste (`Cmd+V`) onto the **canvas**, wire data into its props, and
+- an **MCP resource** every channel (web, native, **studio**) renders natively.
 
 ---
 
 ## Step 5: See it in Studio
 
-Open **Studio** (served by the platform: see [07, **Studio**](/design/studio)):
+Open **studio** (served by the platform: see [07, **studio**](/design/studio)):
 
 1. Find **PriceCard** in the component list.
 2. **Mock mode**: it renders from your prop defaults; multi-state components get a state picker from their `states/` folder, this is your Storybook.
-3. **Live mode**: wire it into a workflow on the **Canvas** and watch a real agent stream real data into it.
+3. **Live mode**: wire it into a workflow on the **canvas** and watch a real agent stream real data into it.
 
-If it looks right in **Studio**, it looks right in production: **Studio** is just another MCP client using the same SDK and the same stream ([02](/design/sdui-and-mcp-apps) explains why).
+If it looks right in **studio**, it looks right in production: **studio** is just another MCP client using the same SDK and the same stream ([02](/design/sdui-and-mcp-apps) explains why).
 
 ---
 
@@ -138,7 +138,7 @@ If it looks right in **Studio**, it looks right in production: **Studio** is jus
 - [ ] Zero raw values: token names only in every `style`
 - [ ] Prop defaults realistic (they ARE the mock); multi-layer components enumerate `states/`
 - [ ] Studio preview clean (mock, then live); publish passes lint with 0 errors
-- [ ] Previewed in **Studio** (mock states, then live)
+- [ ] Previewed in **studio** (mock states, then live)
 
 ---
 

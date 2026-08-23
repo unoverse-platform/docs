@@ -3,7 +3,7 @@ sidebarTitle: "Troubleshooting"
 title: "Troubleshooting"
 ---
 
-**Symptom → cause → fix.** Debug in **Studio**'s DevTools order: stream log → state inspector → definition ([07](/design/studio)). See the data before editing anything.
+**Symptom → cause → fix.** Debug in **studio**'s DevTools order: stream log → state inspector → definition ([07](/design/studio)). See the data before editing anything.
 
 ---
 
@@ -21,30 +21,30 @@ title: "Troubleshooting"
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `visibleWhen` never fires | key written to the wrong **bucket** (set with `setValue`, read from template state: or vice versa), or a key-name mismatch | open the **state inspector**; find where the key actually landed; align action and read ([04](/design/state) decision table) |
+| `visibleWhen` never fires | key written to the wrong **bucket** (set with `setValue`, read from app state: or vice versa), or a key-name mismatch | open the **state inspector**; find where the key actually landed; align action and read ([04](/design/state) decision table) |
 | Two views both visible / both hidden | N `visibleWhen`s with hand-negated conditions drifting apart | one `Switch` on one discriminant |
 | Wizard step never changes | the case content self-guards with a stale condition, or the button writes a value no case matches | remove self-guards; check the exact string values in the inspector |
-| Focus surface won't close | the component's ✕ isn't resetting ITS OWN state (or writes template state: the deprecated bridge) | the expanded state carries its own ✕: `setValue { view: "<its initial>" }` on the component's slice; the ladder walk re-runs and the template drops back ([04](/design/state)) |
+| Focus surface won't close | the component's ✕ isn't resetting ITS OWN state (or writes app state: the deprecated bridge) | the expanded state carries its own ✕: `setValue { view: "<its initial>" }` on the component's slice; the ladder walk re-runs and the app drops back ([04](/design/state)) |
 | Thinking dots never stop bouncing | the turn's `WORKFLOW_COMPLETED` never arrived on the stream: a delivery problem, not your definition | verify in the stream log, then report it; ❌ never gate the indicator on component text as a workaround |
-| Voice template stuck in one phase | branching on raw booleans instead of `callState`, or reading it from the wrong scope | `Switch` on the single `callState` value in template scope ([04](/design/state)) |
+| Voice app stuck in one phase | branching on raw booleans instead of `callState`, or reading it from the wrong scope | `Switch` on the single `callState` value in app scope ([04](/design/state)) |
 
-## Templates & selection
+## Apps & selection
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| A focus panel shows the wrong / a stale component | the slot selects with no `where` (bare `from: "all"` is oldest-first) | select on the public axis: `where: { field: "view", eq: "focus" }, limit: 1`, most recent state-write wins ([05](/design/templates)) |
-| The AI never picks your component/template | `whenToUse` is layout-first or missing | rewrite outcome-first in the user's vocabulary ([05](/design/templates)) |
-| A wide component gets squashed / a card gets stretched | template is imposing sizes on components | delete the template rule; the component declares its own size in its definition |
-| Template swap loses the conversation | template is holding data it shouldn't: state lives in the store, templates own nothing | move the data to the proper bucket; templates only project |
+| A focus panel shows the wrong / a stale component | the slot selects with no `where` (bare `from: "all"` is oldest-first) | select on the public axis: `where: { field: "view", eq: "focus" }, limit: 1`, most recent state-write wins ([05](/design/apps)) |
+| The AI never picks your component/app | `whenToUse` is layout-first or missing | rewrite outcome-first in the user's vocabulary ([05](/design/apps)) |
+| A wide component gets squashed / a card gets stretched | app is imposing sizes on components | delete the app rule; the component declares its own size in its definition |
+| App swap loses the conversation | app is holding data it shouldn't: state lives in the store, apps own nothing | move the data to the proper bucket; apps only project |
 
 ## Pipeline
 
 | Symptom | Cause | Fix |
 |---|---|---|
 | New definition rejected at boot | invalid definition JSON, or an envelope the schema rejects | run the ajv sweep from [08](/design/validate-and-ship); fix the reported file |
-| Component exists in **Studio** but not on the **Canvas** palette | the platform didn't restart / register | `unoverse build`, then `unoverse check` |
-| Mock states don't appear in **Studio**'s switcher | the definition declares no state tree: the viewer renders the served tree and never scans layouts; flat definitions list nothing | declare the `state.view` tree (component) or the manifest `states:` tree (template); pills appear automatically, in tree order ([07](/design/studio)) |
+| Component exists in **studio** but not on the **canvas** palette | the platform didn't restart / register | `unoverse build`, then `unoverse check` |
+| Mock states don't appear in **studio**'s switcher | the definition declares no state tree: the viewer renders the served tree and never scans layouts; flat definitions list nothing | declare the `state.view` tree (component) or the manifest `states:` tree (app); pills appear automatically, in tree order ([07](/design/studio)) |
 
 ---
 
-**Stuck beyond this?** Re-read the relevant concept doc: most persistent bugs are model misunderstandings (wrong bucket, template owning what a component owns, logic in the definition), not typos.
+**Stuck beyond this?** Re-read the relevant concept doc: most persistent bugs are model misunderstandings (wrong bucket, app owning what a component owns, logic in the definition), not typos.

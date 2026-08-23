@@ -191,7 +191,7 @@ folder. It never sits in the definition either.
 <Tip>
 **A credential appears where you enter it, and leaves when nothing needs it.** The
 definition ships with a node package. Install the package and the credential shows up in
-**Canvas** under **Credentials**, ready to fill in. Uninstall it and the type is retracted
+**canvas** under **Credentials**, ready to fill in. Uninstall it and the type is retracted
 again. A component names one of those definitions, so naming one that no package defines
 is a lint error rather than a card that silently renders empty.
 </Tip>
@@ -329,4 +329,4 @@ authored is a prop, fed by the workflow like any other.
 
 ---
 
-**Next**: [07, **Studio**](/design/studio), see it, test it, on every channel.
+**Next**: [07, **studio**](/design/studio), see it, test it, on every channel.

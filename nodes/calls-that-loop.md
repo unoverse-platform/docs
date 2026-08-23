@@ -204,8 +204,8 @@ Makes no request at all. It computes signed URLs from the credentials and the cl
 ```
 
 A presigned URL moves the signature out of the header and into the query string, with an
-expiry, so the link alone is enough to fetch the object. That is what makes it shareable,
-and why the expiry matters: anyone holding it has that access until it lapses.
+expiry, so the link alone is enough to fetch the object. The link is shareable, and the
+expiry is why that is safe: anyone holding it has that access only until it lapses.
 
 **The reply is always an array**, positionally aligned with `for`, even for one file. A
 listing needs a link per object and a single file needs one, and making those different

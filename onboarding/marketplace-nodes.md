@@ -3,43 +3,28 @@ sidebarTitle: "1. Install from the Marketplace"
 title: "Install from the Marketplace"
 ---
 
-{/* The address below is the live catalogue and both Terraform stacks default to it.
-    When it moves behind a domain, change it here, in .env.example, in lib/setup.sh and
-    in the two variables.tf. Better still, give UNOVERSE_MARKETPLACE_URL a default in
-    code (MARKETPLACE.md §5 decided it should have one) and delete this step outright. */}
+A universe starts empty. The marketplace stocks it: nodes for OpenAI, Airtable, Slack and
+AWS, the design system your components render from, and skills your Agents can use.
 
-Your universe starts empty. The marketplace stocks it. Nodes for OpenAI, Airtable, Slack and
-AWS, the design system your components render from, and skills your Agents can use. Each one
-installs into your own database, one at a time. Start here and take what you need.
+Everything you install writes a row into your own universe's database. Take what you need,
+one package at a time.
 
 ## Before you begin
 
-The platform is running (`unoverse start`), and **Studio** is open (`unoverse studio`).
+Your universe is running, and you can reach it in a browser.
 
-<Steps>
-<Step title="Point your universe at a marketplace">
-
-A universe installs from whichever catalogue its `.env` names, and `unoverse setup` leaves
-that setting empty. Point it at the marketplace:
-
-```bash .env
-UNOVERSE_MARKETPLACE_URL=https://unoverse-marketplace-4hlb9.ondigitalocean.app
+```bash
+unoverse start
 ```
 
-Restart with `unoverse restart`. Give it the site root and the universe finds the catalogue
-at `/marketplace/` on its own. Left empty, the **Marketplace** shows only the definitions
-already on this machine's disk, which is what an offline or air-gapped install wants.
-
-A deployment sets the same value from Terraform, where it is already the default, so this
-step is for local development.
-
-</Step>
+<Steps>
 <Step title="Open the Marketplace">
 
-In **Studio**, click **Marketplace** in the header. It opens on the catalogue, with
-**Installed** beside it showing what this universe already holds.
+Open your universe, choose **studio** in the header, then the **marketplace** tile.
 
-![The Marketplace catalogue in Studio, with the search box and the category grid](../images/onboarding/marketplace-catalogue.png)
+![The Marketplace open in Studio, with the search box and the category grid](../images/onboarding/marketplac-intro.png)
+
+**Installed** sits beside it, counting what this universe already holds.
 
 Browse by category, or search. Search is semantic rather than substring, so describe the job:
 "transcribe a call" finds the nodes that do it, whatever they are named.
@@ -53,11 +38,11 @@ Three counts sit above the list: packages, nodes, and how many you have already 
 ![The AI category, listing the OpenAI package and its nodes](../images/onboarding/marketplace-category.png)
 
 A package is a set of nodes that belong together, such as everything that talks to OpenAI.
-Click **Add** on one and it writes a row per node into your universe.
+Click **Add** and it writes a row per node into your universe.
 
 ![A package row with its Add button](../images/onboarding/marketplace-add.png)
 
-The nodes register straight away and appear in the node library in **Canvas**, ready to drag
+The nodes register straight away and appear in the node library in **canvas**, ready to drag
 onto a workflow. Nothing restarts, and the button reads **Added** once they are yours.
 
 Add **OpenAI** now. The next challenge uses <span className="node-chip">OpenAI Stream</span>
@@ -70,12 +55,12 @@ The design system is chosen rather than assumed. A new universe has no component
 styles until you take it. Its card sits in the catalogue grid alongside the node categories.
 Click **Install**.
 
-Do this before the components challenge. Without it, **Studio** has nothing to render.
+Do this before the components challenge. Without it, there is nothing to render.
 
 </Step>
 <Step title="Add credentials where required">
 
-Some nodes talk to external services and name the credential they need. Add it in **Canvas**
+Some nodes talk to external services and name the credential they need. Add it in **canvas**
 under **Credentials**. The next challenge walks through this for your OpenAI key.
 
 </Step>
@@ -89,18 +74,17 @@ back. An item reading `on disk` is a local definition of your own, which no row 
 </Steps>
 
 <Note>
-Installing writes rows into the database of the universe you are pointed at, so what you
-install locally stays local. Production is its own universe with its own database. Open
-**Studio** against it and install there too. Nothing rides `unoverse deploy`, which moves
-platform images only.
+Installing writes rows into the database of the universe you are in, so what you install in
+one stays there. Production is its own universe with its own database, so install there too.
+Nothing rides `unoverse deploy`, which moves platform images only.
 </Note>
 
 ## Next steps
 
 <Card title="Create your first Agent" icon="bot" href="/onboarding/create-your-first-agent" horizontal>
-Wire a trigger, a model, and a response together in Canvas, and talk to it.
+Wire a trigger, a model, and a response together in **canvas**, and talk to it.
 </Card>
 
-<Card title="Create your first node" icon="box" href="/onboarding/create-your-first-node" horizontal>
-Need something the marketplace doesn't have? Build it.
+<Card title="Create your first node" icon="boxes" href="/onboarding/create-your-first-node" horizontal>
+Need something the marketplace does not have? Build it.
 </Card>

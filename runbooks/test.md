@@ -110,7 +110,7 @@ Domain: yourdomain.com
 | Memory       | `http://localhost:4104/health` | 200 OK   |
 | UMAP         | `http://localhost:5001/health` | 200 OK   |
 
-> Unoverse serves `/health` on its public port `:4105` (host-reachable); it has no `/ready` endpoint. Its internal runtime port `:4106` is never published, so there is nothing to health-check from the host. `:4101` is the workflow engine surface, it runs in-process inside the unoverse container.
+> unoverse serves `/health` on its public port `:4105` (host-reachable); it has no `/ready` endpoint. Its internal runtime port `:4106` is never published, so there is nothing to health-check from the host. `:4101` is the workflow engine surface, it runs in-process inside the unoverse container.
 
 ## Troubleshooting
 
@@ -145,7 +145,7 @@ Locally, the whole checklist is one command:
 unoverse check
 ```
 
-It verifies containers, health endpoints (`:4105`, `:4101`, `:4104`, `:5001`), the loaded node catalog, component bundles, and **Canvas** reachability, the same checks `unoverse deploy test` runs against a server. If something is off, `unoverse check` diagnoses the environment.
+It verifies containers, health endpoints (`:4105`, `:4101`, `:4104`, `:5001`), the loaded node catalog, component bundles, and **canvas** reachability, the same checks `unoverse deploy test` runs against a server. If something is off, `unoverse check` diagnoses the environment.
 
 ## Next Steps
 

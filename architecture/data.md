@@ -33,7 +33,7 @@ conversations, installed nodes, all of it, because none of it lived on the machi
 Two artifacts have to survive alongside the database, and they are the ones people forget:
 
 - **The credential encryption key.** Without it, a restored database contains credentials
-  that can no longer be read.
+ that can no longer be read.
 - **The Spatial ML models.** They can be rebuilt from your content, but restoring them is much faster.
 
 The one true loss is live state. The engine keeps its session registry in process, so open
@@ -44,7 +44,7 @@ one engine instance today.
 
 Three modes, and the first match wins. **[AWS](/architecture/aws) has one mode: it always
 creates the database.** There is no way to point an AWS universe at a database you already
-run, by decision rather than oversight — see the note under the table.
+run, by decision rather than oversight, see the note under the table.
 
 | You provide | What happens |
 | --- | --- |
@@ -68,7 +68,7 @@ DigitalOcean because a managed cluster there is something operators already own 
 for, and standing a second one beside it is waste. On AWS an instance is provisioned per
 stack by convention, so the universe's database is its own, and bringing existing data in is
 a copy: `pg_dump` into the new instance once, at the start. It also keeps the teardown
-honest — everything the AWS ground builds, `unoverse destroy aws` removes, with nothing
+honest, everything the AWS ground builds, `unoverse destroy aws` removes, with nothing
 borrowed left behind. Decided 2026-08-02, and the one place the two grounds deliberately
 differ.
 

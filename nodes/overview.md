@@ -3,7 +3,7 @@ sidebarTitle: "Overview"
 title: "Nodes"
 ---
 
-A node is a service you drag onto the **Canvas**. It connects an Agent to another system.
+A node is a service you drag onto the **canvas**. It connects an Agent to another system.
 
 There is a marketplace of nodes. When none of them suits your situation, you build your own,
 and this section is about building one.
@@ -77,7 +77,7 @@ One folder is one node. The package around it holds anything its nodes share.
 | `shared/` | Fragments more than one node reuses, such as a base URL or a list of models |
 | `node.yaml` | What the node is: its name, colour, and the words that decide when an Agent picks it |
 | `interface.yaml` | What it connects to: its inputs, its outputs, and the credentials it needs |
-| `config.yaml` | The settings form someone fills in on the **Canvas** |
+| `config.yaml` | The settings form someone fills in on the **canvas** |
 | `api/` | What the node calls, what comes out, and what it offers to other nodes |
 | `test.yaml` | Sample settings and inputs, so you can run the node for real before wiring it up |
 

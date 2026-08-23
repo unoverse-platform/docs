@@ -13,15 +13,15 @@ And the state model is not a house invention: it is the orthodox stack you alrea
 
 ## The translation table
 
-| Your reflex | The Unoverse move | Doc |
+| Your reflex | The unoverse move | Doc |
 |---|---|---|
-| `useState(false)` for a toggle | A **dev-named key** the component writes into its own slice (`setValue`), read by `visibleWhen`. Template chrome (panels, draft) uses `setTemplateValue` | [04](/design/state) |
+| `useState(false)` for a toggle | A **dev-named key** the component writes into its own slice (`setValue`), read by `visibleWhen`. App chrome (panels, draft) uses `setAppValue` | [04](/design/state) |
 | `{isOpen && <Panel/>}` conditional render | `visibleWhen: { field: "openPanel", eq: "faq" }` (bare field name = truthy test) | [04](/design/state) |
 | `switch`/ternary between views | `Switch` `on` one discriminant with `cases` | [04](/design/state) |
 | `status: 'loading' \| 'loaded'` discriminated union | the **state tree**: one `view` axis, top-level states public, nested states private, each state owning its layout | [03](/design/components) |
 | An XState machine with nested states | the same shape, minus the transition machinery: no guards, no actions, no event objects; transitions are plain `setValue` writes | [04](/design/state) |
 | Spawning a child actor / `useActor` | a streamed component: the host places it at spawn, subscribes to its public `view`, and never writes into it afterwards | [04](/design/state) |
-| `items.map(item => <Row/>)` | `Each` with `bind: { items: "items" }` + a `template` | [03](/design/components) |
+| `items.map(item => <Row/>)` | `Each` with `bind: { items: "items" }` + an `app` | [03](/design/components) |
 | `onClick={() => setStep("confirm")}` | `action: { type: "setValue", values: [{ key: "step", value: "confirm" }] }` | [04](/design/state) |
 | A shared `<Button/>` component | An **atom** in `design/marketplace/atoms/`, used via `Ref`: `props` remaps fields, `with` passes literals | [03](/design/components) |
 | Splitting a big component into files | `$include` of `layouts/`/`components/` siblings: but extraction is **earned**, not default | [03](/design/components) |

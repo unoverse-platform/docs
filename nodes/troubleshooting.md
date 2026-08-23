@@ -50,7 +50,7 @@ This is the one that wastes the most time, because nothing errors.
 
 A path that matches nothing resolves to empty and says nothing about it. The usual causes:
 
-- **The node id is wrong.** `signal.quote1.quote` needs the id **Canvas** gave that node.
+- **The node id is wrong.** `signal.quote1.quote` needs the id **canvas** gave that node.
   Check it against the edge you actually drew.
 - **The output name is wrong.** It has to match `interface.yaml` exactly.
 - **You used `input.*`.** There is no such root.
@@ -73,7 +73,7 @@ error:
   message: "return response.error.message"
 ```
 
-**401 from the service.** Check the credential value in **Canvas**, then check `scheme`
+**401 from the service.** Check the credential value in **canvas**, then check `scheme`
 against the service's own documentation. Bearer and API-key-in-header are easy to confuse.
 
 **Refused before it left.** `refusing a request to "x"` means the host is not in the

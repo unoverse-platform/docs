@@ -3,7 +3,7 @@ sidebarTitle: "Config Schema"
 title: "Config Schema"
 ---
 
-`config.yaml` is the settings form. **Canvas** renders it, someone fills it in, and your
+`config.yaml` is the settings form. **canvas** renders it, someone fills it in, and your
 calls read the saved values as `{{ config.<field> }}`.
 
 It is the file you touch most. Every new option a node grows lands here and nowhere else.

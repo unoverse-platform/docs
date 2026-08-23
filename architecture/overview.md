@@ -25,15 +25,15 @@ The workflow engine is not a separate service. It runs in the same process, behi
 surface, and has no listener of its own. That consolidation is why a universe is four
 containers rather than seven.
 
-**Canvas** is where you build and observe Agents. It is an operator tool, in the same trust
+**canvas** is where you build and observe Agents. It is an operator tool, in the same trust
 ring as SSH, reachable only from an address you nominate.
 
 **Memory** keeps user profiles and open tasks, so an Agent can reason about the same person
 across weeks.
 
-**Spatial ML** maintains the semantic map behind **Spatial**.
+**Spatial ML** maintains the semantic map behind **spatial**.
 
-**Studio** does not appear here. It runs on a developer's own machine, reads their files off
+**studio** does not appear here. It runs on a developer's own machine, reads their files off
 disk, and publishes to a universe over the API. It is never deployed.
 
 ## Ports and trust zones
@@ -44,7 +44,7 @@ Four zones, and which one a service is in is the whole of its network exposure.
 | --- | --- | --- |
 | 443 | The internet | Everything a client does, forwarded to `:4105` |
 | 22 | Operator address | SSH, deploys, issuing publish keys |
-| 3001 | Operator address | **Canvas** |
+| 3001 | Operator address | **canvas** |
 | 8080 | Operator address | The log viewer, on small deployments |
 | 4104 | Blocked at the firewall | **Memory** |
 | 5001 | Blocked at the firewall | **Spatial ML** |
@@ -72,9 +72,9 @@ fork it, and it never writes to your folders.
 | | Ships as | Updated by |
 | --- | --- | --- |
 | The platform | Docker images from the registry | Pulling a new tag |
-| Your interfaces, skills and prompts | Rows in your universe's database | Publishing from **Studio** |
+| Your interfaces, skills and prompts | Rows in your universe's database | Publishing from **studio** |
 | Your nodes | Rows, plus npm packages installed at run time | Publishing, then acceptance |
-| Your workflows | Rows | Building them on the **Canvas** |
+| Your workflows | Rows | Building them on the **canvas** |
 
 Nothing you author rides inside an image. An image carries code and only code, which is why
 a platform upgrade cannot disturb your content and a content change cannot require a

@@ -1,11 +1,11 @@
 ---
-sidebarTitle: "Run the platform"
-title: "Run the Platform"
+sidebarTitle: "Run unoverse"
+title: "Run unoverse"
 ---
 
 Run a universe yourself: the whole platform, on your machine or a server.
 
-You need this to run Agents, use **Canvas**, and serve interfaces to real clients. If you are
+You need this to run Agents, use **canvas**, and serve interfaces to real clients. If you are
 building assets to publish to somebody else's universe, you want [Studio](/onboarding/studio)
 instead, which needs Node and nothing else.
 
@@ -108,10 +108,10 @@ Every line should be green. One command answers the whole question: services up,
 
 | Service | URL | What it is |
 | --- | --- | --- |
-| **Canvas** | http://localhost:3001 | Build, manage, and observe Agents |
+| **canvas** | http://localhost:3001 | Build, manage, and observe Agents |
 | **API** | http://localhost:4105 | The unoverse engine's public surface |
 
-**Studio** is separate. It is a tool you install, not a service the platform serves, and it
+**studio** is separate. It is a tool you install, not a service the platform serves, and it
 runs on :4108 whether or not a platform is up. See [Studio](/onboarding/studio).
 
 </Step>
@@ -151,7 +151,7 @@ Don't mix them up. `.env` is local development on your laptop; production config
 | You build | In | Guide |
 | --- | --- | --- |
 | **Logic**: custom workflow nodes (YAML manifests) | Studio project `nodes/` | [Create Your First Node](/onboarding/create-your-first-node) |
-| **Design**: components, templates, styles | Studio project `design/` | [Components and Templates](/onboarding/components-and-templates) |
+| **Design**: components, templates, styles | Studio project `design/` | [Create a component](/onboarding/create-a-component) |
 | **Behavior**: Agent skills and prompt blocks | Studio project `prompts/` | [Create Your First Agent](/onboarding/create-your-first-agent) |
 
 You don't have to build everything yourself. The **marketplace** offers the design system and ready-made nodes and services to install into your universe, per item.
@@ -236,13 +236,13 @@ It checks the whole stack and tells you what's wrong.
 ## Next steps
 
 <Card title="Build your first Agent" icon="bot" href="/onboarding/create-your-first-agent" horizontal>
-Wire a trigger, a model, and a response together in **Canvas**, and talk to it.
+Wire a trigger, a model, and a response together in **canvas**, and talk to it.
 </Card>
 
 <Card title="Explore the CLI" icon="terminal" href="/onboarding/cli" horizontal>
 Every command for setup, development, design, and deployment.
 </Card>
 
-<Card title="Create a component" icon="palette" href="/onboarding/components-and-templates" horizontal>
-Design a component in **Studio** and see it render live.
+<Card title="Create a component" icon="palette" href="/onboarding/create-a-component" horizontal>
+Design a component in **studio** and see it render live.
 </Card>
