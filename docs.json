@@ -205,6 +205,52 @@
           }
         ],
         "icon": "server"
+      },
+      {
+        "tab": "Reference",
+        "icon": "book-marked",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "reference/overview"
+            ]
+          },
+          {
+            "group": "Design",
+            "pages": [
+              "reference/manifest",
+              "reference/primitives",
+              "reference/style-keys",
+              "reference/scales",
+              "reference/analytics"
+            ]
+          },
+          {
+            "group": "Nodes",
+            "pages": [
+              "reference/node-envelope",
+              "reference/node-interface",
+              "reference/node-config",
+              "reference/node-test"
+            ]
+          },
+          {
+            "group": "Nodes \u00b7 api/",
+            "pages": [
+              "reference/node-api",
+              "reference/node-events",
+              "reference/node-audio"
+            ]
+          },
+          {
+            "group": "Nodes \u00b7 package",
+            "pages": [
+              "reference/node-package",
+              "reference/node-credentials"
+            ]
+          }
+        ]
       }
     ]
   },

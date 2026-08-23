@@ -1,0 +1,236 @@
+# Reader-facing copy for the node reference.
+#
+# THE SCHEMA SUPPLIES THE SHAPE, THIS SUPPLIES THE WORDS, and the schema's own `description`
+# is deliberately NOT used. Those descriptions are maintainer notes: `api.run` runs to 244
+# words of rationale, `api.schema.json`'s own description to 195, and several cite
+# `docs/architecture/DECLARATIVE_NODES.md`, a path that is never published. Piping them into
+# field cards produced pages nobody could scan, and broke the rule in
+# docs/doc-control/DOCS_AND_SKILLS_RULES.md: "Never paraphrase a source comment into copy...
+# Read them to learn what is TRUE, then write what the reader GETS."
+#
+# One line per field. What it is, and what it is for. The guides carry the why.
+
+pages:
+  node: One file per node, naming what it is and how an Agent finds it.
+  interface: The node's wiring surface. Everything another node or an Agent can see.
+  api: The calls the node makes, and what leaves it.
+  config: The settings form someone fills in on the canvas.
+  credential: The shape of a credential, declared once per package. Never a value.
+  package: The envelope around a folder of nodes, and what the marketplace lists.
+  test: The fixture behind Load sample and `unoverse node test`.
+  audio: How a voice node binds to the platform's audio lane.
+  events: Everything that leaves the node, one row per output connector.
+
+node:
+  type: "How the node runs. `promise` settles once; `callback` streams and settles later. The last call's transport decides it."
+  kind: "What the node is for. Picks the executor and the shape the platform expects."
+  name: "The node's id, unique in its package. Used everywhere it is referenced."
+  description: "One line saying what the node does, shown in the node library."
+  category: "The job's domain, used in the library and in discovery ranking. Name the work, never the implementation."
+  whenToUse: "The text an Agent's search is ranked against, so this is what decides whether the node is ever chosen. Write the words a person would actually say, outcome first, and disqualify by property rather than by naming a sibling. Getting it wrong fails silently: the node still works, it is just never picked. Full rules: [Node discoverability](/nodes/node-discoverability)."
+  color: "The node's accent colour on the canvas."
+  logoUrl: "The service's logo, shown on the node and in the marketplace."
+  template: "A starter configuration, prefilled when someone drops the node onto a canvas."
+  allowedHosts: "Every host this node may reach. No entry, no network."
+  visibility: "Whether the node appears in the library, or is reachable only by another node."
+  capabilities: "Platform features this node needs. Publishing refuses where a universe cannot satisfy them."
+  interface: "Points at `interface.yaml`, or declares the wiring surface inline."
+  config: "Points at `config.yaml`, or declares the settings form inline."
+  api: "Points at the `api/` folder, or declares the calls inline."
+  test: "Points at `test.yaml`, or declares the fixture inline."
+  auth: "Who may set this node off. The node author's floor, which a workflow builder can tighten and never loosen."
+
+interface:
+  inputs: "The connectors data arrives on."
+  outputs: "The connectors data leaves on. Their order is the order `events` must declare."
+  credentials: "The credential types this node needs, by name. The values are entered once in canvas and never live in your files."
+  serviceConnectors: "Service edges this node offers or consumes, and the methods on each."
+
+api:
+  run: "The calls this node makes, in order, always a list. Each step can read what earlier ones returned. Every call but the last must settle; only the last may stream."
+  events: "Everything that leaves the node, one row per output connector, in the order `interface.yaml` declares them. Lint enforces coverage and order."
+  service: "Methods this node offers to others over a service edge, keyed by name. Called by another node rather than by the graph, and each returns a value to the caller."
+  toolExchange: "Hands tools to a model and resolves the calls that come back. Declaring it makes the node a callback node."
+  narrate: "A second, cheaper model writing a status line while the main call runs. A `from: narrator` row in `events` says where the line lands."
+  publish: "A write straight into the caller's screen state, pushed after the node settles. A side channel to the person watching, never an output."
+  audio: "Binds a voice node to the platform's audio lane, which is a separate socket. Everything that is not audio belongs in `events`."
+
+config:
+  configSchema: "The settings form, as JSON Schema. Every field someone fills in on the canvas."
+  "ui:order": "The order fields appear in the form. Anything unlisted follows, in declaration order."
+
+credential:
+  name: "The credential type's id, referenced by `interface.yaml`."
+  displayName: "The name on the form someone fills in. Write it for a person who has your service open in another tab."
+  description: "One line saying what the credential is for, shown above the form."
+  documentationUrl: "A link to where the key comes from, shown beside the form."
+  properties: "The fields on the form. Mark anything that grants access `secret: true`."
+
+package:
+  name: "The package id, unique in the marketplace."
+  displayName: "The package's name as the marketplace shows it."
+  description: "One line saying what the package is for, used as the listing's subtitle."
+  version: "The package version. A newer fingerprint is what an install takes."
+  category: "Where the package sits in the marketplace."
+  logoUrl: "The logo shown on the listing."
+  features: "What the package offers, listed on its marketplace page."
+  allowedHosts: "Every host any node in this package may reach, and part of the package's content hash."
+  requires: "Platform capabilities every node here needs. Publishing refuses where a universe cannot satisfy them."
+  publisher: "Who publishes the package."
+
+test:
+  testData: "Realistic input for one run, so the sample exercises the node rather than proving it parses."
+
+events:
+  emit: "The output connector this row writes to. Must be one of the outputs declared in `interface.yaml`, in the same order."
+  from: "Where the row fires from. `response` is the last call's reply; `narrator` is the status line; a call name is that step's result."
+  match: "Streaming only. The event type this row fires on, such as `response.output_text.delta`. A literal, never a pattern."
+  when: "An extra test, for when one event type carries more than one meaning."
+  value: "What to emit. A `return` expression over whatever the row's `from` puts in scope."
+  accumulate: "Emit the running total rather than each fragment. A delta-per-event stream is rarely what a consumer wants."
+  resetOn: "The event types that end a turn, after which `accumulate` starts again."
+  throttleMs: "Emit at most this often. Nothing is dropped; what is held back is flushed at the end of the run."
+  throttleChars: "Emit only once this many characters have built up. Also flushed at the end."
+  send: "Deliver to a named node instead of an output connector. Mutually exclusive with `emit`."
+  handle: "Send rows only. Which input connector on the target node this arrives on. Defaults to `input`."
+
+audio:
+  in: "How audio arriving from the caller reaches the vendor socket."
+  out: "How audio from the vendor reaches the caller."
+  control: "The non-audio messages that steer the call."
+
+# One example per page, taken from a REAL shipped node: `nodes/airtable/AirtableFetch`.
+#
+# The first draft of these was invented and got the shape wrong in ways a reader would have
+# copied: `type:` is the node's identifier and `kind:` is PromiseNode/CallbackNode (the draft
+# had `type: promise`); `api/run.yaml` and `api/events.yaml` are SEPARATE FILES, each a bare
+# list rather than a `run:` / `events:` key; events rows are `emit`/`from`/`value`; . Ground an example in a
+# node that ships, or it teaches a shape the platform does not accept.
+#
+# The `$schema:` line every real file opens with is left OUT: it wires the editor squiggle and
+# says nothing about the node.
+#
+# BLOCK STYLE ONLY. Flow mappings (`{ a: 1 }`) read as JSON and overflow the code panel.
+examples:
+  node: |
+    type: AirtableFetch
+    kind: PromiseNode
+    name: Airtable Fetch
+    category: Storage & Data
+    color: "#FCB400"
+    description: Read records from an Airtable table, with
+      filters, views and paging
+    whenToUse: >
+      Pick to READ rows out of an Airtable table: filtered,
+      sorted, and paged past the first hundred.
+
+    auth:
+      required: false
+
+    capabilities:
+      cacheable: true
+  interface: |
+    inputs:
+      - name: input
+        type: object
+        description: Trigger. Config may template from upstream.
+
+    outputs:
+      - name: records
+        type: array
+        description: Each record as a plain object, plus its id
+      - name: totalCount
+        type: number
+        description: How many came back after paging
+
+    credentials:
+      - name: airtableCredential
+        required: true
+        displayName: Airtable
+  api: |
+    # The file IS the list of calls. There is no `run:` key.
+    - name: page
+      method: GET
+      url:
+        $ref: table#url
+      credential:
+        $ref: table#credential
+      query:
+        filterByFormula: "{{ config.filterFormula }}"
+        view: "{{ config.view }}"
+      transport: json
+      retry:
+        attempts: 3
+        backoff: exponential
+        on: [429, 500, 502, 503, 504]
+      paginate:
+        strategy: cursor
+        cursor: "return response.offset"
+        into: offset
+  config: |
+    configSchema:
+      type: object
+      required: [baseId, tableId]
+      properties:
+        baseId:
+          type: string
+          title: Base ID
+          description: Airtable Base ID, starts with 'app'
+          default: ""
+          "ui:field": template
+        tableId:
+          type: string
+          title: Table Name or ID
+          description: Table name, or a table ID starting with 'tbl'
+          default: ""
+          "ui:field": template
+  credential: |
+    name: airtableCredential
+    displayName: Airtable
+    description: Airtable Personal Access Token
+    documentationUrl: https://airtable.com/create/tokens
+
+    properties:
+      - name: personalAccessToken
+        displayName: Personal Access Token
+        type: string
+        required: true
+        secret: true
+        description: Your Airtable Personal Access Token
+        placeholder: pat
+  package: |
+    name: airtable
+    displayName: Airtable
+    description: Read and write records in Airtable bases.
+    version: 1.0.0
+    category: Storage & Data
+    requires:
+      credential: [bearer]
+      transport: [json]
+      paginate: [cursor]
+  test: |
+    testData:
+      baseId: appXXXXXXXXXXXXXX
+      tableId: Companies
+      maxRecords: 25
+  events: |
+    # The file IS the list of rows, one per output connector,
+    # in interface.yaml order.
+    - emit: records
+      from: response
+      value: >-
+        return response.items.map(
+          r => Object.assign({ id: r.id }, r.fields || {}))
+
+    - emit: totalCount
+      from: response
+      value: >-
+        return response.items.length
+  audio: |
+    # api/audio.yaml — only for a `transport: ws` voice node.
+    in:
+      encoding: pcm16
+      sampleRate: 24000
+    out:
+      encoding: pcm16
+      sampleRate: 24000

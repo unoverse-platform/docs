@@ -1,0 +1,21 @@
+# Copy for the component/app manifest reference. The schema at
+# apps/unoverse/design/_schema/manifest.schema.json supplies the shape; five of its 22
+# properties carry no description, so they are written here. The rest are reader-facing
+# already and are used as-is.
+manifest:
+  # Overrides the schema's own text: this is what discovery ranks on, and getting it wrong
+  # is quiet — the component works and is simply never chosen.
+  whenToUse: >-
+    The text an Agent's search is ranked against, so this is what decides whether the
+    component is ever chosen. Write the words a person would actually say, outcome first, and
+    disqualify by property rather than by naming a sibling. Getting it wrong fails silently:
+    the component still works, it is just never picked. Full rules:
+    [Node discoverability](/nodes/node-discoverability), which applies to components and apps
+    verbatim.
+  category: The job's domain, used in discovery ranking. Name the work, never the build.
+  version: The definition's version.
+  states: >-
+    An app's state tree. Top-level order IS the priority ladder, base first, and nesting is
+    containment. Each state owns the layout that draws it.
+  autoTrigger: Whether the app fires its bound workflow on load, without waiting for a message.
+  expose: Legacy. Org scoping is the boundary now, so this no longer does anything.

@@ -23,16 +23,30 @@
  *
  * Run: npm run gen-reference
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
+import Ajv from "ajv";
 
-const DOCS = join(dirname(fileURLToPath(import.meta.url)), "..");
+// OUTPUT IS OPT-IN, and that is the whole safety mechanism. The docs lane publishes by
+// `rsync -a --delete packages/docs/ → the deploy repo` (scripts/lib/publish.sh), so every .md
+// under packages/docs becomes a live URL whether or not it is committed or linked in the nav.
+// A script and a content file are harmless there (copy-check.mjs already ships); PAGES are not.
+// So this writes to a scratch dir unless you pass --publish, which is the moment a human
+// decides those URLs should exist.
+const HERE = dirname(fileURLToPath(import.meta.url));
+const DOCS = join(HERE, "..");
 const REPO = join(DOCS, "../..");
+const PUBLISH = process.argv.includes("--publish");
 const SCHEMA_DIR = join(REPO, "packages/sdk/conformance/schema");
 const STYLES = join(REPO, "apps/unoverse/design/marketplace/styles");
-const OUT = join(DOCS, "reference");
+// The preview goes to the OS temp dir, NOT anywhere under packages/docs. rsync excludes only
+// .git/, node_modules/, .turbo/ and .DS_Store, so a dotfolder here would ship exactly like a
+// normal one — which is how three unlinked pages reached the live site on 2026-08-23.
+const OUT = PUBLISH ? join(DOCS, "reference") : join(tmpdir(), "unoverse-reference-preview");
+mkdirSync(OUT, { recursive: true }); // build output is disposable: recreate it rather than require it
 const VERSIONS = ["1.0", "1.1", "1.2"];
 const CURRENT = VERSIONS[VERSIONS.length - 1];
 
@@ -40,7 +54,7 @@ const readSchema = (v) => JSON.parse(readFileSync(join(SCHEMA_DIR, `definition-$
 const readTokens = (p) => parse(readFileSync(join(STYLES, `${p}.yaml`), "utf8"));
 
 const schema = readSchema(CURRENT);
-const content = parse(readFileSync(join(OUT, "_content.yaml"), "utf8"));
+const content = parse(readFileSync(join(HERE, "reference-content.yaml"), "utf8"));
 const { TOKEN_KEYS, DIMENSION_KEYS } = await import(
   join(REPO, "packages/base/src/lint/design/vocabulary.mjs")
 );
@@ -62,7 +76,39 @@ if (problems.length) {
   console.error("✗ reference is out of date with the schema:\n");
   for (const p of problems) console.error(`  ${p}`);
   console.error(`\nSchema: packages/sdk/conformance/schema/definition-${CURRENT}.schema.json`);
-  console.error("Describe the new entries in packages/docs/reference/_content.yaml, then re-run.");
+  console.error("Describe the new entries in packages/docs/scripts/reference-content.yaml, then re-run.");
+  process.exit(1);
+}
+
+// ── Examples are validated, not trusted ──────────────────────────────────────
+// An example is hand-written, so it is the one part of this page that CAN rot. Checking
+// each one against the schema's own `node` definition closes that: an example using a
+// field the contract dropped fails the build exactly like a missing description does.
+const ajv = new Ajv({ allErrors: true, strict: false });
+// Compile the node definition ALONE. Spreading the root schema drags in its envelope
+// rules (unoverse/kind/name/root), which a single node fragment can never satisfy.
+const validateNode = ajv.compile({ $ref: "#/definitions/node", definitions: schema.definitions });
+for (const [name, entry] of Object.entries(content.primitives)) {
+  if (!entry.example) {
+    problems.push(`primitive: "${name}" has no example`);
+    continue;
+  }
+  let parsed;
+  try {
+    parsed = parse(entry.example);
+  } catch (e) {
+    problems.push(`primitive: "${name}" example is not valid YAML — ${e.message}`);
+    continue;
+  }
+  if (!validateNode(parsed))
+    problems.push(
+      `primitive: "${name}" example fails the schema — ` +
+        validateNode.errors.map((e) => `${e.instancePath || "/"} ${e.message}`).join("; "),
+    );
+}
+if (problems.length) {
+  console.error("✗ reference examples do not match the schema:\n");
+  for (const p of problems) console.error(`  ${p}`);
   process.exit(1);
 }
 
@@ -115,18 +161,17 @@ title: "${title}"
 
 ${description}
 
-<Note>
-Generated from \`definition-${CURRENT}.schema.json\`, the contract every unoverse SDK is
-tested against, and from the token files themselves. It cannot describe something the
-platform does not have, and the values below are the values that ship.
-</Note>
+<div className="ref-source">
+Generated from <code>definition-${CURRENT}.schema.json</code> and the token files, so it
+cannot fall behind what ships.
+</div>
 
 ${body}## Next steps
 
 ${next}
 `,
   );
-  console.log(`  reference/${file}`);
+  console.log(`  ${PUBLISH ? join("packages/docs/reference", file) : join(OUT, file)}`);
 }
 
 const grouped = (names, source) => {
@@ -148,7 +193,7 @@ for (const [group, names] of grouped(primitives, content.primitives)) {
     if (requires[n]) labels.push(`requires ${requires[n].join(" + ")}`);
     if (primitiveAdded[n] !== VERSIONS[0]) labels.push(`added in ${primitiveAdded[n]}`);
     const post = labels.length ? ` post={${JSON.stringify(labels)}}` : "";
-    body += `<ResponseField name="${n}" type="primitive"${post}>\n${content.primitives[n].summary}\n</ResponseField>\n\n`;
+    body += `<ResponseField name="${n}"${post}>\n${content.primitives[n].summary}\n\n\`\`\`yaml\n${content.primitives[n].example.trim()}\n\`\`\`\n</ResponseField>\n\n`;
   }
 }
 page({
@@ -171,12 +216,14 @@ How these compose into something an Agent can send.
 body = "";
 for (const [group, names] of grouped(styleKeys, content.styleKeys)) {
   body += `## ${group}\n\n`;
+  const ex = content.styleGroups?.[group];
+  if (ex) body += `\`\`\`yaml\n${ex.trim()}\n\`\`\`\n\n`;
   for (const n of names) {
     const c = content.styleKeys[n];
-    const post = c.css ? ` post={${JSON.stringify([c.css])}}` : "";
     const takes = accepts(n);
-    body += `<ResponseField name="${n}" type="style key"${post}>\n${c.summary}${
-      takes ? `\n\nTakes ${takes}.` : ""
+    const meta = [c.css ? `CSS \`${c.css}\`` : null, takes ? `takes ${takes}` : null].filter(Boolean);
+    body += `<ResponseField name="${n}">\n${c.summary}${
+      meta.length ? `\n<div className="ref-takes">${meta.join(" · ")}</div>` : ""
     }\n</ResponseField>\n\n`;
   }
 }
@@ -185,8 +232,8 @@ page({
   sidebar: "Style keys",
   title: "Style keys",
   description: `Every key a \`style\` block accepts. The set is closed, so an unknown key is ignored by every
-renderer and is always a typo or a web-ism that would not port. The badge on the right is the
-CSS property it maps to, for when you know the CSS name and not ours.`,
+renderer and is always a typo or a web-ism that would not port. Each entry names the CSS
+property it maps to, for when you know the CSS name and not ours.`,
   body,
   next: `<Card title="Scales" icon="ruler" href="/reference/scales" horizontal>
 Every value these keys accept, with what it resolves to.
@@ -198,12 +245,26 @@ Where the values come from, and how a rebrand works.
 });
 
 // Scales
-const table = (rows) =>
-  `| Name | Resolves to | |\n|---|---|---|\n${rows
-    .map(([n, v, d]) => `| \`${n}\` | \`${v}\` | ${d || ""} |`)
+/** `{space.120}` is an alias, and an alias is not a value. Print what it resolves to. */
+const resolve = (v) => {
+  const alias = String(v).match(/^\{space\.([\w.]+)\}$/);
+  return alias && scale[alias[1]] ? `${scale[alias[1]].$value}` : String(v);
+};
+
+const table = (rows) => {
+  const noted = rows.some(([, , d]) => d);
+  const head = noted ? `| Name | Resolves to | |\n|---|---|---|` : `| Name | Resolves to |\n|---|---|`;
+  return `${head}\n${rows
+    .map(([n, v, d]) => (noted ? `| \`${n}\` | \`${resolve(v)}\` | ${d || ""} |` : `| \`${n}\` | \`${resolve(v)}\` |`))
     .join("\n")}\n\n`;
+};
 
 body =
+  "```yaml\n" +
+  'style: { padding: "6", gap: "3", width: "20" }   # steps\n' +
+  "style: { maxWidth: reading }                     # a page width by name\n" +
+  "appWidth: rail                                   # an app size by name\n" +
+  "```\n\n" +
   `## The space scale\n\n` +
   `One scale serves spacing and element size alike, Tailwind-style: step N is N × 0.25rem.\n` +
   `Only these steps exist. An invented one such as \`26\` is not rounded, it falls through as\n` +
@@ -238,3 +299,5 @@ The layers behind these, and how to retune them for a brand.
 console.log(
   `\n✓ ${primitives.length} primitives, ${styleKeys.length} style keys, ${steps.length} scale steps, from schema v${CURRENT}`,
 );
+
+if (!PUBLISH) console.log("\nPreview only. Pass --publish to write into packages/docs/reference (those become live URLs).");

@@ -539,3 +539,88 @@
 }
 
 .dark #content-area .fig-notes { border-top-color: rgb(55 58 66); }
+
+/* ── Reference pages ─────────────────────────────────────────────────────────
+   A field reference is scanned, not read. So the field NAME carries the weight,
+   its description sits quieter beneath, and everything else recedes. The theme's
+   defaults give a name, its type and its body all the same size, which reads as
+   an undifferentiated list at a glance. */
+
+/* Provenance: one quiet line, not a full-width panel repeated on twelve pages. */
+#content-area .ref-source {
+  margin: -0.25rem 0 2.25rem;
+  padding-left: 0.875rem;
+  border-left: 2px solid rgb(109 93 246 / 0.3);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: #6b7280;
+}
+.dark #content-area .ref-source { color: #9aa1ad; }
+#content-area .ref-source code {
+  font-size: 0.78125rem;
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* The field name: the thing you are scanning for. `.param-head` is the theme's own row. */
+#content-area .param-head button {
+  font-size: 0.9375rem;
+  letter-spacing: -0.005em;
+}
+/* A qualifier badge (required, added in 1.1) is quieter than the name it follows. Scoped to
+   the badge container itself — a positional selector here grabs the NAME once a row has no
+   badge, which right-aligned every field on the page. */
+#content-area .param-head [class*="text-xs"] {
+  color: #6b7280;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.dark #content-area .param-head [class*="text-xs"] { color: #9aa1ad; }
+
+/* Accepted values: metadata, so it must not compete with the description. */
+#content-area .ref-takes {
+  margin-top: 0.4rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+.dark #content-area .ref-takes { color: #9aa1ad; }
+#content-area .ref-takes code {
+  font-size: 0.75rem;
+  padding: 0.05rem 0.3rem;
+}
+/* The scales link is a route out, not an emphasis: no underline shouting. */
+#content-area .ref-takes a {
+  color: #4c3fd1;
+  text-decoration-color: rgb(109 93 246 / 0.35);
+  font-weight: 500;
+}
+.dark #content-area .ref-takes a { color: #8b7ef8; }
+
+/* Examples: the code panel is the heaviest thing on the page, so it needs to sit
+   TIGHT under its description rather than floating as a separate block. */
+#content-area [class*="ResponseField"] pre,
+#content-area .response-field pre {
+  margin-top: 0.7rem;
+  margin-bottom: 0.15rem;
+  font-size: 0.8125rem;
+}
+
+/* Rhythm: reference rows are denser than prose. The theme spaces them for reading. */
+#content-area .param-head { padding-bottom: 0.15rem; }
+
+/* Scales tables: this page is 27 values with one number each, so a table is right —
+   it just has to look like the same design as the field cards beside it. */
+#content-area table code {
+  font-size: 0.8125rem;
+  background: none;
+  padding: 0;
+  color: #4c3fd1;
+  font-weight: 500;
+}
+.dark #content-area table code { color: #8b7ef8; }
+
+/* Reference tables carry one short value per row, so the theme's reading-height rows leave a
+   27-step scale two screens tall. Tighten to a scannable rhythm. */
+#content-area table td { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+#content-area table th { padding-bottom: 0.45rem; }
