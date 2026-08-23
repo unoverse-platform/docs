@@ -206,3 +206,13 @@ Filter the browser console on `unoverse:analytics` to see only these.
 - [Components](/design/components) for the node grammar
 - [State](/design/state) for how a view change is a state write
 - [Lifecycle Hooks](/design/lifecycle-hooks) for fetching data at a moment, which is a different job
+
+## Next steps
+
+<Card title="Validate and ship" icon="shield-check" href="/design/validate-and-ship" horizontal>
+What the lint enforces, and what only you can judge.
+</Card>
+
+<Card title="Studio" icon="layout-dashboard" href="/design/studio" horizontal>
+Check your events arrive before you ship.
+</Card>

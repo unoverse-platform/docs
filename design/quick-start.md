@@ -1,30 +1,41 @@
 ---
-sidebarTitle: "Quick Start"
-title: "Quick Start"
+sidebarTitle: "Quick start"
+title: "Quick start"
 ---
 
-**Build your first component, validate it, deploy it, and see it render in Studio.**
+Build a price card, see it render in **studio**, and publish it to your universe.
 
-No React. No build config. One YAML file.
+You need **studio** running. [Studio](/onboarding/studio) covers the install.
 
----
+## Make a project
 
-## What you're building
-
-A `PriceCard` component: a card that shows a product name, a price, and a short description, streamed to it by any workflow. It will render natively on web (and every other channel) from the same definition.
-
----
-
-## Step 1: Scaffold, then shape the definition
-
-> Throughout these docs, `design/` means the design folder in your Studio project workspace. Studio reads it directly; publishing sends it to your universe.
+Your work lives in an org. The folder you run in becomes its name, and that name travels
+with everything the org publishes.
 
 ```bash
-# In Studio: New Project → "acme": scaffolds design/acme/ (components/, apps/,
-# and a complete copy of the default token set in styles/)
+mkdir acme && cd acme
+unoverse create
 ```
 
-This creates `design/acme/components/pricecard/pricecard.yaml`, already passing the linter: you fill the TODOs and shape the tree. Edited for our card:
+Choose **Studio** at the prompt. You get three folders, and your org sits inside `design/`:
+
+```
+acme/
+  design/
+    acme/              your org
+      components/      one piece of interface
+      apps/            whole surfaces
+      styles/          colour, type, spacing
+  prompts/
+  nodes/
+```
+
+A worked example lands in each, so no folder starts empty.
+
+## Write the definition
+
+Create `design/acme/components/pricecard/pricecard.yaml`. The file name is the component's
+name, and the lint enforces the match.
 
 ```yaml
 unoverse: "1.0"
@@ -32,21 +43,24 @@ kind: component
 name: pricecard
 category: Commerce
 description: A card showing a product name, price and short description.
-whenToUse: Show a single product or plan with its price. Not for lists of products (use a list component) or for charts.
+whenToUse: Show a single product or plan with its price.
 props:
-  title:       { type: string, default: Pro Plan, input: true }
-  price:       { type: string, default: $29/mo, input: true }
-  description: { type: string, default: Everything in Basic plus priority support., input: true }
+  title: { type: string, default: Pro Plan, input: true }
+  price: { type: string, default: $29/month, input: true }
+  description:
+    type: string
+    default: Everything in Basic, plus priority support.
+    input: true
 root:
   type: Box
   style:
     width: full
     direction: column
     gap: "3"
-    padding: lg
+    padding: "6"
     background: surface.base
     border: subtle
-    shadow: lg
+    radius: lg
   children:
     - type: Text
       bind: { value: title }
@@ -60,23 +74,24 @@ root:
       style: { font: body.md, color: text.secondary }
 ```
 
-What each part is:
+Reading it top to bottom:
 
-| Field | Role |
+| Part | What it does |
 |---|---|
-| `unoverse` / `kind` / `name` | The **envelope**: marks this file as a component definition |
-| `whenToUse` | **Required for components**: the AI reads this to pick your component. Outcome-first, in the user's vocabulary. See [08](/design/validate-and-ship) |
-| `props` | The **data contract**: every field the definition reads, with a default (the **studio** mock). `input: true` = fed by the workflow at runtime, mark **all** workflow-fed props |
-| `root` | The UI tree, built only from **primitives** ([02](/design/sdui-and-mcp-apps)) |
-| `bind` | An object mapping the primitive's target → your data field: `{ value: title }`, `{ src: image }` |
-| `visibleWhen` | A bare field name is a truthy test: the description row hides when empty |
-| `style` values | **Token names only**: `"3"`, `"surface.base"`, `"headline.sm"`. Never `12px` or `#fff` ([06](/design/styles-and-tokens)) |
+| `unoverse` `kind` `name` | The envelope. It marks the file as a component definition |
+| `whenToUse` | How an Agent finds your component. Write the words a user would say |
+| `props` | Every field a workflow can fill. `input: true` marks a field as workflow-fed |
+| `default` | The value **studio** previews from, so make each one realistic content |
+| `root` | The layout, composed only from the closed primitive set |
+| `bind` | Maps a primitive's target to a field: `{ value: title }`, `{ src: image }` |
+| `visibleWhen` | A bare field name is a truthy test, so the row hides when the field is empty |
+| `style` | Token names only. Never `12px`, never `#fff` |
 
----
+## Catch mistakes as you type
 
-## Step 2: Validate as you type
-
-The JSON Schema at `design/_schema/unoverse.schema.json` catches structural mistakes (unknown primitive, missing `whenToUse`, a `Switch` without `cases`, an illegal condition) **in your editor**. Definitions are YAML, so wire it once through the YAML extension in `.vscode/settings.json` (the schema file itself stays JSON: it is the schema, not a definition):
+The schema at `design/_schema/unoverse.schema.json` marks an unknown primitive, a missing
+`whenToUse` or an illegal condition while you are still in the file. Wire it once through
+the YAML extension in `.vscode/settings.json`:
 
 ```jsonc
 {
@@ -90,56 +105,41 @@ The JSON Schema at `design/_schema/unoverse.schema.json` catches structural mist
 }
 ```
 
-Now a typo like `type: Bax` or a missing `description` is a red squiggle, not a runtime surprise. [08: Validate & Ship](/design/validate-and-ship) covers the full enforcement stack (schema → linter → checklist).
+The schema file stays JSON because it is the schema, not a definition.
 
----
-
-## Step 3: Mock data & states for Studio
-
-Two mechanisms, both already in your file:
-
-- **Prop `default`s ARE the mock.** Studio renders the component from them with no backend: that's why every prop carries a realistic default, not an empty string.
-- **The `states/` folder is the state picker.** If your component has multiple layers (a `Switch` on a discriminant: wizard steps, inline↔focused), enumerate each layer as `states/<layer>.yaml` and **studio** automatically shows a pill per state; clicking one sets the discriminant and that layer draws itself ([07](/design/studio)). PriceCard is single-view, so it needs none.
-
----
-
-## Step 4: Lint, then deploy
+## See it
 
 ```bash
-# Validation is Studio's job: the schema checks as you type; the full lint
-# (tokens, state rules, structure) runs at publish and blocks on any error
-unoverse build    # nodes synthesize from your definitions at boot
+unoverse studio
 ```
 
-Component nodes are **definition-backed**: one universal executor serves every component, and the platform synthesizes a node per definition at boot, there is no code generation. The restart just picks up your new definition. Your `PriceCard` is now:
+Open **Components** and find **pricecard**. It renders from the prop defaults with no
+backend involved, which is why the defaults matter. Open the code view and the definition
+sits beside the live preview: edit, save, and the preview follows.
 
-- a **node** any workflow can use: copy it from **studio** (**⧉ Copy for Canvas**) and paste (`Cmd+V`) onto the **canvas**, wire data into its props, and
-- an **MCP resource** every channel (web, native, **studio**) renders natively.
+A component with a state tree gets one pill per public state, taken straight from the tree.
+This card has none, so it shows none.
 
----
+## Ship it
 
-## Step 5: See it in Studio
+```bash
+unoverse login
+unoverse deploy studio
+```
 
-Open **studio** (served by the platform: see [07, **studio**](/design/studio)):
+Lint runs first and blocks on any error, so nothing broken reaches a universe. Once it
+lands, your card is a node any workflow can use: open it in **studio**, click **Copy for
+Canvas**, and paste it onto a workflow with `Cmd+V`.
 
-1. Find **PriceCard** in the component list.
-2. **Mock mode**: it renders from your prop defaults; multi-state components get a state picker from their `states/` folder, this is your Storybook.
-3. **Live mode**: wire it into a workflow on the **canvas** and watch a real agent stream real data into it.
+Edits to a component that already shipped apply live. Publishing a brand new component adds
+it to the set the platform loads at boot.
 
-If it looks right in **studio**, it looks right in production: **studio** is just another MCP client using the same SDK and the same stream ([02](/design/sdui-and-mcp-apps) explains why).
+## Next steps
 
----
+<Card title="Components" icon="square-dashed" href="/design/components" horizontal>
+States, layouts, and everything a component can show.
+</Card>
 
-## Quick-Start Checklist
-
-- [ ] Project created in Studio (New Project); component authored in it with a full envelope
-- [ ] `whenToUse` written outcome-first (the AI picks components by it)
-- [ ] Every `bind` has a matching prop **with a default**, workflow-fed props marked `input: true`
-- [ ] Zero raw values: token names only in every `style`
-- [ ] Prop defaults realistic (they ARE the mock); multi-layer components enumerate `states/`
-- [ ] Studio preview clean (mock, then live); publish passes lint with 0 errors
-- [ ] Previewed in **studio** (mock states, then live)
-
----
-
-**Next:** [02, SDUI & MCP Apps](/design/sdui-and-mcp-apps), the model behind what you just did.
+<Card title="Coming from React" icon="repeat" href="/design/coming-from-react" horizontal>
+Every framework reflex, and what it becomes here.
+</Card>

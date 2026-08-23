@@ -3,49 +3,61 @@ sidebarTitle: "Coming from React"
 title: "Coming from React"
 ---
 
-**Every instinct you have has a home here: it's just data now.**
+Every instinct you already have has a home here. It is just data now.
 
-SDUI feels alien for about a day, because your framework reflexes reach for code. This table is the mapping. The reason it must be data: one definition renders through **every** platform's SDK, web today; iOS, Android, React Native and Flutter as those SDKs land. Anything you could only express in code would fork per platform; data can't fork.
-
-And the state model is not a house invention: it is the orthodox stack you already know, as data. One discriminant per axis is the discriminated-union doctrine ("make impossible states impossible"); nested states with an `initial` at every level are [statecharts](https://statecharts.dev/); a streamed component is a spawned [actor](https://stately.ai/docs/actors) that owns its state and publishes it; and "derive, don't store" is React's own [Choosing the State Structure](https://react.dev/learn/choosing-the-state-structure). If anything, this is *more* React-like than most React codebases.
-
----
+The state model is not a house invention. One discriminant per axis is the
+discriminated-union doctrine. Nested states with an `initial` at every level are
+[statecharts](https://statecharts.dev/). A streamed component is a spawned
+[actor](https://stately.ai/docs/actors) that owns its state and publishes it. Deriving
+rather than storing is React's own
+[Choosing the State Structure](https://react.dev/learn/choosing-the-state-structure).
 
 ## The translation table
 
-| Your reflex | The unoverse move | Doc |
+| Your reflex | The move here | More |
 |---|---|---|
-| `useState(false)` for a toggle | A **dev-named key** the component writes into its own slice (`setValue`), read by `visibleWhen`. App chrome (panels, draft) uses `setAppValue` | [04](/design/state) |
-| `{isOpen && <Panel/>}` conditional render | `visibleWhen: { field: "openPanel", eq: "faq" }` (bare field name = truthy test) | [04](/design/state) |
-| `switch`/ternary between views | `Switch` `on` one discriminant with `cases` | [04](/design/state) |
-| `status: 'loading' \| 'loaded'` discriminated union | the **state tree**: one `view` axis, top-level states public, nested states private, each state owning its layout | [03](/design/components) |
-| An XState machine with nested states | the same shape, minus the transition machinery: no guards, no actions, no event objects; transitions are plain `setValue` writes | [04](/design/state) |
-| Spawning a child actor / `useActor` | a streamed component: the host places it at spawn, subscribes to its public `view`, and never writes into it afterwards | [04](/design/state) |
-| `items.map(item => <Row/>)` | `Each` with `bind: { items: "items" }` + an `app` | [03](/design/components) |
-| `onClick={() => setStep("confirm")}` | `action: { type: "setValue", values: [{ key: "step", value: "confirm" }] }` | [04](/design/state) |
-| A shared `<Button/>` component | An **atom** in `design/marketplace/atoms/`, used via `Ref`: `props` remaps fields, `with` passes literals | [03](/design/components) |
-| Splitting a big component into files | `$include` of `layouts/`/`components/` siblings: but extraction is **earned**, not default | [03](/design/components) |
-| CSS / styled-components / Tailwind values | **Semantic token names** only: `"padding": "lg"`, `"color": "text.primary"`. The values live in `design/<project>/styles/` | [06](/design/styles-and-tokens) |
-| `className="hover:shadow-md"` | `style: { hover: { "shadow": "md" } }` | [06](/design/styles-and-tokens) |
-| Conditional classNames by state | `style.when: [{ field: "deltaPositive", eq: true, apply: { "color": "status.success" } }]` | [04](/design/state) |
-| `const total = items.reduce(…)` in render | **Computed in the workflow node**, streamed as a plain field. Definitions have no expressions: by design | [03](/design/components) |
-| `fetch()` / axios / your own WebSocket | Never. The SDK owns the one MCP path (`tools/call`, elicitation, `/stream`) | [02](/design/sdui-and-mcp-apps) |
-| A context/store for "is the AI typing" | Locked: derived flags (`isStreaming`, `isEmpty`) are handed to you; project them | [04](/design/state) |
-| Managing the mic / audio / call state | Locked: the SDK voice service owns audio; you branch a `Switch` on the projected `callState` | [04](/design/state) |
-| A new widget library / npm UI package | No. Compose the **closed primitive set**: bars are `Box`+`Each`, an accordion is `visibleWhen` | [02](/design/sdui-and-mcp-apps) |
-
----
+| `useState(false)` for a toggle | A key you name, written into the component's own slice with `setValue`, read by `visibleWhen` | [State](/design/state) |
+| `{isOpen && <Panel/>}` | `visibleWhen: { field: openPanel, eq: faq }`, or a bare field name for truthy | [State](/design/state) |
+| A ternary between two views | `Switch` on one discriminant, with `cases` | [State](/design/state) |
+| `status: 'loading' \| 'loaded'` | The state tree: one `view` axis, top-level states public, nested states private | [Components](/design/components) |
+| An XState machine | The same shape without the transition machinery. No guards, no actions, no event objects | [State](/design/state) |
+| Spawning a child actor | A streamed component. The host places it once and never writes into it again | [State](/design/state) |
+| `items.map(item => <Row/>)` | `Each` with `bind: { items: items }` and an `app` subtree | [Components](/design/components) |
+| `onClick={() => setStep("confirm")}` | `action: { type: setValue, values: [{ key: step, value: confirm }] }` | [State](/design/state) |
+| A shared `<Button/>` | An atom, composed with `Ref`. `props` remaps fields, `with` passes literals | [Components](/design/components) |
+| Splitting a big component up | `$include` of a sibling file, but extraction is earned rather than automatic | [Components](/design/components) |
+| CSS, styled-components, Tailwind | Semantic token names only. The values live in `design/<org>/styles/` | [Styles and tokens](/design/styles-and-tokens) |
+| `className="hover:shadow-md"` | `style: { hover: { shadow: md } }` | [Styles and tokens](/design/styles-and-tokens) |
+| Conditional classNames | `style.when`, a list of conditions each applying its own style patch | [State](/design/state) |
+| `const total = items.reduce(…)` | Computed in the workflow node and streamed in as a plain field | [Components](/design/components) |
+| `fetch()`, axios, your own socket | Never. The SDK owns the one MCP path | [How it works](/design/sdui-and-mcp-apps) |
+| A store for "is the AI typing" | Handed to you as derived flags. Project them, never simulate them | [State](/design/state) |
+| Managing the mic or call state | Handed to you as `callState`. Branch a `Switch` on it | [State](/design/state) |
+| Reaching for a widget library | Compose the closed primitive set instead | [How it works](/design/sdui-and-mcp-apps) |
 
 ## The three habit-breakers
 
-Most confusion is one of these three, so name them up front:
+Almost all early confusion is one of these.
 
-1. **No expressions.** You cannot compute, concatenate, or compare beyond `eq`/`ne`/`in`/truthy. If you're missing a value, the workflow node sends it. This feels limiting for an hour and then becomes the feature: definitions stay verifiable, portable, and safe for an AI to write.
-2. **No invented vocabulary.** Primitives are closed. Style **keys** are closed (the cross-platform contract: an invented key renders nowhere). Style **values** are token names. The linter and schema hold all three lines; when you hit a wall, the answer is composition or a token, not a new word.
-3. **No plumbing.** State transport, streaming, voice, reconnection, turn identity: all locked inside the SDK and the MCP standard. You write what things look like and which keys they read; everything that moves data is someone else's (solved) problem.
+**No expressions.** You cannot compute, concatenate or compare beyond `eq`, `ne`, `in` and
+truthy. A value you are missing is one the workflow node sends. This constrains you for about
+an hour, and then it is the feature: a definition stays verifiable, portable, and safe for an
+AI to write.
 
----
+**No invented vocabulary.** Primitives are closed, style keys are closed, and style values
+are token names. An unknown style key renders nowhere on any platform, so it is always a typo
+or a web-ism that would not port. When you hit the wall, the answer is composition or a new
+token.
 
-**Why it's worth it:** the same file you write in [01. Quick Start](/design/quick-start) is the file a Flutter user renders natively. There is no "port to mobile" project later: that's the entire bet of the platform.
+**No plumbing.** State transport, streaming, voice, reconnection and turn identity all sit
+inside the SDK. You write what things look like and which keys they read.
 
-**Next:** [03, Components](/design/components).
+## Next steps
+
+<Card title="Components" icon="square-dashed" href="/design/components" horizontal>
+States, layouts, and everything a component can show.
+</Card>
+
+<Card title="State" icon="workflow" href="/design/state" horizontal>
+How a component and the app around it stay in step.
+</Card>

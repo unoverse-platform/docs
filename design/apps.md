@@ -23,11 +23,10 @@ design/<project>/apps/acmechatlayout/
 │   ├── main.yaml        #   the base: the core chat alone
 │   ├── products.yaml    #   a card entered "products" → core + the cards rail
 │   └── detail.yaml      #   a card entered "detail"   → core + the pinned page
-├── components/          # app-local partials (core, header, composer-bar, turns, …)
-└── (no states/ folder — retired 2026-08-22: every drawing lives in layouts/)
+└── components/          # app-local partials (core, header, composer-bar, turns, …)
 ```
 
-There is **no `<name>.yaml`**: the manifest is the single contract file. Same grammar as components ([03](/design/components)): a component declares a `view` tree; an app declares a `states:` tree. Each layout is a complete arrangement: typically `{ "$include": "components/core" }` plus that state's slot, so shared chrome lives once in `components/` and every layout includes it.
+There is **no `<name>.yaml`**: the manifest is the single contract file. Same grammar as components ([Components](/design/components)): a component declares a `view` tree; an app declares a `states:` tree. Each layout is a complete arrangement: typically `{ "$include": "components/core" }` plus that state's slot, so shared chrome lives once in `components/` and every layout includes it.
 
 ```yaml
 # manifest.yaml: the whole app in one file (design/sab/apps/sab-chat, as shipped)
@@ -62,13 +61,13 @@ autoTrigger: false
 
 What the tree means, line by line:
 
-- **Top-level order IS the priority ladder.** The base comes first; the rest are reaction states in priority order. When hosted components sit in different views, the app enters the FIRST of its states any component matches ([04](/design/state) rule 4). A higher state cancels the claims below it, so release always lands on the base. `stateOrder` is **derived** from this tree; it is no longer authored (*legacy:* an authored `stateOrder` list survives only for apps without a tree).
+- **Top-level order IS the priority ladder.** The base comes first; the rest are reaction states in priority order. When hosted components sit in different views, the app enters the FIRST of its states any component matches ([State](/design/state) rule 4). A higher state cancels the claims below it, so release always lands on the base. `stateOrder` is **derived** from this tree; it is no longer authored (*legacy:* an authored `stateOrder` list survives only for apps without a tree).
 - **Nesting IS containment.** `welcome` exists only inside `main`: the compiler strips a declared base substate from every non-base arrangement, so no hand-written guard polices it. The substate's own file keeps its condition (`visibleWhen: isEmpty`); the first declared substate is the viewer's landing default.
 - **The shell is not declared.** The conversation timeline is `main`'s own content, included by the shared chrome and legitimately drawn beside the rail, the page, and under focus. Declaring a state CONTAINS it: declare only what should exist in the base alone.
 - **Each state owns its layout, same-name default.** `focus: {}` draws `layouts/focus`; write `layout:` only when the filename differs. An app with a single state is simply always in it.
 - Reaction is by **name-match** with the hosted component's public views; `reactsTo: <otherName>` on a state is the rare escape hatch for vocabulary mismatches.
 
-**States vs the base's moods: the rearrange rule.** *If a component causes the app to rearrange, it's a top-level state. If the app itself knows it and wouldn't move, it's a contained substate of the base.* Local moods (`welcome` on an empty conversation, a voice layout's call phases on `callState`) branch inside the base via the normal condition vocabulary ([04](/design/state)); listing them on the ladder is wrong twice: they'd outrank reactions, and they'd draw inside reaction states.
+**States vs the base's moods: the rearrange rule.** *If a component causes the app to rearrange, it's a top-level state. If the app itself knows it and wouldn't move, it's a contained substate of the base.* Local moods (`welcome` on an empty conversation, a voice layout's call phases on `callState`) branch inside the base via the normal condition vocabulary ([State](/design/state)); listing them on the ladder is wrong twice: they'd outrank reactions, and they'd draw inside reaction states.
 
 ---
 
@@ -76,7 +75,7 @@ What the tree means, line by line:
 
 > **The app is always the ACTIVE state's layout total: nothing else, ever.**
 
-Widths are declared with the neutral `appWidth` key, always a **named org size** from `styles/semantic/app-sizes.yaml` (`chat` · `chat-slim` · `rail` · `panel`: served on the theme, resolved by the SDK like any token). Two declaration points, both inside a layout:
+Widths are declared with the neutral `appWidth` key, normally a named org size from `styles/semantic/app-sizes.yaml` (`chat` · `chat-slim` · `rail` · `panel`: served on the theme, resolved by the SDK like any token). Two declaration points, both inside a layout:
 
 ```yaml
 # components/core.yaml: the chat column: a panel, always open, exactly `chat` wide
@@ -102,7 +101,7 @@ So the width is one of a small known set by construction: the base layout is the
 
 The rules (all lint-enforced):
 
-- **Named sizes only.** Raw CSS in `appWidth` is an error: retuning a size is one edit in app-sizes.
+- **Prefer a named size.** A bare name must exist in `styles/semantic/app-sizes.yaml`, or the lint names the ones that do. Raw CSS is accepted (`min(50vw, 760px)`), and `flex` takes whatever host space is left, but a name keeps the org on one scale and makes retuning a size one edit.
 - **One declaration per panel.** The panel's `appWidth` sizes its box *and* grows the app: a panel (or its frame) never declares `width`/`flex` of its own.
 - **Never on a layout root.** The root is the arrangement; panels inside it carry the widths.
 - **Never `visibleWhen`-guarded.** A conditional arrangement is a *state* with its own layout: not a guarded pane.
@@ -113,7 +112,7 @@ The rules (all lint-enforced):
 
 ## App-only primitives
 
-- **`Timeline`**: renders the conversation (you supply the `user`/`assistant` turn subtrees; per-turn scope carries `text`, `streaming`, …). The conversation bucket is locked to the stream ([04](/design/state)).
+- **`Timeline`**: renders the conversation (you supply the `user`/`assistant` turn subtrees; per-turn scope carries `text`, `streaming`, …). The conversation bucket is locked to the stream ([State](/design/state)).
 - **`ComponentSlot`**: where components render. Two forms:
 
 ```yaml
@@ -132,7 +131,7 @@ Rules that bite:
 - ✅ **A state's layout surfaces its own view.** The layout a state owns must contain a slot selecting that state's view: the tree claims the instance; the slot renders it (guard-enforced).
 - ✅ **A slot's single occupant fills the slot.** A `limit: 1` slot gives its occupant the frame's full height automatically, zero per-layout height styling. Multi-occupant slots (a rail) keep content-sized instances.
 - ✅ **One instance → one placeholder.** While a component's view matches an app state, it renders in that state's slot: lifted out of the flow, never painted twice. Its own ✕ switches it back and it returns to the flow.
-- ❌ Never size or restyle a component from the app: a component owns its states ([03](/design/components)); the app owns only the framing.
+- ❌ Never size or restyle a component from the app: a component owns its states ([Components](/design/components)); the app owns only the framing.
 
 **In-layout slots without a state of their own** are still normal: an overlay (e.g. a wizard in a focus overlay over the chat) lives inside the core, claims its view, and changes no width. Reach for a top-level state when the *arrangement* changes; keep an overlay in-core when only a layer appears.
 
@@ -148,7 +147,7 @@ Declare `"service": "voice"` in the manifest; the channel instantiates the nativ
 
 ## Naming & discoverability: how the AI picks the app
 
-> **Canonical guide: `docs/nodes/node-discoverability.md`**, every rule there applies to
+> **Canonical guide: [Node discoverability](/nodes/node-discoverability)**, every rule there applies to
 > apps and components verbatim, at *higher* stakes: apps are ranked against the
 > **user's own words** (`findIntent`), not a planner's task query. Bad meta makes an
 > entire app invisible. This section is the design-side summary.
@@ -203,8 +202,18 @@ one plain line about what it is? Does the category name the domain, not the buil
 - [ ] `binding.workflow` + `binding.trigger` real (the app owns them); `preview` seeds each state's mock
 - [ ] Flow slot generic (`select: {}`); reaction slots select on the public axis (`view`), never `type`
 - [ ] `whenToUse` utterance-shaped; `description` ≤120 chars
-- [ ] Preview in **studio**: state pills, then live ([07](/design/studio)); publish passes lint with 0 errors
+- [ ] Preview in **studio**: state pills, then live ([studio](/design/studio)); publish passes lint with 0 errors
 
 ---
 
-**Next:** [06. Styles & Tokens](/design/styles-and-tokens).
+**Next:** [Styles and tokens](/design/styles-and-tokens).
+
+## Next steps
+
+<Card title="Styles and tokens" icon="palette" href="/design/styles-and-tokens" horizontal>
+Your brand, as values every definition resolves against.
+</Card>
+
+<Card title="Studio" icon="layout-dashboard" href="/design/studio" horizontal>
+Preview an app against mock state, then live.
+</Card>

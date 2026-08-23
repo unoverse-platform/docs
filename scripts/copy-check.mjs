@@ -69,8 +69,13 @@ function checkMarkdown(file) {
       add("warn", rel, n, "run-command should be a code block", inlineCmd[1]);
   }
 
-  // Sentence length, measured across the paragraph rather than the line
-  const prose = lines.map((l) => l.text).join(" ");
+  // Sentence length, measured across the paragraph rather than the line.
+  // A heading, or a lead-in ending in a colon, TERMINATES a sentence: without this the
+  // joiner runs "Reading it top to bottom:" straight into the next section's prose and
+  // reports one 31-word sentence that nobody wrote.
+  const prose = lines
+    .map((l) => (/^\s*#/.test(l.raw) ? "." : /:\s*$/.test(l.text) ? `${l.text} .` : l.text))
+    .join(" ");
   for (const s of prose.split(/(?<=[.!?])\s+/)) {
     const words = s.trim().split(/\s+/).filter(Boolean);
     if (words.length > 28) {

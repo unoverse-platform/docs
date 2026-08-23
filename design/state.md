@@ -25,7 +25,7 @@ All three live in the client's in-memory store, rebuilt from the stream on reloa
 
 ## The reaction contract
 
-The contract is six rules (canon: `UNOVERSE_STATE_MODEL.md` §5). Learn them once; every moment in every app is these rules replaying.
+The contract is six rules (canon: [UNOVERSE_STATE_MODEL](/unoverse/UNOVERSE_STATE_MODEL) §5). Learn them once; every moment in every app is these rules replaying.
 
 ### 1. A component is data + a state tree; each state owns its layout
 
@@ -48,7 +48,7 @@ state:
 ```
 
 - **Top-level states of the `view` axis are PUBLIC**: the component's entire interface. Everything nested below is **PRIVATE**: invisible to apps, invisible to senders. Here the public menu is `products · detail`; `step` and its states do not exist outside the card.
-- **`layout:` is optional.** A state with no declaration draws the layout of its own name; `{}` is a complete state. Write `layout:` only when the filename differs. Substate drawings differ by convention: a step's file is prefixed with its axis (`step-register`, `callState-idle`), so `layouts/` reads at a glance: unprefixed files are arrangements, prefixed files are steps ([03 §Naming the drawings](/design/components)).
+- **`layout:` is optional.** A state with no declaration draws the layout of its own name; `{}` is a complete state. Write `layout:` only when the filename differs. Substate drawings differ by convention: a step's file is prefixed with its axis (`step-register`, `callState-idle`), so `layouts/` reads at a glance: unprefixed files are arrangements, prefixed files are steps ([Components: Naming the drawings](/design/components)).
 - **The shell vs the steps.** A state's own layout is its SHELL: always on while the state is active, never a choice. Its nested substates are the STEPS: the only choices inside it, addressed by state name. One step, or none, is not a choice.
 
 This one placement decision replaces judgment calls, guided by the rearrange rule: **if the app must rearrange to show it, make it a public state; if the app wouldn't move, nest it privately.** Privacy is the default; promotion is deliberate.
@@ -153,7 +153,7 @@ action:
     - { key: step, value: route }
 ```
 
-Anything that is not one of these two routes to the **server as a native MCP call** ([02](/design/sdui-and-mcp-apps)): sending a message is `tools/call`; answering a waiting wizard is an elicitation. You never build transport.
+Anything that is not one of these two routes to the **server as a native MCP call** ([How it works](/design/sdui-and-mcp-apps)): sending a message is `tools/call`; answering a waiting wizard is an elicitation. You never build transport.
 
 ---
 
@@ -165,14 +165,14 @@ All reactivity is `eq` / `ne` / `in` / truthy applied four ways:
 |---|---|---|
 | **`visibleWhen`** | a small thing appears/disappears | `{ "field": "isLookingUp", "eq": true }` |
 | **`Switch`** | a whole view swaps (public states, wizard steps) | `"on": "view", "cases": { … }` |
-| **`Each`** | repeat: a literal `items: []` list or a bound array | see [03](/design/components) |
+| **`Each`** | repeat: a literal `items: []` list or a bound array | see [Components](/design/components) |
 | **`style.when`** | the same element restyles by state | `[{ "field": "deltaPositive", "eq": true, "apply": { "color": "status.success" } }]` |
 
 ✅ Mutually exclusive views belong in **one `Switch`**; a case never re-guards its own discriminant. Name **one field per axis** (`view`, `step`, `callState`): never boolean soup. This is the discriminated-union doctrine ("make impossible states impossible"; see React's [Choosing the State Structure](https://react.dev/learn/choosing-the-state-structure)).
 
 ### The tree enumerates: viewable, served, ordered
 
-Because the root DECLARES the state tree, everything downstream is a projection: **studio** shows one pill per public state with the active state's steps beneath ([07](/design/studio)), and the **served manifest** lists the public menu for any MCP caller (`publicStates`, `initialView`). Add a state to the tree and it appears everywhere. No fixture, no drift.
+Because the root DECLARES the state tree, everything downstream is a projection: **studio** shows one pill per public state with the active state's steps beneath ([studio](/design/studio)), and the **served manifest** lists the public menu for any MCP caller (`publicStates`, `initialView`). Add a state to the tree and it appears everywhere. No fixture, no drift.
 
 ---
 
@@ -204,4 +204,14 @@ Because the root DECLARES the state tree, everything downstream is a projection:
 
 ---
 
-**Next:** [05. Apps (MCP Apps)](/design/apps).
+**Next:** [Apps](/design/apps).
+
+## Next steps
+
+<Card title="Apps" icon="layout-template" href="/design/apps" horizontal>
+The shell your components render inside.
+</Card>
+
+<Card title="Styles and tokens" icon="palette" href="/design/styles-and-tokens" horizontal>
+Your brand, as values every definition resolves against.
+</Card>

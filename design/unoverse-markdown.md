@@ -1,6 +1,6 @@
 ---
-sidebarTitle: "unoverse Markdown"
-title: "unoverse Markdown"
+sidebarTitle: "unoverse markdown"
+title: "unoverse markdown"
 ---
 
 **Markdown is a language for formatting text. unoverse Markdown is a language for streaming UI.**
@@ -112,6 +112,12 @@ The prompt block never lists the components. A hand-written vocabulary drifts fr
 actually renders, so the schema is compiled from the atoms marked `category: markdown`.
 Adding an atom offers the model a new component on the next call, with no prompt to edit.
 
----
+## Next steps
 
-**Next**: [Validate and Ship](/design/validate-and-ship)
+<Card title="Components" icon="square-dashed" href="/design/components" horizontal>
+States, layouts, and everything a component can show.
+</Card>
+
+<Card title="Validate and ship" icon="shield-check" href="/design/validate-and-ship" horizontal>
+What the lint enforces, and what only you can judge.
+</Card>

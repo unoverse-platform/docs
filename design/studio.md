@@ -1,6 +1,6 @@
 ---
-sidebarTitle: "Studio"
-title: "Studio"
+sidebarTitle: "studio"
+title: "studio"
 ---
 
 **Build and test your work: mock states in isolation, or live against a real platform, on every channel at once.**
@@ -9,36 +9,36 @@ title: "Studio"
 your files straight off disk, and needs Node and nothing else.
 
 ```bash
-npm install -g unoverse
 unoverse studio
 ```
 
-It opens on http://localhost:4108 and finds your project by looking for `design/` in the current
-folder, any parent, or a single folder directly below. So it works from inside your project
-or from the folder you created it in. [Studio](/onboarding/studio) covers the setup in full.
-
----
+It opens on http://localhost:4108 and finds your project by looking for `design/` in the
+current folder, any parent, or a single folder directly below. So it works from inside your
+project or from the folder you created it in. [Studio](/onboarding/studio) covers the install.
 
 ## What you get
 
-```
-┌────────────────────────────────────────────────────────────────┐
-│  STUDIO                                      [ Mock | ● Live ] │
-│ ┌──────────────────┐  ┌──────────────────────────────────────┐ │
-│ │ DEFINITIONS      │  │ NATIVE PREVIEW: per channel          │  │
-│ │  components/…    │  │  edit the definition ⇒ preview        │ │
-│ │  apps/…     │  │  updates live (MCP resource subscribe)│ │
-│ │  [props / states]│  │                                       │ │
-│ └──────────────────┘  └──────────────────────────────────────┘ │
-│  DEVTOOLS: state inspector · component stream log               │
-└────────────────────────────────────────────────────────────────┘
-```
+A definitions rail on the left, a native preview on the right, and DevTools beneath it. The
+nav is grouped in three:
 
-Because **studio** is **just another MCP client**: same SDK, same definition resources, same component stream as production, what you see is what ships ([02](/design/sdui-and-mcp-apps)). Hot reload isn't a dev trick: it's the same `resources/subscribe → updated` mechanism that live-updates production channels.
+| Group | Screens |
+|---|---|
+| Build | **Apps**, **Components**, **Atoms**, **Styles** |
+| AI | **Skills**, **Prompt Blocks** |
+| Code | **Nodes** |
 
-The top nav is flat: **Apps · Components · Styles · Nodes · AI**, and a header **org switcher** scopes the whole **studio**: the Apps list, the Components list (the design system + the selected org's own components only), and the preview theme. **All** shows everything cross-org, with an org badge per card. Atoms have no **studio** view: they're authoring-time only; the server expands them before anything is served.
+A header org switcher scopes the whole of **studio**: the Apps list, the Components list,
+and the preview theme. The Components list shows the design system plus the selected org's
+own components. **All** shows every org at once, with a badge per card.
 
----
+Atoms preview but never serve. The server expands every `Ref` before anything leaves it, so
+no channel ever receives an atom.
+
+**studio** is another MCP client: the same SDK, the same definition resources, the same
+component stream as production. So hot reload is not a development trick, it is the resource
+subscription that live-updates production channels
+([How it works](/design/sdui-and-mcp-apps)).
+
 
 ## Mode A: Mock (isolation)
 
@@ -49,7 +49,7 @@ Render a component or app with **mock data and mock history**, no backend logic 
 Two mechanisms, zero hand-maintained fixtures:
 
 1. **Prop `default`s are the mock data.** Studio renders every definition from its declared defaults: which is why defaults should be realistic content, not empty strings.
-2. **States on top, steps below.** The switcher renders the definition's declared state tree ([03](/design/components)), and nothing else:
+2. **States on top, steps below.** The switcher renders the definition's declared state tree ([Components](/design/components)), and nothing else:
    - the **public states** (the top level of the `view` axis) are **pills in the sub-navigation**, one per state, in tree order. A flat component with no tree shows none.
    - selecting a state reveals **its steps beneath, by step name**: the state's nested substates, never layout filenames (those are plumbing). The state's own shell is not listed (it is always on), and one drawing is not a choice: a single-layout state shows nothing below.
 
@@ -87,19 +87,28 @@ Use Live mode to verify the things mock can't:
 
 Debugging order, always: **stream log** (did it arrive?) → **state inspector** (is it in the bucket I read?) → the definition (is my bind/condition right?). Never start by editing the definition on a guess: see the data first.
 
----
-
 ## The full loop
 
+Edit the definition, watch it in mock, prove it in live, then publish.
+
 ```bash
-vi design/acme/components/pricecard/pricecard.yaml   # 1. edit (schema validates as you type)
-unoverse build              # 2. the node re-synthesizes from the definition at boot
-# 3. Studio: mock states → looks right
-# 4. Studio: live mode → streams right
+unoverse deploy studio
 ```
 
-For pure definition edits (layouts, styles, copy), the resource subscription refreshes the preview live: no restart at all. A restart is only needed when the component's **node** must change (new props, a new component, discovery meta), because node definitions synthesize from your JSON at boot: there is no code generation step, ever.
+Layouts, styles and copy refresh in the preview as you save, because the resource
+subscription carries them. Nothing restarts.
 
----
+Publishing is what a **new** component needs, or one whose node contract changed: new props,
+a new name, changed discovery meta. The platform loads the set of definitions at boot and
+builds one node from them, so a definition it has never seen has to arrive first. There is no
+code generation at any point.
 
-**Next:** [08. Validate & Ship](/design/validate-and-ship).
+## Next steps
+
+<Card title="Validate and ship" icon="shield-check" href="/design/validate-and-ship" horizontal>
+What the lint enforces, and what only you can judge.
+</Card>
+
+<Card title="Troubleshooting" icon="wrench" href="/design/troubleshooting" horizontal>
+Symptom, cause and fix for the mistakes that recur.
+</Card>

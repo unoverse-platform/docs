@@ -1,127 +1,119 @@
 ---
-sidebarTitle: "SDUI & MCP Apps"
-title: "SDUI & MCP Apps"
+sidebarTitle: "How it works"
+title: "How it works"
 ---
 
-**UI is data. MCP is the transport. This is the standard: not one option among several.**
+A definition is data, so it can travel. That one property is where every rule in this
+section comes from.
 
----
+## What you write, and what draws it
 
-## The model in one picture
+You author YAML definitions and token files. Nothing you write is compiled, bundled or
+shipped inside a client.
 
-```
-  YOU WRITE (data)                 THE PLATFORM PROVIDES (code)
-┌──────────────────────┐        ┌─────────────────────────────────┐
-│ design/ definitions  │        │ SDK renderer (per platform)     │
-│  components/ atoms/  │  MCP   │  web · Flutter · iOS · Android  │
-│  orgs/<org>/         │ ─────► │  dumb, generic, style-free      │
-│    apps/ styles/     │ stream │                                 │
-│    components/       │        │                                 │
-└──────────────────────┘        │ Engine: workflows stream data   │
-   JSON + tokens only           │ into your components            │
-                                └─────────────────────────────────┘
-```
+Each client has an SDK that draws your definition with that platform's own native controls.
+The SDK hardcodes no feature, no style and no UI concept. It resolves token names and moves
+state keys, and that is the whole of it.
 
-- **You** author neutral JSON definitions and token files.
-- **The SDK** on each platform renders them natively. It hardcodes **no feature, no style, no UI concept**: it resolves tokens and moves your state keys, nothing else.
-- **The engine** runs workflows whose agents pick your components (by `whenToUse`) and stream data into them.
+Between the two sits your universe, which serves each definition over MCP as a resource with
+a `unoverse://` address. Clients subscribe to those resources, so an update notification is
+how a change reaches a running app. The same mechanism serves themes, at
+`unoverse://theme/<name>`.
 
-### Why SDUI
-
-| Benefit | How you feel it |
+| What this buys you | How you feel it |
 |---|---|
-| **Zero-release UI changes** | Edit a definition or a token → every channel updates on refresh. No app-store release, no rebuild per platform. |
-| **One definition, every platform** | The same JSON renders as React on web and native views elsewhere. You never fork per platform. |
-| **Agents can drive UI** | Because UI is data, a workflow/agent can select, stream, and update it at runtime: the whole point of the platform. |
-| **Rebrand = data** | All styling is tokens; a theme swap touches `styles/` only ([06](/design/styles-and-tokens)). |
-| **Provable dev loop** | **studio** renders through the exact production path: what you preview is what ships ([07](/design/studio)). |
-
----
+| No release cycle | Edit a definition or a token, and every channel updates on refresh |
+| One definition, every platform | The same file draws on web today, and natively on iOS, Android and Flutter as those SDKs land |
+| Agents can drive interface | Because UI is data, a workflow can select it, fill it and update it while it runs |
+| A rebrand is a data change | Every visual value is a token, so a theme swap touches `styles/` alone |
 
 ## The closed primitive set
 
-Definitions compose ONLY these. The set is frozen: adding to it is an SDK change, and a build-failing guard test enforces that.
+Definitions compose from these and nothing else. Adding to the set is a change to every SDK,
+so a guard test fails the build on any attempt.
 
 | Group | Primitives |
 |---|---|
-| **Structure** | `Box`, `Stack`, `Row`, `Column`, `Each`, `Switch`, `ComponentSlot`, `Timeline` |
-| **Leaves** | `Text`, `Image`, `Button`, `Input`, `Markdown`, `Skeleton`, `Icon` |
-| **Helpers** | `Ref` (use an atom), `$include` (pull in a sibling file) |
-| **Conditions** | `eq`, `ne`, `in`, truthy: used by `visibleWhen`, `Switch`, `style.when` |
+| Structure | `Box` `Stack` `Row` `Column` `Each` `Switch` `ComponentSlot` `Timeline` |
+| Leaves | `Text` `Image` `Button` `Input` `Markdown` `Skeleton` `Icon` |
+| Helpers | `Ref` to use an atom, `$include` to pull in a sibling file |
+| Conditions | `eq` `ne` `in`, and a bare field name for truthy |
 
-❌ **Wrong instinct:** "I need a `Chart` / `Accordion` / `Carousel` primitive."
-✅ **Right instinct:** compose it, bars are `Box` + `Each` over data; an accordion is `visibleWhen` on a dev-named state key. If it genuinely cannot be composed, that's a platform conversation, not a definition.
+The instinct this frustrates is reaching for a `Chart`, an `Accordion` or a `Carousel`.
+Compose them instead: bars are `Box` inside `Each`, and an accordion is `visibleWhen` on a
+key you named. Something genuinely uncomposable is a platform conversation, not a definition
+you write around.
 
----
+## One interaction path
 
-## MCP Apps: the standard
+The SDK owns every message that moves. You never build transport.
 
-**An app is an MCP App.** This is not an integration detail; it is the contract every client and every tool in the ecosystem shares:
-
-| Concern | The MCP-standard answer |
+| What happens | How it travels |
 |---|---|
-| **How definitions reach clients** | Served as **MCP resources** (`unoverse://` URIs). Clients subscribe; `resources/updated` notifications ARE hot reload: in dev *and* prod. |
-| **How the app binds to logic** | The app's `manifest.yaml` names its **workflow**. The app owns its workflow: clients pull the app; nothing is pushed by name. |
-| **How a user message is sent** | `tools/call` on the app's trigger tool. Fire-and-forget: results come back over the component stream, never the call result. |
-| **How a form/wizard answers** | Native MCP **elicitation** resolving the held `tools/call`: the agent is literally waiting on the user's answer. |
-| **How UI state arrives** | Run-scoped messages (`COMPONENT_INIT/DATA`, `APP_DATA`, `WORKFLOW_STATE`) on the MCP **`/stream`**. |
-| **How themes arrive** | Served live as MCP resources (`unoverse://theme/<name>`), never baked into an SDK bundle. |
+| A user sends a message | `tools/call` on the app's trigger tool, fire and forget |
+| A form or wizard answers | A native MCP elicitation, resolving the call the Agent is waiting on |
+| Results come back | The component stream, never the call result |
+| UI state arrives | Run-scoped messages on the MCP `/stream` |
 
-**The rule:** a host must NEVER hand-roll its own transport, no bespoke REST send, no custom `user_action` message, no side-channel state push. The SDK owns the one interaction path; every consumer (**studio**, a native app, an external MCP client) shares it. If your channel needs something the path doesn't do, that's a platform gap to raise: not a workaround to build.
+A host must never hand-roll its own send, its own state push or its own message shape. Every
+consumer shares the one path: **studio**, a native app, an external MCP client. A channel
+that needs something the path does not do is a gap to raise.
 
-### The org endpoint + its default app (the front door)
+Voice is the one exception, and it is not yours to wire. Audio frames travel a separate SDK
+socket because binary audio cannot ride the same lane. [State](/design/state) covers what
+that projects into your scope.
 
-Each org is its own MCP endpoint: a self-contained connector / "experience":
+## How a component reaches a conversation
 
-```
-https://api.<domain>/mcp          → all orgs (flattened)
-https://api.<domain>/mcp/<org>    → only that org's apps, as one connector
-```
+Four routes, and every one ends the same way: the SDK draws your definition. Which route
+delivered it tells you where the data came from, and nothing else.
 
-Within an org, **exactly one app's `manifest.yaml` sets `default: true`**, the org's **home** (typically its chat app, e.g. `acmechatlayout`). The endpoint tags that tool with `_meta["unoverse/default"]`, so a client knows which app to open first as the conversation's entry point. A lint rule enforces **at most one `default` per org**.
-
-MCP is pull-based (no "auto-open on connect"): our SDK reads that flag and opens the home app immediately, rendering its arrival `defaultState`; a foreign host (ChatGPT) surfaces it when the user first engages. `default` only answers *"which app is the front door"*: the app's own `defaultState`/`autoTrigger`/`binding` behave exactly as usual. (The old per-app `expose` flag is removed: org scoping is the boundary now.)
-
-### The two lanes (know which carries what)
-
-| Lane | Carries | Scope |
+| Route | Where the data comes from | Workflow involved |
 |---|---|---|
-| **MCP `/stream`** | components, app data, workflow lifecycle: everything that renders | **run-scoped** (this conversation, this app) |
-| **SDK WebSocket** | audio frames (voice) + global cross-app state | global / native I/O |
+| A workflow-bound app | The workflow the app names in its manifest | Yes |
+| A streamed component | The running workflow, emitting into the conversation mid-run | Yes |
+| A self-contained component app | The component itself, which carries its own data | No |
+| A node-hydrated component | A **spatial** data node that fills a card shell it points at | No |
 
-Everything you author reads from the first lane. The second lane belongs to native **services** (like voice): covered in [04, State](/design/state), because it's where "locked" state comes from.
+The last two are discovered rather than pushed. A component is never a callable thing in its
+own right. What an Agent discovers is an ordinary MCP app, and an ordinary `tools/call`
+returns a result carrying the interface.
 
----
+How a component is **shown** is a separate question from how it arrived, and the answer is
+the same for all four. The component owns a public state; the app hosting it reacts to that
+state by name. [State](/design/state) is that contract in full.
 
-## The four ways a component renders
+## Each org is its own endpoint
 
-Every design component reaches the chat by one of **four paths**: two in the workflow world, two discovered natively from **spatial**. **Every path ends identically:** the SDK renders your definition into the conversation. Knowing which path you're on tells you *where the data comes from* and *whether a workflow is involved*. (Canonical: `docs/unoverse/UNOVERSE_MCP_APP_PROTOCOL.md` §"The four ways UI reaches the chat".)
+An org is a self-contained connector, so a client can hold one org without seeing the rest.
 
-| # | Way to render | Where the data comes from | Workflow? |
-|---|---|---|---|
-| **A** | **Workflow-bound app**: you bind a workflow to an app; the workflow drives the whole surface (the app shell, `binding` in the manifest, [05](/design/apps)). | the bound workflow | ✅ |
-| **B** | **Self-contained component app**: the component **is its own MCP app** (a tool + `ui://`); **spatial** surfaces it, the agent reacts natively, and the SDK renders it **as-is**. It carries its own `state`. | the component itself | ❌ |
-| **C** | **Node-hydrated component**: a **spatial** **data node** carries an assigned component **URI** (a card shell); on discovery the node **hydrates** that component with its data and the SDK renders the filled card. | a **spatial** data node | ❌ |
-| **D** | **Streamed component**: a workflow node emits `COMPONENT_INIT`/`DATA` mid-run and the component **streams in** (the classic runtime paint path for **A**). | the running workflow | ✅ |
+```
+https://api.<domain>/mcp          every org
+https://api.<domain>/mcp/<org>    that org alone
+```
 
-**Two worlds:**
-- **A + D: the workflow world.** Assign a workflow; it drives the surface (A) and streams its pieces in (D). Streaming is the standard runtime paint path, not a legacy one.
-- **B + C: the native-MCP-from-spatial world.** The component is **discovered**, not pushed. **B** carries its own data; **C** is a reusable card shell a **spatial** node fills.
+Exactly one app in an org sets `default: true` in its manifest, marking the org's front
+door. The endpoint tags that tool so a client knows which app to open first. Lint allows one
+per org.
 
-**The one rule that keeps B + C pure:** a component is never a callable primitive. The discovered unit is a standard **MCP app** (a tool with a `ui://` resource); the agent does an ordinary `tools/call`, the result carries the UI, and the **SDK** renders it. Nothing component-specific is invented.
+MCP is pull-based, so nothing opens on connect. Our SDK reads the flag and opens the home app
+immediately; a foreign host such as ChatGPT surfaces it when the user first engages.
 
-**This axis is orthogonal to *presentation*.** The four ways are only *how the data arrives*. Once a component is in the store: by **any** of the four, how it's **shown** is the **reaction contract**: the component is a small state machine whose public states are its whole interface (`view`); the hosting app places it at spawn, then reacts by name in its own declared priority order, and never reaches into the component. So a **streamed (D)** product card can write `view: "detail"` and a chat app with a `detail` state enters it and frames the card, exactly the same way a **self-contained (B)** one would. Which of the four delivered it, and how an app presents it, are independent choices: see [04, State](/design/state).
+## Studio is not a harness
 
----
+**studio** is another MCP client. It subscribes to the same resources, receives the same
+component stream, and runs the same renderers as production.
 
-## One path, dev and prod
+So hot reload is not a development trick, it is the resource subscription that live-updates
+production too. And a component that works in **studio** works in production, because there
+is no second path for it to work differently on.
 
-**studio** is **not a special harness**. It is just another MCP client: it subscribes to the same definition resources, receives the same component stream, and runs the same native renderers as production channels. That's why:
+## Next steps
 
-- "Works in **studio**" provably means "works in production."
-- Hot reload in **studio** is the same `resources/subscribe` mechanism that live-updates production channels.
-- Live mode in **studio** is literally production, pointed at local renderers.
+<Card title="Coming from React" icon="repeat" href="/design/coming-from-react" horizontal>
+Every framework reflex, and what it becomes here.
+</Card>
 
----
-
-**Next:** coming from React or Flutter? Read the [02a translation table](/design/coming-from-react) first. Then [03: Components](/design/components), composition, props, and reuse.
+<Card title="Components" icon="square-dashed" href="/design/components" horizontal>
+States, layouts, and everything a component can show.
+</Card>

@@ -1,6 +1,6 @@
 ---
-sidebarTitle: "Lifecycle Hooks"
-title: "Lifecycle Hooks"
+sidebarTitle: "Lifecycle hooks"
+title: "Lifecycle hooks"
 ---
 
 **A hook fires at a moment in a component's life: when the instance is created, or when one of its views opens. The component fetches its own data at that moment.**
@@ -32,7 +32,7 @@ changes on its own schedule, so the component asks for it when it renders.
 | `onEnterView` | the instance **enters one of its states** | data only that state needs |
 
 **The scope key is spelled `layouts`, and its entries are STATE names.** A component
-declares a state tree, and each state owns the layout that draws it ([03](/design/components)),
+declares a state tree, and each state owns the layout that draws it ([Components](/design/components)),
 so scoping a hook to a state also names the moment its drawing appears. The names in the
 list are always states, never layout filenames: the shipped `product-card` declares
 `layouts: [ detail ]`, and `detail` is the state whose shell file is `layouts/product`.
@@ -327,6 +327,12 @@ Is it something else (a live rating, a stock level, a third-party lookup)?
 And if the answer is "the model already knows it", that is not a hook. Content the model
 authored is a prop, fed by the workflow like any other.
 
----
+## Next steps
 
-**Next**: [07, **studio**](/design/studio), see it, test it, on every channel.
+<Card title="Studio" icon="layout-dashboard" href="/design/studio" horizontal>
+Watch a hook fire against a live universe.
+</Card>
+
+<Card title="Analytics" icon="bar-chart-3" href="/design/analytics" horizontal>
+Report the moments that matter to you.
+</Card>
