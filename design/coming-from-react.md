@@ -24,7 +24,7 @@ And the state model is not a house invention: it is the orthodox stack you alrea
 | `items.map(item => <Row/>)` | `Each` with `bind: { items: "items" }` + a `template` | [03](/design/components) |
 | `onClick={() => setStep("confirm")}` | `action: { type: "setValue", values: [{ key: "step", value: "confirm" }] }` | [04](/design/state) |
 | A shared `<Button/>` component | An **atom** in `design/marketplace/atoms/`, used via `Ref`: `props` remaps fields, `with` passes literals | [03](/design/components) |
-| Splitting a big component into files | `$include` of `layouts/`/`states/`/`components/` siblings: but extraction is **earned**, not default | [03](/design/components) |
+| Splitting a big component into files | `$include` of `layouts/`/`components/` siblings: but extraction is **earned**, not default | [03](/design/components) |
 | CSS / styled-components / Tailwind values | **Semantic token names** only: `"padding": "lg"`, `"color": "text.primary"`. The values live in `design/<project>/styles/` | [06](/design/styles-and-tokens) |
 | `className="hover:shadow-md"` | `style: { hover: { "shadow": "md" } }` | [06](/design/styles-and-tokens) |
 | Conditional classNames by state | `style.when: [{ field: "deltaPositive", eq: true, apply: { "color": "status.success" } }]` | [04](/design/state) |

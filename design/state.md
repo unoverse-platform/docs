@@ -48,7 +48,7 @@ state:
 ```
 
 - **Top-level states of the `view` axis are PUBLIC**: the component's entire interface. Everything nested below is **PRIVATE**: invisible to templates, invisible to senders. Here the public menu is `products · detail`; `step` and its states do not exist outside the card.
-- **`layout:` is optional.** A state with no declaration draws the layout of its own name; `{}` is a complete state. Write `layout:` only when the filename differs.
+- **`layout:` is optional.** A state with no declaration draws the layout of its own name; `{}` is a complete state. Write `layout:` only when the filename differs. Substate drawings differ by convention: a step's file is prefixed with its axis (`step-register`, `callState-idle`), so `layouts/` reads at a glance: unprefixed files are arrangements, prefixed files are steps ([03 §Naming the drawings](/design/components)).
 - **The shell vs the steps.** A state's own layout is its SHELL: always on while the state is active, never a choice. Its nested substates are the STEPS: the only choices inside it, addressed by state name. One step, or none, is not a choice.
 
 This one placement decision replaces judgment calls, guided by the rearrange rule: **if the template must rearrange to show it, make it a public state; if the template wouldn't move, nest it privately.** Privacy is the default; promotion is deliberate.
@@ -76,7 +76,7 @@ Match: the template enters its own state of that name and that state's layout dr
 A template declares its own state tree in its manifest, and one declaration answers everything:
 
 ```yaml
-# manifest.yaml (design/sab/templates/sab-chat-layout, as shipped)
+# manifest.yaml (design/sab/templates/sab-chat, as shipped)
 states:
   main:                 # the base arrangement, always first
     states:
@@ -142,7 +142,7 @@ select: { from: all, where: { field: view, eq: focus }, limit: 1 }
 ## The two writes
 
 - **`setValue`** → the component's **own slice**: its answers, its `step`, its `view`. This is the only thing a component ever writes.
-- **`setTemplateValue`** → template state: **only for what is genuinely the template's own** (a disclosure panel, the composer draft). ❌ A component chaining `setTemplateValue` to open a surface is the deprecated bridge: the linter flags it; the template tree reacts by name instead.
+- **`setTemplateValue`** → template state: the template's own chrome (a disclosure panel, the composer draft). A component may write it too — chrome drawn inside a template via `Ref` has no slice of its own, so template state is the only state in scope, and one direction still holds: the button writes a key, whoever cares reacts. ❌ What stays deprecated is the **focus bridge**: writing `defaultState` to move the template to another surface. Change the view with `setValue` and let the template tree react by name.
 
 ```yaml
 # a wizard option: record the answer + advance: one setValue, own slice

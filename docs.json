@@ -29,7 +29,7 @@
   },
   "styling": {
     "eyebrows": "breadcrumbs",
-    "codeblocks": "system"
+    "codeblocks": "dark"
   },
   "icons": {
     "library": "lucide"
@@ -57,9 +57,10 @@
             "pages": [
               "index",
               "onboarding/how-it-fits-together",
+              "onboarding/cli",
               "onboarding/studio",
               "onboarding/platform",
-              "onboarding/cli"
+              "onboarding/skills"
             ]
           },
           {
@@ -77,8 +78,7 @@
           {
             "group": "Ship It",
             "pages": [
-              "onboarding/deployment",
-              "onboarding/update-unoverse"
+              "onboarding/deployment"
             ]
           }
         ],
@@ -265,7 +265,7 @@
     },
     {
       "source": "/onboarding/09-update-unoverse",
-      "destination": "/onboarding/update-unoverse"
+      "destination": "/onboarding/cli"
     },
     {
       "source": "/design/01-quick-start",
@@ -378,6 +378,10 @@
     {
       "source": "/runbooks/09-restart-rebuild",
       "destination": "/runbooks/restart-rebuild"
+    },
+    {
+      "source": "/onboarding/update-unoverse",
+      "destination": "/onboarding/cli"
     }
   ]
 }

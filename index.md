@@ -3,11 +3,13 @@ sidebarTitle: "Welcome"
 title: "unoverse"
 ---
 
-unoverse is a platform for building AI Agents that represent your brand.
+unoverse is a platform for building AI Agents that represent your brand. Your content, your Agents and the infrastructure they run on live in one governed platform.
 
 Your customers increasingly meet your brand through AI. An Agent built on unoverse makes that meeting a real brand experience. It answers from your own content. It speaks through interfaces you design. It works on every channel you connect, from your website and mobile apps to new AI channels like ChatGPT.
 
-You build, manage, and observe Agents visually in **Canvas**. You create everything an Agent needs in **Studio**: interfaces, nodes, services, skills, and MCPs. And **Spatial** gives every Agent exactly what it needs, exactly when it needs it. The platform is enterprise-grade from the ground up. It runs on your own infrastructure, with the security and governance you expect: authentication, role-based access, and a full audit trail. And everything you build is yours: your Agents, your interfaces, and your content live in your own codebase.
+**Studio** is what your Agents need. **Canvas** is what your Agents do. **Spatial** is where your Agents live.
+
+The platform is enterprise-grade from the ground up. It runs on your own infrastructure, with authentication, role-based access and a full audit trail. Everything you build is yours: your Agents, your interfaces and your content live in your own codebase.
 
 [Get started](/onboarding/studio). Studio opens in a couple of minutes and needs nothing but Node.
 
@@ -15,7 +17,7 @@ You build, manage, and observe Agents visually in **Canvas**. You create everyth
 
 ## Canvas
 
-**Canvas** is where you build, manage, and observe Agents. An Agent is a workflow: a trigger receives the message, nodes reason and act, and results stream back live.
+**Canvas** is where teams design, test and run Agents as visible workflows. An Agent is a workflow: a trigger receives the message, nodes reason and act, and results stream back live. You connect knowledge, models and tools, and you inspect every step.
 
 ![Canvas](./images/canvas.png)
 
@@ -25,7 +27,7 @@ You build a workflow visually and test it as you go. Each node runs on its own, 
 
 ## Studio
 
-**Studio** is where you create everything an Agent needs: interfaces, templates, nodes, services, skills, and MCPs.
+**Studio** is where you create everything an Agent needs: integrations, interface components, design systems, skills and prompts. You manage them once, and every team and every Agent uses the same set. Change one, and every experience built on it changes with it.
 
 ![Studio](./images/studio.png)
 

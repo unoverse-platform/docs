@@ -15,7 +15,7 @@ publish over the API. What changes is who runs the universe.
 | Who runs it | someone else | you |
 | Where it runs | their account | AWS, DigitalOcean, Azure, GCP, on-premises |
 | What you install | **Studio** | **Studio**, and the platform |
-| What you need | an address and an account | a premium token, and somewhere to run it |
+| What you need | an address and an account | a registry token, and somewhere to run it |
 | Right when | the universe already exists | the deployment has to be yours |
 
 **Connecting is the faster start.** You point **Studio** at a universe that is already
@@ -28,7 +28,7 @@ deployment in a private cloud. It is the only option when data cannot leave your
 You pull the platform images from the registry, and Docker Compose runs them.
 
 <Note>
-**The premium registry token comes with your licence.** It is read-only, and it lets your
+**The registry token comes with your licence.** It is read-only, and it lets your
 machines pull the platform images. Terraform takes it as `docr_token`, and `unoverse deploy`
 asks for it on the first run of a new ground.
 </Note>

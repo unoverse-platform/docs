@@ -96,6 +96,14 @@ state:
 - **Top level = the public menu; nesting = privacy.** Templates react only to the
   top-level names; a nested step never moves the page. Promote a step to the top
   level only when templates must rearrange for it (the rearrange rule, LAYERS §2).
+- **Who owns a mood: the DRIVER decides** (LAYERS §2). What WRITES the discriminant
+  picks the mechanism: the component's own `setValue` → private-axis substates, names
+  from the design (`course-application`); a service projecting a NAMED value
+  (`callState`) → substates named for those values + a preview prop (`voice-chat`);
+  DERIVED conversation facts (`isEmpty`/`hasMessages`) → the TEMPLATE tier owns the
+  mood (condition-guarded; the template has the state, components just react) — never
+  component named substates, never another field's values as state names (bpp
+  `text-chat`).
 - **The root still composes a `Switch` on `view`** whose cases `$include` the state
   layouts (guard-enforced); the server compiles the tree into the served projections
   (`publicStates`, `initialView`, `stateTree`).
@@ -633,8 +641,8 @@ between states by name (STATE_MODEL §5). Two template-only primitives place con
 to a workflow, and describes it. The sab pilot, as shipped:
 
 ```yaml
-# design/sab/templates/sab-chat-layout/manifest.yaml
-name: sab-chat-layout
+# design/sab/templates/sab-chat/manifest.yaml
+name: sab-chat
 description: The SAB customer-support chat, with a route to live support.
 whenToUse: "Ask SAB a banking question or get general help…"   # SELECTION text: below
 category: Assistant

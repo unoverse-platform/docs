@@ -26,7 +26,7 @@ deploy` first runs:
 - Scope: **Full Access** (Read Only cannot create infrastructure)
 - It stays on your machine and is never shared
 
-(The registry access token you pasted at `unoverse create` is different and already
+(The registry token you pasted at `unoverse create` is different and already
 done: your Unoverse admin issued it, and it only pulls platform images.)
 
 ## Quick Deploy (Single VM)
@@ -99,4 +99,4 @@ Working with no domain at all also gets you surprisingly far: `http://IP:3001` a
 
 ## Challenge Complete
 
-Your platform is deployed to production! Proceed to [Challenge 9: Update Unoverse](/onboarding/update-unoverse).
+Your platform is deployed to production.

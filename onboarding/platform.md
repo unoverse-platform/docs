@@ -14,7 +14,7 @@ instead, which needs Node and nothing else.
 [`starter`](https://github.com/unoverse-platform/starter) is a **template repository**. You create your own copy on GitHub, and everything you build lives in that copy: your nodes, your components, your Agent skills. The platform itself runs as Docker images that you pull, not source you compile.
 
 <Warning>
-**A license is required.** The starter repository is the scaffold, not the platform. The platform ships as licensed Docker images, and your registry token is what authorizes downloading them. Without a license, nothing runs.
+**A licence is required.** The starter repository is the scaffold, not the platform. The platform ships as licensed Docker images, and your registry token is what authorizes downloading them. Without a licence, nothing runs.
 </Warning>
 
 ## Before you begin
@@ -31,7 +31,7 @@ Setup asks for four credentials. One comes from unoverse; the rest are yours.
 
 <CardGroup cols={2}>
 <Card title="unoverse provides" icon="key">
-Your registry token, issued with your license. It authorizes downloading the platform images and activates your installation.
+Your registry token, issued with your licence. It authorizes downloading the platform images and activates your installation.
 </Card>
 <Card title="You provide" icon="database">
 Your PostgreSQL connection string, your Redis credentials, and your auth provider's issuer, client ID, and audience. Any OIDC-compatible provider works: Auth0, Okta, Microsoft Entra ID.
@@ -73,7 +73,7 @@ One line: the CLI scaffolds your universe:
 npm create unoverse@latest
 ```
 
-Choose **"A universe"**. The wizard asks for your **registry access token** (from your Unoverse admin) and validates it against the registry before anything downloads: the platform is licensed through that token, so there is nothing to run without it. It then configures the universe end to end: writes your `.env`, logs into the registry, and sets up the database. There is no separate setup wizard to run afterwards.
+Choose **"A universe"**. The wizard asks for your **registry token** (from your unoverse admin) and validates it against the registry before anything downloads: the platform is licensed through that token, so there is nothing to run without it. It then configures the universe end to end: writes your `.env`, logs into the registry, and sets up the database. There is no separate setup wizard to run afterwards.
 
 Most people don't need this page at all: authoring happens in a **Studio project** (the wizard's default, see [Studio](/onboarding/studio)). The universe kit is for operators running the full platform.
 

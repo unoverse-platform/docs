@@ -103,6 +103,61 @@
   color: #8b7ef8;
 }
 
+/* Code blocks: ONE panel, not a frame around a darker hole.
+   The theme nests a rounded surface inside the block's own rounded shell, which reads as a
+   double border. Everything below flattens that: the shell carries the corner, the border
+   and the lift, and every inner surface is transparent so the panel is a single colour. */
+#content-area .code-block {
+  --u-surface: #1e212b;
+  --u-header: #2b3040;
+  --u-hairline: #3a4055;
+
+  /* The theme paints its inner surface from this variable. Redefining it here is what
+     actually changes the colour; overriding backgrounds alone leaves the ring behind. */
+  --color-codeblock: var(--u-surface);
+  --color-background-codeblock: var(--u-surface);
+
+  background: var(--u-surface) !important;
+  border: 1px solid var(--u-hairline);
+  border-radius: 0.75rem;
+  /* the theme's p-0.5 is what frames the inner panel and reads as a double border */
+  padding: 0 !important;
+  overflow: hidden;
+  box-shadow:
+    0 1px 2px rgb(6 7 10 / 0.3),
+    0 16px 40px -20px rgb(6 7 10 / 0.5);
+}
+
+/* Every inner surface: no second background, no second corner, no ring */
+#content-area .code-block > *,
+#content-area .code-block .code-block-background,
+#content-area .code-block .bg-codeblock,
+#content-area .code-block pre,
+#content-area .code-block .shiki {
+  background: transparent !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  --tw-ring-shadow: 0 0 !important;
+}
+
+/* The header strip carries the title. A shade lighter, hairline under it. */
+#content-area .code-block > div:first-child:has(+ div),
+#content-area .code-block [class*="header"] {
+  background: var(--u-header) !important;
+  border-bottom: 1px solid var(--u-hairline);
+}
+
+#content-area .code-block pre {
+  line-height: 1.65;
+}
+
+/* The theme's right-edge fade is a gradient toward its own codeblock colour. Once that
+   colour is overridden the fade shows as a pale smear, so it goes. */
+#content-area .code-block-fade-overlay {
+  display: none;
+}
+
 /* Skill callout: feature panel for the Claude Code skill */
 #content-area .skill-callout {
   position: relative;

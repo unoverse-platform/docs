@@ -24,14 +24,14 @@ design/<project>/templates/acmechatlayout/
 │   ├── products.yaml    #   a card entered "products" → core + the cards rail
 │   └── detail.yaml      #   a card entered "detail"   → core + the pinned page
 ├── components/          # template-local partials (core, header, composer-bar, turns, …)
-└── states/              # drawings for the base's contained substates (welcome, …)
+└── (no states/ folder — retired 2026-08-22: every drawing lives in layouts/)
 ```
 
 There is **no `<name>.yaml`**: the manifest is the single contract file. Same grammar as components ([03](/design/components)): a component declares a `view` tree; a template declares a `states:` tree. Each layout is a complete arrangement: typically `{ "$include": "components/core" }` plus that state's slot, so shared chrome lives once in `components/` and every layout includes it.
 
 ```yaml
-# manifest.yaml: the whole app in one file (design/sab/templates/sab-chat-layout, as shipped)
-name: sab-chat-layout
+# manifest.yaml: the whole app in one file (design/sab/templates/sab-chat, as shipped)
+name: sab-chat
 description: The SAB customer-support chat, with a route to live support.
 whenToUse: Ask SAB a banking question or get general help from customer support…   # utterance-shaped: selection text
 category: Assistant
@@ -142,7 +142,7 @@ Rules that bite:
 
 ## Voice templates
 
-Declare `"service": "voice"` in the manifest; the channel instantiates the native service, which projects **`callState`** into scope. The call phases (`states/idle … states/user-speaking`) are contained substates of the base, branching inside its layouts: typically a wide core in the base and a slim core beside a card slot, both including the same files. Cards streaming in during a call are placed by the ladder exactly as in chat. Audio is never wired in a definition.
+Declare `"service": "voice"` in the manifest; the channel instantiates the native service, which projects **`callState`** into scope. The call phases (`layouts/idle … layouts/user-speaking`) are drawings of the base, branching inside its layouts: typically a wide core in the base and a slim core beside a card slot, both including the same files. Cards streaming in during a call are placed by the ladder exactly as in chat. Audio is never wired in a definition.
 
 ---
 

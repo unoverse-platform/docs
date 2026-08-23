@@ -4,7 +4,7 @@
 > organizes FILES; the machine itself (the six rules: public/private, arrival, the
 > priority ladder, inline fallback) lives in
 > [`UNOVERSE_STATE_MODEL.md`](./UNOVERSE_STATE_MODEL.md) §5. The sab pilot
-> (`product-card` + `sab-chat-layout`) is the proving ground; anatomy details bend
+> (`product-card` + `sab-chat`) is the proving ground; anatomy details bend
 > there first, then here.
 > **Companion to**: [`UNOVERSE_AUTHORING.md`](./UNOVERSE_AUTHORING.md) (writing
 > definitions), [`UNOVERSE_CONFORMANCE.md`](./UNOVERSE_CONFORMANCE.md) (the guards).
@@ -50,8 +50,10 @@ nothing (STATE_MODEL §7: DATA → STATE → UI, one direction).
 The top level of the `view` axis is the component's **public menu**: what templates
 and hosts can see, place at spawn, and react to. Everything nested below is
 **private**: invisible outside the component. The boundary is structural (where a
-state sits in the tree), not a judgment call. The old VIEW test (three questions) and
-the `<face>-<step>` filename convention are superseded by this one rule, and the
+state sits in the tree), not a judgment call. The old VIEW test (three questions) is
+superseded by this one rule, and the `<face>-<step>` filename convention is
+superseded as MECHANISM only: ownership lives in the tree, while the axis prefix
+survives as the naming convention for step drawings (the same-name bullet, below). The
 rearrange rule survives as its guide:
 
 > **If the template must rearrange to show it, make it a PUBLIC state.
@@ -71,6 +73,27 @@ docreview.)
 Direction is locked with it: components stream into the template and the TEMPLATE
 REACTS TO COMPONENTS, never the reverse (post-spawn; the spawn-time placement scan is
 STATE_MODEL §5 rule 3).
+
+### Who owns a mood: the DRIVER decides
+
+Before nesting substates anywhere, ask what WRITES the discriminant; the writer
+picks the mechanism, and there are only three:
+
+1. **The component's own buttons write it** (`setValue { step: … }`) → component
+   substates on a private axis (`on: step`), names chosen by the design
+   (exemplar: `course-application`).
+2. **A service projects a NAMED value** (`callState: idle | speaking | …`) →
+   component substates named for those VALUES, plus a preview prop so Studio can
+   drive them (exemplar: `voice-chat`).
+3. **It is DERIVED from conversation facts** (`isEmpty` / `hasMessages`) → the
+   TEMPLATE tier owns it: a condition-guarded mood of the base (the
+   welcome-substate pattern), or condition-guarded drawings inside an embedded
+   component reacting to the same facts. The template has the state; components
+   just react. NEVER model a derived mood as component named substates (no field
+   carries the design's names), and NEVER borrow another field's values
+   (`lifecycle`'s thinking/streaming) as state names: state names come from the
+   DESIGN (exemplar: bpp `text-chat`).
+
 
 ---
 
@@ -115,7 +138,10 @@ the only choices inside it, addressed by their state names.
   it declares otherwise. The filename is a READABILITY convention now, not the wire
   contract: the state VALUE is the contract, so a layout can be reused by two states,
   and one state can own variant layouts, neither of which the v1 filename rule
-  allowed.
+  allowed. The readability rule for PARTS: a substate's drawing is prefixed with
+  its axis (`step-register`, `callState-idle`) and declared with `layout:`, so
+  `layouts/` reads at a glance: unprefixed files are arrangements, prefixed files
+  are the steps of the named axis (exemplars: `course-application`, `voice-chat`).
 - **`components/`** = a shape earns a file here only when 2+ layouts reuse it. A
   shape used once stays inline in its layout (extraction is earned, §4).
 - The v1 `states/` folder (thin state files at the component tier) is absorbed by the
@@ -258,9 +284,9 @@ The `step` value selects which data the `question` layout binds; only genuinely
 different arrangements (`summary`, `result`) own files. No self-guarding, no
 extraction reuse didn't earn.
 
-### product-card + sab-chat-layout: the streamed contract
+### product-card + sab-chat: the streamed contract
 
-The §3 tree, hosted: `sab-chat-layout` declares `stateOrder: [focus, product,
+The §3 tree, hosted: `sab-chat` declares `stateOrder: [focus, product,
 products]`, reaction states only; its welcome/conversation moods are private
 substates of the base arrangement, guarded inside it, never ladder entries. Eight
 product cards stream in; each declares `initial: products` and the template has a

@@ -18,7 +18,7 @@ Validation lives in **Studio**, because Studio is the only thing that publishes:
 - broken primitives: `Switch` without `cases`, `Each` without `template` + a list (literal `items` or `bind.items`), `Ref` without `ref`, `ComponentSlot` without `select`
 - illegal conditions: only `eq` / `ne` / `in` / truthy exist; `and`/`or`/arithmetic are rejected by design (derive in the node, [03](/design/components))
 
-It validates two shapes: **envelope** files (with the `unoverse` field) and **bare node** partials (`layouts/`, `states/`, `components/`, atoms).
+It validates two shapes: **envelope** files (with the `unoverse` field) and **bare node** partials (`layouts/`, `components/`, atoms; legacy `states/`).
 
 One-off sweep of everything from the CLI, if you want it (needs `ajv` and `yaml` once: `npm i -D ajv yaml` at the repo root; Studio runs the same schema as you type). Definitions are YAML; the schema file itself is JSON:
 
@@ -63,7 +63,7 @@ The platform's own CI additionally runs the **theme-contract** and **discoverabi
 What no linter can decide: audit every artifact against this before calling it done:
 
 **Structure**
-- [ ] Structure is **earned**: flat if it can be; `components/`/`states/`/`layouts/` only when the shape demands them
+- [ ] Structure is **earned**: flat if it can be; `components/`/`layouts/` only when the shape demands them (templates never carry `states/` — retired 2026-08-22)
 - [ ] Few shallow discriminants, not boolean soup; same-shape states collapsed into one data-driven state
 - [ ] No self-guarding states; mutually exclusive views in ONE `Switch`
 
@@ -72,7 +72,7 @@ What no linter can decide: audit every artifact against this before calling it d
 - [ ] Derived values computed in the node, sent as plain fields: no logic simulated in the definition
 
 **State ([04](/design/state))**
-- [ ] Reaction contract respected: a component writes only its own slice; templates react by name via their declared tree, slots select on `view`; `setTemplateValue` only for the template's own chrome
+- [ ] Reaction contract respected: templates react by name via their declared tree, slots select on `view`; `setTemplateValue` writes chrome keys only, never `defaultState` (the deprecated focus bridge)
 - [ ] Locked state respected: lifecycle from derived flags, voice via `callState`, host chrome via `props`
 
 **Templates ([05](/design/templates))**

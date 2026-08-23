@@ -93,8 +93,8 @@ face in `scripts/lib/lint.mjs`) runs at authoring time and **mirrors** the serve
   `view` (legacy alias `defaultState`), never a component's internal key (warn); and it
   claims exactly ONE view with a string `eq`; `ne`/`in`/bare selects are errors
   (`packages/base/src/lint/design/walk.mjs`) | warn/error | none (lint-first) |
-| **Deprecated bridge**: a component writing template state (`setTemplateValue` from a
-  component = error; writing `defaultState` into template state = warn) | warn/error | none |
+| **Deprecated focus bridge**: `setTemplateValue` writing `defaultState` (from a
+  component = error; from a template = warn). Other chrome keys are allowed anywhere | warn/error | none |
 | Theme token contract across orgs | CI only | `theme-contract.test.ts` |
 
 *Legacy twin:* templates without a `stateOrder`/tree keep the v1 recency semantics under

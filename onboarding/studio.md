@@ -1,172 +1,161 @@
 ---
-sidebarTitle: "Studio"
-title: "Studio"
+sidebarTitle: "studio"
+title: "studio"
 ---
 
-**Studio** is where you build everything an Agent uses: interfaces, nodes, skills and the
-design system behind them.
+**studio** is where you build everything an Agent uses. Open it and you can:
 
-It runs on your machine, reads your files straight off disk, and needs Node and nothing
-else. No database, no Docker, no account, and it works offline.
+- design components, atoms and the styles behind them
+- write Agent skills and prompt blocks
+- build custom nodes, and run them against the real service
+- preview every one of them at any size, as you save
 
-<Frame caption="The Studio workbench: a component, its live preview at every size, and its controls.">
-  <img src="/images/onboarding/studio2.png" alt="Unoverse Studio editing a card component" />
+It runs on your machine, reads your files off disk, and works offline. You need Node 20 or
+newer. There is no database, no Docker and no account.
+
+## What you can author
+
+Seven kinds of asset, in the order the tabs appear. Every one is a file in your own
+repository.
+
+<AccordionGroup>
+
+<Accordion title="Apps" icon="layout-dashboard">
+A whole surface an Agent speaks through: a chat window, a wizard, a dashboard. An app carries
+its own states and layouts, and arranges the components inside it.
+
+Lives in `design/<project>/templates/`, and publishes as a `template`.
+</Accordion>
+
+<Accordion title="Components" icon="square-dashed">
+One piece of interface, described as data rather than code. A card, a form, a document. The
+same definition renders on the web, in ChatGPT and in Claude, with no build step.
+
+Lives in `design/<project>/components/`.
+</Accordion>
+
+<Accordion title="Atoms" icon="atom">
+The shared pieces components are built from: a button, a heading, a badge. Compose these
+rather than hand-rolling a shape the design system already ships.
+
+Lives in `design/<project>/atoms/`.
+</Accordion>
+
+<Accordion title="Styles" icon="palette">
+Tokens: colour, type, spacing. No pixels or hex codes anywhere else, so a rebrand is a change
+here rather than a sweep through every component.
+
+Lives in `design/<project>/styles/`.
+</Accordion>
+
+<Accordion title="Skills" icon="sparkles">
+Behaviour an Agent follows, written in plain markdown. What it should do, how it should
+answer, what it must never say.
+
+Lives in `prompts/skills/`.
+</Accordion>
+
+<Accordion title="Prompt Blocks" icon="text-quote">
+A reusable fragment of a prompt, written once and referenced wherever it is needed, so the
+same wording does not drift across a dozen Agents.
+
+Lives in `prompts/blocks/`.
+</Accordion>
+
+<Accordion title="Nodes" icon="boxes">
+Your own integration, written as YAML rather than code. The **Nodes** tab runs one against
+the real service with no platform running: fill in the settings, press **Run**, and the
+output appears beside them. Keys come from your own `.env` and are stored nowhere.
+
+Lives in `nodes/`. [Testing nodes](/nodes/testing-nodes) covers it.
+</Accordion>
+
+</AccordionGroup>
+
+There is an eighth kind, the **recipe**, which is a workflow graph copied onto a canvas
+rather than authored here.
+
+<Frame caption="A component, its live preview at every size, and its controls.">
+  <img src="/images/onboarding/studio2.png" alt="unoverse studio editing a card component" />
 </Frame>
-
-| | |
-| --- | --- |
-| **What you need** | Node 20+ |
-| **What you get** | The workbench for every asset you author |
-| **Where your work goes** | Published to a universe when you are ready |
 
 ## Start it
 
-Studio is a tool, not a project. Install it, run it where you want your project, and it
-sets everything up for you.
-
-<Steps>
-<Step title="Install the CLI">
-
-```bash Install the unoverse CLI
-npm install -g unoverse
-```
-
-One small package, and it gives you the `unoverse` command:
-
-| Command | What it does |
-| --- | --- |
-| `unoverse create` | Asks what you are building: a Studio project, a universe, or a client app |
-| `unoverse studio` | Launches Studio, downloading it on first run |
-
-Open source and free. No account, and nothing else to install.
-
-</Step>
-<Step title="Run Studio">
-
-```bash Start a project
+```bash
 unoverse studio
 ```
 
-Make a folder for your project, and run it there. The first time, it builds the project in
-that folder and names it after the folder:
+That is the whole install. **studio** is fetched on launch and opens on
+**http://localhost:4108**.
+
+Run it in an empty folder the first time and it creates a project there, named after the
+folder. The name becomes the **org** on everything that project publishes, so it has to be
+lowercase letters, numbers and dashes, two to 39 characters. If the folder's name does not
+qualify, **studio** asks for one.
 
 ```
-mkdir acme && cd acme
-unoverse studio
-
-  Created design/acme/, prompts/ and nodes/ in /Users/you/code/acme
-```
-
-The folder's name is also the **org** on everything that project publishes. So it has to be
-lowercase letters, numbers and dashes. If your folder is called something else, Studio asks
-for a name instead.
-
-```
-acme/                        your project
-  design/acme/                   components, templates, styles
-  prompts/                   Agent skills and prompt blocks
+acme/
+  design/acme/               components, templates, styles
+  prompts/skills/            Agent skills
+  prompts/blocks/            prompt blocks
   nodes/                     your own integrations
 ```
 
-`design/` holds a folder per project, not your files directly, because one repository can carry
-several and each publishes separately. Add more from Studio's **New project** whenever you
-want; they sit beside `design/acme/`.
+You also get a first component, `design/acme/components/welcome/welcome.yaml`, so **studio**
+opens on something real rather than an empty list. Change its text, save, and the preview
+follows.
 
-You also get a first component, so Studio opens on something real rather than an empty list.
+After that, run `unoverse studio` from anywhere inside the project.
 
-Next time, run `unoverse studio` from `acme/` or anywhere inside it.
+<Note>
+**It updates itself.** Each launch resolves the current version, so there is nothing to
+update and no version to track. A **studio** left running from an earlier session is
+replaced automatically. Anything else holding port 4108 is left alone and named, so nothing
+of yours is ever killed.
+</Note>
 
-A project and a universe are different sets of files, so they can share one folder. Run
-`unoverse create` in this folder later and you get a universe here too, with your `design/`,
-`prompts/` and `nodes/` untouched.
+## Where your work lives
 
-</Step>
-<Step title="Edit the first component">
+`design/` holds a folder per project, because one repository can carry several and each
+publishes separately. **studio** renders what is on disk, and saving a file updates what you
+see.
 
-Studio opens on **http://localhost:4108**. Open `design/<your-project>/components/welcome/welcome.yaml`,
-change the text, and save. Studio updates as you save.
+## Ship it
 
-</Step>
-</Steps>
+Publishing happens in your terminal, not in **studio**. There is no sign-in and no publish
+button in the app: your identity lives in the CLI.
 
-Two equivalent routes, if you prefer them: `npm create unoverse@latest` runs the same
-wizard with nothing installed, and `npm install -g @unoverse-platform/studio` installs
-Studio itself, as the `unoverse-studio` command.
-
-Run it again inside an existing project and it skips all that and opens straight away. It
-finds your project by looking for `design/` in the current folder or any parent, so it works from
-anywhere inside it, and it will not offer to make a second project inside one you already
-have.
-
-## What you build here
-
-| Tab | What it holds |
-| --- | --- |
-| **Apps** | The surfaces an Agent speaks through |
-| **Components** | The interface pieces, as data rather than code |
-| **Atoms** | The shared pieces components are built from |
-| **Design System** | Tokens: colour, type, spacing |
-| **Skills** | Behaviour an Agent follows |
-| **Prompt Blocks** | Reusable prompt fragments |
-| **Nodes** | Your own integrations, and a place to run them |
-
-Everything is a file in your repository. Studio renders what is there, and saving a file
-updates what you see.
-
-## Check your work
-
-Studio validates as you go, and it will not let a broken definition be published.
-
-## Run a node for real
-
-The **Nodes** tab runs a node against the real service, with no platform running. Fill in
-the settings, press **Run**, and the output appears beside them.
-
-Keys come from your own `.env` and are stored nowhere.
-[Testing Nodes](/nodes/testing-nodes) covers it.
-
-## Deploy to a universe
-
-Everything up to here is offline. No account, no network, no universe. Deploying is the
-one step that reaches one, and it happens in your terminal, not in Studio:
-
-```
+```bash
+unoverse login https://your-universe.example
 unoverse deploy studio
 ```
 
-**Signing in happens by itself.** The first deploy asks which universe this workspace
-ships to (an address like `universe.example.com`, saved to `unoverse.yaml` so the whole
-team deploys to the same place) and opens your browser to sign in with whatever your
-organisation uses. Studio names no provider and holds no credential; the CLI keeps the
-session. `unoverse login` exists to sign in ahead of time, but you never need it first.
+`login` keeps the session and writes the address to `unoverse.yaml`, so the whole team ships
+to the same universe. After that `deploy studio` needs nothing else.
 
-**The deploy checks your work, then shows a plan.** Lint runs locally and blocks on any
-error, so you see the problem in your terminal rather than as a server rejection. Then a
-plan lists every item, what kind it is, and whether it is new or a change. Nothing is
-sent until you answer.
+The order is the safety. Lint runs locally and blocks on any error, so you see the problem in
+your terminal rather than as a server rejection. Then every item is compared against the
+universe, and a plan lists what is new and what changes. Nothing leaves your machine until
+you answer.
 
 ```
 $ unoverse deploy studio
-  ~ design/cards/DealCard.yaml      (changed)
-  + design/atoms/StatusPill.yaml    (new)
-  ~ nodes/hubspot/node.yaml         (changed, lands PENDING review)
+  ~ design/acme/components/deal-card.yaml   (changed)
+  + design/acme/atoms/status-pill.yaml      (new)
+  ~ nodes/hubspot/node.yaml                 (changed, lands PENDING review)
 
-  3 items -> https://universe.example
+  3 items -> https://your-universe.example
   Deploy? [y/N]
 ```
 
-**A node then waits to be accepted**, because it is the only thing you deploy that holds a
-URL and a key. Whoever runs the universe sees the hosts it wants to call and the credentials
-it needs before it can run. After that first acceptance you deploy freely, and it only
-pauses again if the node reaches for something new.
-
-Deploying needs permission on your account, and it is a specific one. Being able to build a
-workflow does not carry it, because pushing a node the whole universe can use is a different
-power. If you do not have it, whoever runs the universe grants it.
+A node then waits to be accepted, because it is the only thing you ship that holds a URL and
+a key. Whoever runs the universe sees the hosts it wants to call and the credentials it needs
+before it can run. After that first acceptance you ship freely, and it only pauses again if
+the node reaches for something new.
 
 ## Set up your editor
 
-Everything you author is validated against a schema **as you type**, so a typo or an unknown
+Everything you author is validated against a schema as you type, so a typo or an unknown
 field is underlined rather than surfacing later.
 
 This works for `.json` out of the box. YAML needs one extension:
@@ -175,28 +164,26 @@ This works for `.json` out of the box. YAML needs one extension:
 | --- | --- | --- |
 | **YAML** | `redhat.vscode-yaml` | [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) · [Open VSX](https://open-vsx.org/extension/redhat/vscode-yaml) |
 
-Install it from your editor's extensions panel, or the links above. It is the same
-extension everywhere: VS Code installs it from the Marketplace; Cursor and Windsurf
-install it from Open VSX.
+VS Code installs it from the Marketplace; Cursor and Windsurf install it from Open VSX.
 
 <Warning>
-Without the extension, YAML files get **no validation at all**. Nothing warns you: they simply stop being checked. If you skipped the prompt, search for `redhat.vscode-yaml` in your editor's extensions panel.
+Without the extension, YAML files get **no validation at all**. Nothing warns you: they simply stop being checked.
 </Warning>
 
-Each file you author carries a `$schema` line, which is what the extension follows. To
-confirm it works, open a node's `node.yaml` and delete a required field such as `type`. A red
-underline should appear within a second. Undo, and it clears.
+Each file carries a `$schema` line, which is what the extension follows. To confirm it works,
+open a node's `node.yaml` and delete a required field such as `type`. A red underline should
+appear within a second. Undo, and it clears.
 
 ## Next steps
 
-<Card title="Create your first node" icon="boxes" href="/onboarding/create-your-first-node" horizontal>
-Build an integration as four small YAML files.
-</Card>
+<CardGroup cols={2}>
 
-<Card title="Components and templates" icon="palette" href="/onboarding/components-and-templates" horizontal>
+<Card title="Components and templates" icon="palette" href="/onboarding/components-and-templates">
 Design the interfaces your Agents speak through.
 </Card>
 
-<Card title="Run the platform" icon="server" href="/onboarding/platform" horizontal>
-Run a universe yourself: Docker, database, images.
+<Card title="Create your first node" icon="boxes" href="/onboarding/create-your-first-node">
+Build an integration as a few small YAML files.
 </Card>
+
+</CardGroup>
