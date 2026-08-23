@@ -13,6 +13,56 @@ title: "studio"
 It runs on your machine, reads your files off disk, and works offline. You need Node 20 or
 newer. There is no database, no Docker and no account.
 
+## Start it
+
+```bash
+npm install -g unoverse
+mkdir acme && cd acme
+unoverse create
+```
+
+`create` asks what you are building. Choose **Studio**.
+
+```ansi unoverse create
+  [2mLaunching Unoverse Studio. It creates and manages your projects.[0m
+
+  [2mCreated design/acme/, prompts/ and nodes/ in /Users/you/acme[0m
+```
+
+**studio** opens on **http://localhost:4108**, and it has made you a project. Everything you
+author lives in one of three folders:
+
+```
+acme/
+  design/          your projects: apps, components, atoms, styles
+    acme/
+  prompts/         skills and prompt blocks
+  nodes/           your own integrations
+```
+
+| Folder | What it holds |
+| --- | --- |
+| `design/` | Everything an interface is made of: apps, components, atoms and styles. One subfolder per project, because a repository can carry several, and each publishes separately under its own name. |
+| `prompts/` | How your Agents behave: skills that guide them, and prompt blocks they reuse. Plain markdown, not code. |
+| `nodes/` | Integrations you write yourself, as YAML. A node is one step an Agent can take: call an API, read a database, transform a payload. |
+
+The project takes the folder's name, and that name becomes the **org** on everything it
+publishes. So it has to be lowercase letters, numbers and dashes, two to 39 characters. If
+the folder does not qualify, **studio** asks for a name instead.
+
+You also get a first component, `design/acme/components/welcome/welcome.yaml`, so **studio**
+opens on something real rather than an empty list. Change its text, save, and the preview
+follows.
+
+After that, `unoverse studio` reopens it from anywhere inside the project.
+
+<Note>
+**It updates itself.** Each launch resolves the current version, so there is nothing to
+update and no version to track. A **studio** left running from an earlier session is replaced
+automatically. Anything else holding port 4108 is left alone and named, so nothing of yours
+is ever killed.
+</Note>
+
 ## What you can author
 
 Seven kinds of asset, in the order the tabs appear. Every one is a file in your own
@@ -78,47 +128,6 @@ rather than authored here.
 <Frame caption="A component, its live preview at every size, and its controls.">
   <img src="/images/onboarding/studio2.png" alt="unoverse studio editing a card component" />
 </Frame>
-
-## Start it
-
-```bash
-unoverse studio
-```
-
-That is the whole install. **studio** is fetched on launch and opens on
-**http://localhost:4108**.
-
-Run it in an empty folder the first time and it creates a project there, named after the
-folder. The name becomes the **org** on everything that project publishes, so it has to be
-lowercase letters, numbers and dashes, two to 39 characters. If the folder's name does not
-qualify, **studio** asks for one.
-
-```
-acme/
-  design/acme/               components, templates, styles
-  prompts/skills/            Agent skills
-  prompts/blocks/            prompt blocks
-  nodes/                     your own integrations
-```
-
-You also get a first component, `design/acme/components/welcome/welcome.yaml`, so **studio**
-opens on something real rather than an empty list. Change its text, save, and the preview
-follows.
-
-After that, run `unoverse studio` from anywhere inside the project.
-
-<Note>
-**It updates itself.** Each launch resolves the current version, so there is nothing to
-update and no version to track. A **studio** left running from an earlier session is
-replaced automatically. Anything else holding port 4108 is left alone and named, so nothing
-of yours is ever killed.
-</Note>
-
-## Where your work lives
-
-`design/` holds a folder per project, because one repository can carry several and each
-publishes separately. **studio** renders what is on disk, and saving a file updates what you
-see.
 
 ## Ship it
 
