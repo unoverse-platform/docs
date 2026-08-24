@@ -91,6 +91,10 @@ Anything genuinely computed happens in a workflow node and arrives as a plain fi
 
 <div className="concept-lede">The way your interface reaches a model, using a standard rather than an integration.</div>
 
+<Frame caption="MCP Apps: one protocol, spoken by every host worth reaching.">
+  <img src="/images/design/mcp-app.png" alt="The Model Context Protocol mark" />
+</Frame>
+
 [MCP](https://modelcontextprotocol.io/extensions/apps/overview) is the protocol Claude,
 ChatGPT and a growing list of hosts already speak. MCP Apps is its extension for tools that
 carry a user interface, and your definitions are served as exactly that.
