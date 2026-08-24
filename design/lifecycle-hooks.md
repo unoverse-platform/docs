@@ -333,6 +333,6 @@ authored is a prop, fed by the workflow like any other.
 Watch a hook fire against a live universe.
 </Card>
 
-<Card title="Analytics" icon="bar-chart-3" href="/design/analytics" horizontal>
-Report the moments that matter to you.
+<Card title="manifest.yaml" icon="book-marked" href="/reference/manifest" horizontal>
+Where `lifecycle` is declared, with every other manifest field.
 </Card>

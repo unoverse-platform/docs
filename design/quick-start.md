@@ -19,16 +19,19 @@ unoverse create
 
 Choose **Studio** at the prompt. You get three folders, and your org sits inside `design/`:
 
-```
-acme/
-  design/
-    acme/              your org
-      components/      one piece of interface
-      apps/            whole surfaces
-      styles/          colour, type, spacing
-  prompts/
-  nodes/
-```
+<Tree>
+  <Tree.Folder name="acme" defaultOpen>
+    <Tree.Folder name="design" defaultOpen>
+      <Tree.Folder name={<><b>acme</b> <span className="tree-note">your org</span></>} defaultOpen>
+        <Tree.File name={<><b>components</b> <span className="tree-note">one piece of interface</span></>} />
+        <Tree.File name={<><b>apps</b> <span className="tree-note">whole surfaces</span></>} />
+        <Tree.File name={<><b>styles</b> <span className="tree-note">colour, type, spacing</span></>} />
+      </Tree.Folder>
+    </Tree.Folder>
+    <Tree.Folder name={<><b>prompts</b> <span className="tree-note">skills and prompt blocks</span></>} defaultOpen />
+    <Tree.Folder name={<><b>nodes</b> <span className="tree-note">your own integrations</span></>} defaultOpen />
+  </Tree.Folder>
+</Tree>
 
 A worked example lands in each, so no folder starts empty.
 
@@ -140,6 +143,6 @@ it to the set the platform loads at boot.
 States, layouts, and everything a component can show.
 </Card>
 
-<Card title="Coming from React" icon="repeat" href="/design/coming-from-react" horizontal>
-Every framework reflex, and what it becomes here.
+<Card title="Primitives" icon="box" href="/reference/primitives" horizontal>
+Every element a definition composes from.
 </Card>

@@ -32,12 +32,12 @@ how a change reaches a running app. The same mechanism serves themes, at
 Definitions compose from these and nothing else. Adding to the set is a change to every SDK,
 so a guard test fails the build on any attempt.
 
-| Group | Primitives |
-|---|---|
-| Structure | `Box` `Stack` `Row` `Column` `Each` `Switch` `ComponentSlot` `Timeline` |
-| Leaves | `Text` `Image` `Button` `Input` `Markdown` `Skeleton` `Icon` |
-| Helpers | `Ref` to use an atom, `$include` to pull in a sibling file |
-| Conditions | `eq` `ne` `in`, and a bare field name for truthy |
+Eighteen of them, in three groups. **Structure** arranges: `Box`, `Each`, `Switch`,
+`ComponentSlot`. **Leaves** draw: `Text`, `Image`, `Button`, `Input`. **Helpers** compose:
+`Ref` pulls in an atom, `$include` pulls in a sibling file.
+
+[Primitives](/reference/primitives) lists all eighteen, with what each one reads and an
+example. Conditions are `eq`, `ne`, `in`, and a bare field name for truthy.
 
 The instinct this frustrates is reaching for a `Chart`, an `Accordion` or a `Carousel`.
 Compose them instead: bars are `Box` inside `Each`, and an accordion is `visibleWhen` on a
@@ -114,6 +114,6 @@ is no second path for it to work differently on.
 Every framework reflex, and what it becomes here.
 </Card>
 
-<Card title="Components" icon="square-dashed" href="/design/components" horizontal>
-States, layouts, and everything a component can show.
+<Card title="Primitives" icon="box" href="/reference/primitives" horizontal>
+All 18, with what each one reads and an example.
 </Card>

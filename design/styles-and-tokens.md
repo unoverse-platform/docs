@@ -20,7 +20,7 @@ style: { padding: "4", color: text.primary, font: headline.sm }
 ```
 
 - No `px` / `rem` / `em` / `#hex` anywhere in any component, atom, or app definition. the deploy lint scans for exactly this and blocks ([Validate and ship](/design/validate-and-ship)).
-- Sizes use the **space scale** (`"width": "8"` = 2rem, Tailwind-style: step N = N × 0.25rem), and only **real steps**: `0 1 1.5 2 3 4 5 6 7 8 10 12 16 20 24 28 40 50 75 90 100 120 140 160 180 200` (+ `full`/`auto`). An invented step (`"26"`, `"3.5"`) is NOT rounded: it falls through as broken CSS and the element silently reverts to auto sizing. the deploy lint rejects off-scale values.
+- Sizes use the **space scale**: step N is N × 0.25rem, so `width: "8"` is 2rem. Only real steps exist, and [Scales](/reference/scales) lists every one with what it resolves to. An invented step such as `"26"` is not rounded. It falls through as broken CSS and the element silently reverts to auto sizing, which the deploy lint catches.
 - **Page widths have NAMES** (`semantic/layout.yaml`): `compact` 30rem · `narrow` 35rem · `reading` 40rem · `page` 45rem · `wide` 50rem. They are aliases onto the same scale, so `maxWidth`/`hideBelow`/`stackBelow` read as what they are (`"maxWidth": "reading"`, not `"160"`). **The rule, so one value never gets two spellings:** a PAGE-level cap uses a name; an ELEMENT's own size (an image tile's height, a card's max) stays a scale step. An image tile is not a page.
 - ❌ No invented component-named tokens (`cardMin`, `wizardWidth`): use the generic scale steps. If the scale genuinely lacks a step, extend the scale in `styles/`, don't smuggle a value into a definition.
 
@@ -92,28 +92,31 @@ root:
 
 **The `Ref`'s own `style` merges OVER the atom's**, so a component keeps the shared look and still overrides one thing (a tighter padding, no border) without forking the atom. That is the cascade: **atom = the look, `Ref` = this instance's exceptions.** Reach for a new atom the moment a second component needs the same combination; never copy the block.
 
+A `Ref` also composes a whole flat **component**, which is how a shared piece of interface travels rather than a shared look. What is inlined reads the host's slice, because an embedded piece has no slice of its own. So **the piece's `state` initials come with it**: a renderer that starts on its first tab starts there in every component that embeds it. No host declares a default belonging to something it merely composes. The host's own values win on any key it declares, and the piece's `view` never travels, since arriving somewhere is the host's decision.
+
 ---
 
 ## The token layers
 
-```
-design/<project>/styles/
-├── base/        # raw scales: the only place raw values EXIST
-│   ├── color.yaml        # palettes
-│   ├── spacing.yaml      # the space scale (the closed step set: see LAW above)
-│   ├── typography.yaml   # font scales
-│   └── radius.yaml / shadow.yaml / border.yaml / motion.yaml
-├── semantic/    # named meanings, built FROM base
-│   ├── text-styles.yaml  # headline.lg, body.sm… (referenced via "font")
-│   ├── fonts.yaml / icons.yaml
-│   ├── layout.yaml       # PAGE WIDTHS by name: compact · reading · page · wide
-│   ├── grid.yaml         # grid.stackBelow: when a columns grid stacks
-│   ├── app-sizes.yaml    # STANDARD APP SIZES: chat · rail · panel (see below)
-│   └── prose.yaml / skeleton.yaml / keyframes.yaml / root.yaml
-└── themes/      # brand / dark-mode swaps
-    ├── light.yaml
-    └── dark.yaml
-```
+<Tree>
+  <Tree.Folder name={<><b>base</b> <span className="tree-note">raw scales: the only place raw values exist</span></>} defaultOpen>
+    <Tree.File name={<><b>color.yaml</b> <span className="tree-note">palettes</span></>} />
+    <Tree.File name={<><b>spacing.yaml</b> <span className="tree-note">the space scale</span></>} />
+    <Tree.File name={<><b>typography.yaml</b> <span className="tree-note">font scales</span></>} />
+    <Tree.File name={<><b>radius.yaml</b> <span className="tree-note">and shadow, border, motion</span></>} />
+  </Tree.Folder>
+  <Tree.Folder name={<><b>semantic</b> <span className="tree-note">named meanings, built from base</span></>} defaultOpen>
+    <Tree.File name={<><b>text-styles.yaml</b> <span className="tree-note">headline.lg, body.sm, referenced via font</span></>} />
+    <Tree.File name={<><b>layout.yaml</b> <span className="tree-note">page widths by name: compact, reading, page, wide</span></>} />
+    <Tree.File name={<><b>grid.yaml</b> <span className="tree-note">when a columns grid stacks</span></>} />
+    <Tree.File name={<><b>app-sizes.yaml</b> <span className="tree-note">chat, rail, panel</span></>} />
+    <Tree.File name={<><b>prose.yaml</b> <span className="tree-note">and fonts, icons, skeleton, keyframes, root</span></>} />
+  </Tree.Folder>
+  <Tree.Folder name={<><b>themes</b> <span className="tree-note">brand and dark-mode swaps</span></>} defaultOpen>
+    <Tree.File name={<><b>light.yaml</b> <span className="tree-note"></span></>} />
+    <Tree.File name={<><b>dark.yaml</b> <span className="tree-note"></span></>} />
+  </Tree.Folder>
+</Tree>
 
 | Layer | Answers | Definitions may reference? |
 |---|---|---|
@@ -177,6 +180,6 @@ Every org starts from the same default set, so rebranding is editing values rath
 A component that fetches its own data.
 </Card>
 
-<Card title="Studio" icon="layout-dashboard" href="/design/studio" horizontal>
-See a token change redraw every component.
+<Card title="Scales" icon="ruler" href="/reference/scales" horizontal>
+Every space step, page width and app size, with what it resolves to.
 </Card>

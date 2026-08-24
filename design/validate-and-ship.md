@@ -98,6 +98,6 @@ error, so nothing broken leaves your machine. What lands is live in every canvas
 Symptom, cause and fix for the mistakes that recur.
 </Card>
 
-<Card title="Studio" icon="layout-dashboard" href="/design/studio" horizontal>
-Mock, live, and the DevTools that answer "where did my data go".
+<Card title="Reference" icon="book-marked" href="/reference/overview" horizontal>
+Every field the lint checks, generated from the schemas.
 </Card>

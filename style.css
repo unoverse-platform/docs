@@ -624,3 +624,118 @@
    27-step scale two screens tall. Tighten to a scannable rhythm. */
 #content-area table td { padding-top: 0.4rem; padding-bottom: 0.4rem; }
 #content-area table th { padding-bottom: 0.45rem; }
+
+/* ── Reference links ─────────────────────────────────────────────────────────
+   A link into the Reference tab is a different promise from a link to another
+   guide: it goes to a generated field list, not to more prose. It gets its own
+   treatment so a reader knows which one they are about to follow.
+
+   Selected by HREF, never by a class. A class has to be remembered, and the one
+   nobody remembers is the one that silently stops matching. Every link into
+   /reference/ is styled by construction, including ones written later.
+   Excluded: the Next steps cards, which already carry their own chrome. */
+#content-area a[href^="/reference/"]:not([class*="card"]):not([class*="Card"]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.08rem 0.42rem 0.08rem 0.34rem;
+  border-radius: 0.3rem;
+  background: rgb(109 93 246 / 0.09);
+  border: 1px solid rgb(109 93 246 / 0.22);
+  color: #4c3fd1;
+  font-weight: 500;
+  text-decoration: none;
+  line-height: 1.35;
+  white-space: nowrap;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+#content-area a[href^="/reference/"]:not([class*="card"]):not([class*="Card"]):hover {
+  background: rgb(109 93 246 / 0.16);
+  border-color: rgb(109 93 246 / 0.4);
+}
+.dark #content-area a[href^="/reference/"]:not([class*="card"]):not([class*="Card"]) {
+  background: rgb(139 126 248 / 0.13);
+  border-color: rgb(139 126 248 / 0.28);
+  color: #8b7ef8;
+}
+.dark #content-area a[href^="/reference/"]:not([class*="card"]):not([class*="Card"]):hover {
+  background: rgb(139 126 248 / 0.22);
+  border-color: rgb(139 126 248 / 0.45);
+}
+
+/* The mark: a book, so the destination reads as a reference rather than a page.
+   A masked SVG inherits `color`, so it follows the link in both themes. */
+#content-area a[href^="/reference/"]:not([class*="card"]):not([class*="Card"])::before {
+  content: "";
+  width: 0.82em;
+  height: 0.82em;
+  flex: none;
+  background: currentColor;
+  opacity: 0.75;
+  -webkit-mask: var(--u-ref-icon) center / contain no-repeat;
+  mask: var(--u-ref-icon) center / contain no-repeat;
+}
+:root {
+  --u-ref-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19.5A2.5 2.5 0 0 1 6.5 17H20'/%3E%3Cpath d='M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'/%3E%3C/svg%3E");
+}
+
+/* ── Concept sections ────────────────────────────────────────────────────────
+   Some pages carry two or three IDEAS the rest of the section is built on, and
+   an ordinary H2 makes them look like any other subheading. A "Core concept"
+   eyebrow plus an accent rule marks the load-bearing ones.
+
+   The label names WHAT the section is, never where it sits in a count: "one of
+   three" breaks the moment a fourth lands, and says nothing on its own.
+
+   The eyebrow is authored as a sibling div rather than by wrapping the section:
+   wrapping puts tables and fenced code inside JSX, where MDX parses them as
+   markup and the page breaks. Same reason the reference pages carry a plain
+   `.ref-source` line instead of a component. */
+#content-area .concept-label {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 3.25rem 0 -0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #6d5df6;
+}
+.dark #content-area .concept-label { color: #8b7ef8; }
+
+/* The rule runs to the measure, so the three read as a set rather than as three
+   unrelated headings. */
+#content-area .concept-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgb(109 93 246 / 0.3), rgb(109 93 246 / 0));
+}
+
+/* The heading under an eyebrow sits tight to it and carries more weight. */
+#content-area .concept-label + h2 {
+  margin-top: 0.5rem;
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+}
+
+/* The opening claim of a concept: one line, bigger than body, no bold shouting. */
+#content-area .concept-lede {
+  margin: 0.9rem 0 1.1rem;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  font-weight: 500;
+  color: #1f2430;
+}
+.dark #content-area .concept-lede { color: #e6e8ee; }
+
+/* A file tree's inline notes are what make it teach, so they must not read as part of
+   the filename. `Tree.File name` accepts JSX, which is the only hook for splitting them. */
+#content-area .tree-note {
+  margin-left: 0.15rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  font-weight: 400;
+}
+.dark #content-area .tree-note { color: #9aa1ad; }

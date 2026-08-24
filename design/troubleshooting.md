@@ -27,6 +27,7 @@ title: "Troubleshooting"
 | Focus surface won't close | the component's ✕ isn't resetting ITS OWN state (or writes app state: the deprecated bridge) | the expanded state carries its own ✕: `setValue { view: "<its initial>" }` on the component's slice; the ladder walk re-runs and the app drops back ([State](/design/state)) |
 | Thinking dots never stop bouncing | the turn's `WORKFLOW_COMPLETED` never arrived on the stream: a delivery problem, not your definition | verify in the stream log, then report it; ❌ never gate the indicator on component text as a workaround |
 | Voice app stuck in one phase | branching on raw booleans instead of `callState`, or reading it from the wrong scope | `Switch` on the single `callState` value in app scope ([State](/design/state)) |
+| A `Switch` draws nothing until something is clicked | its discriminant has no starting value: nothing set the key, so no case matches and no `style.when` comparing it applies | give the axis an initial in the component that owns it, never in the ones embedding it: a `Ref`'d piece's initials travel with it ([Styles and tokens](/design/styles-and-tokens)) |
 
 ## Apps & selection
 

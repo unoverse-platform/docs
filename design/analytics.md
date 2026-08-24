@@ -213,6 +213,6 @@ Filter the browser console on `unoverse:analytics` to see only these.
 What the lint enforces, and what only you can judge.
 </Card>
 
-<Card title="Studio" icon="layout-dashboard" href="/design/studio" horizontal>
-Check your events arrive before you ship.
+<Card title="analytics" icon="book-marked" href="/reference/analytics" horizontal>
+The key, the four ready-made events, and turning it on.
 </Card>

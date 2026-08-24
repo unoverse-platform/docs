@@ -24,7 +24,12 @@ const add = (level, file, line, rule, detail) =>
 function proseLines(src) {
   const out = [];
   let fenced = false;
+  // Frontmatter is metadata, not prose. Left in, its unterminated `title: "X"` lines join the
+  // first real sentence and report a length nobody wrote.
+  let inFront = false;
   src.split("\n").forEach((raw, i) => {
+    if (/^---\s*$/.test(raw) && i === 0) { inFront = true; return; }
+    if (inFront) { if (/^---\s*$/.test(raw)) inFront = false; return; }
     if (/^\s*```/.test(raw)) { fenced = !fenced; return; }
     if (fenced) return;
     if (/^\s*[-|]/.test(raw) && raw.includes("|")) return;   // table rows
