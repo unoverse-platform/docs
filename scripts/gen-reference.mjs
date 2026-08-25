@@ -47,7 +47,7 @@ const STYLES = join(REPO, "apps/unoverse/design/marketplace/styles");
 // normal one — which is how three unlinked pages reached the live site on 2026-08-23.
 const OUT = PUBLISH ? join(DOCS, "reference") : join(tmpdir(), "unoverse-reference-preview");
 mkdirSync(OUT, { recursive: true }); // build output is disposable: recreate it rather than require it
-const VERSIONS = ["1.0", "1.1", "1.2"];
+const VERSIONS = ["1.0", "1.1", "1.2", "1.3"];
 const CURRENT = VERSIONS[VERSIONS.length - 1];
 
 const readSchema = (v) => JSON.parse(readFileSync(join(SCHEMA_DIR, `definition-${v}.schema.json`), "utf8"));
