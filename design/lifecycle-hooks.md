@@ -192,8 +192,10 @@ folder. It never sits in the definition either.
 **A credential appears where you enter it, and leaves when nothing needs it.** The
 definition ships with a node package. Install the package and the credential shows up in
 **canvas** under **Credentials**, ready to fill in. Uninstall it and the type is retracted
-again. A component names one of those definitions, so naming one that no package defines
-is a lint error rather than a card that silently renders empty.
+again. A component simply NAMES a credential: the value exists in the universe or it
+does not, and shipping never blocks on it. Naming one that no installed package defines
+is a deploy WARNING (no pre-built form exists yet to enter it) and a loud runtime
+warning whenever the hook runs without a value — never a blocked deploy.
 </Tip>
 
 ### `fetchplacedetails.yaml`
@@ -307,7 +309,7 @@ these is an error, not a silent no-op:
 | `is a lifecycle handler no manifest opted into` | code in the folder nothing declared. Name it or delete it |
 | `declares no "handler", so nothing would run` | a phase opted into with nothing named to run |
 | `<handler>.yaml makes requests, so this manifest must declare "allowedHosts"` | declared calls with no host allowlist |
-| `credential "X" has no definition in any installed node package` | a name nothing can offer a form for. Install the package that defines it, or name one that exists |
+| `credential "X" has no definition in any installed node package` (warning) | no pre-built form exists to enter it — the hook runs without it until a value is provided. Install the defining package, or provide the value another way |
 
 ---
 
