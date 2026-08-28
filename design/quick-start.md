@@ -42,7 +42,7 @@ name, and the lint enforces the match.
 
 ```yaml
 unoverse: "1.0"
-kind: component
+type: component
 name: pricecard
 category: Commerce
 description: A card showing a product name, price and short description.

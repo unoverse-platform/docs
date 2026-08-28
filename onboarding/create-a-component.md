@@ -120,7 +120,7 @@ Author your component in your project, at `design/acme/components/pricecard/pric
 
 ```yaml design/acme/components/pricecard/pricecard.yaml
 unoverse: "1.0"
-kind: component
+type: component
 name: pricecard
 category: General
 nodeSize: { width: 360, height: 320 }
