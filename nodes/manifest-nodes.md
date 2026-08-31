@@ -10,25 +10,19 @@ There is a marketplace of nodes. When none of them suits your situation, you bui
 A node you build is a folder of YAML files. You describe the API call, and the platform
 makes it.
 
-You build it in **studio**, run it against the real service, then publish it. Once it is
-accepted, the node is in the node library alongside every other node.
-
-## What belongs to you, and what belongs to the platform
-
 > Computation over the request belongs to the platform. Description of the service belongs
 > to you.
 
-Auth schemes, retries, SSE framing, template resolution: the platform's job, written once.
-Base URL, method, parameters, credentials, what comes out: yours, written as data.
+Auth schemes, retries, SSE framing and template resolution are the platform's job, written
+once. Base URL, method, parameters, credentials and what comes out are yours, written as
+data. You name a capability and the platform performs it, and `unoverse node lint` fails on
+a capability that does not exist, so you find out while you write rather than at run time.
 
-You name a capability and the platform performs it. `unoverse node lint` fails on a
-capability that does not exist, so you find out while you write rather than at run time.
+## Build and publish
 
-## Build it in Studio, then publish it
-
-You build a node in **studio**, on your own machine. Studio reads your files straight off
-disk, so there is no server to start and no database to connect to while you work. That is
-why it works offline.
+You build a node in **studio**, on your own machine. It reads your files straight off disk,
+so there is no server to start and no database to connect to while you work, which is why
+it works offline.
 
 Publishing is a separate act pointed at a separate place. It writes your node into a
 universe as a record. There is no commit, no package to build and no image to push. Where
@@ -62,25 +56,30 @@ is why they can say yes quickly.
 
 ## One folder is one node
 
-```
-nodes/<package>/            # in your Studio project workspace
-  package.yaml                # the package envelope: name, category, allowedHosts, requires
-  credentials/
-    <name>Credential.yaml     # one credential type
-  shared/
-    endpoints.yaml            # fragments several nodes $ref
-    models.yaml
-    helpers.yaml              # named functions every expression can call
-  nodes/
-    <NodeName>/
-      node.yaml               # what it IS               (the only REQUIRED file)
-      interface.yaml          # what it CONNECTS TO
-      config.yaml             # the settings form
-      api/                    # ALWAYS a folder
-        run.yaml              #   the calls it makes
-        events.yaml           #   everything that leaves the node
-      test.yaml               # a fixture you can actually run
-```
+<Tree>
+  <Tree.Folder name={<><b>nodes/&lt;package&gt;</b> <span className="tree-note">in your studio project workspace</span></>} defaultOpen>
+    <Tree.File name={<><b>package.yaml</b> <span className="tree-note">name, category, allowedHosts, requires</span></>} />
+    <Tree.Folder name="credentials" defaultOpen>
+      <Tree.File name={<><b>&lt;name&gt;Credential.yaml</b> <span className="tree-note">one credential type</span></>} />
+    </Tree.Folder>
+    <Tree.Folder name="shared" defaultOpen>
+      <Tree.File name={<><b>endpoints.yaml</b> <span className="tree-note">fragments several nodes reuse</span></>} />
+      <Tree.File name={<><b>helpers.yaml</b> <span className="tree-note">named functions every expression can call</span></>} />
+    </Tree.Folder>
+    <Tree.Folder name="nodes" defaultOpen>
+      <Tree.Folder name="&lt;NodeName&gt;" defaultOpen>
+        <Tree.File name={<><b>node.yaml</b> <span className="tree-note">what it is: the only required file</span></>} />
+        <Tree.File name={<><b>interface.yaml</b> <span className="tree-note">what it connects to</span></>} />
+        <Tree.File name={<><b>config.yaml</b> <span className="tree-note">the settings form</span></>} />
+        <Tree.Folder name={<><b>api</b> <span className="tree-note">always a folder</span></>} defaultOpen>
+          <Tree.File name={<><b>run.yaml</b> <span className="tree-note">the calls it makes</span></>} />
+          <Tree.File name={<><b>events.yaml</b> <span className="tree-note">everything that leaves the node</span></>} />
+        </Tree.Folder>
+        <Tree.File name={<><b>test.yaml</b> <span className="tree-note">a fixture that runs</span></>} />
+      </Tree.Folder>
+    </Tree.Folder>
+  </Tree.Folder>
+</Tree>
 
 Each file carries a `$schema` pointer, so your editor autocompletes every field and shows
 errors as you type. The schema descriptions are the field reference, so they cannot drift
@@ -103,13 +102,13 @@ mean scrolling past a logo URL.
 Every section except `api` may instead be inlined into `node.yaml`, so a simple node can
 be one file. Defining a section in two places is an error, never a merge.
 
-## The five files
+### The five files, in full
 
 Taken from the real `OpenAI` node, trimmed of its comments.
 
-### `node.yaml`: what it is
+### `node.yaml`
 
-```yaml
+```yaml node.yaml
 $schema: ../../../_schema/node.schema.json
 
 type: OpenAI
@@ -147,7 +146,7 @@ non-deterministic. Nodes that read content through a **volatile URL** (a presign
 that changes every run) use the object form and declare the content's real identity
 instead:
 
-```yaml
+```yaml node.yaml
 capabilities:
   cacheable:
     ignore: [fileUrl]     # volatile config fields, dropped from the fingerprint
@@ -162,7 +161,7 @@ is called; if a key field collects nothing on a run, that run is not cached.
 **cannot be undone**: it sends, posts, charges, or writes into somewhere outside the
 platform. A deleted scratch row can be undone and needs nothing; a delivered email cannot.
 
-```yaml
+```yaml node.yaml
 capabilities:
   cacheable: false
   emitsExternally: true
@@ -179,9 +178,9 @@ the workflow, and there is no parameter that lets a test perform one.
 If you are unsure, set it. A withheld node costs a build nothing; an unwanted send costs a
 real person something.
 
-### `interface.yaml`: what it connects to
+### `interface.yaml`
 
-```yaml
+```yaml interface.yaml
 $schema: ../../../_schema/interface.schema.json
 
 inputs:
@@ -203,12 +202,12 @@ credentials:
     displayName: OpenAI API
 ```
 
-### `config.yaml`: the settings form
+### `config.yaml`
 
 Canvas renders the form from this, and the executor resolves `{{ config.* }}` against the
 saved values.
 
-```yaml
+```yaml config.yaml
 $schema: ../../../_schema/config.schema.json
 
 configSchema:
@@ -240,11 +239,11 @@ that the platform injects; you never declare them, and their names (`authRequire
 
 `ui:field: template` is what makes a field wirable from an upstream node.
 
-### `api/run.yaml`: the calls it makes
+### `api/run.yaml`
 
 A list, always, even when there is one call. Each entry is named for what it fetches.
 
-```yaml
+```yaml api/run.yaml
 - name: generate
   method: POST
   url: { $ref: endpoints#responses }
@@ -309,13 +308,13 @@ on a job, and `state` to remember between runs. See
 `error` matters more than it looks. An API that returns HTTP 200 with an error in the
 body will otherwise read as success and hand nonsense downstream.
 
-### `api/events.yaml`: everything that leaves the node
+### `api/events.yaml`
 
 **One row per output connector, in the same order `interface.yaml` declares them.** Read
 this one file and you know the node's entire outward behaviour. Lint enforces the coverage
 and the order, so it stays true after edits.
 
-```yaml
+```yaml api/events.yaml
 - emit: text
   from: response
   value: "return response.output.filter(o => o.type === 'message').map(...).join('')"
@@ -361,7 +360,7 @@ For a streaming node, two controls matter:
 - `throttleMs` or `throttleChars` bound how often a row emits. Nothing held back is
  dropped; it is flushed when the run ends.
 
-```yaml
+```yaml api/events.yaml
 - emit: stream
   from: response
   match: response.output_text.delta
@@ -370,9 +369,9 @@ For a streaming node, two controls matter:
   throttleMs: 200
 ```
 
-### `test.yaml`: a fixture that runs
+### `test.yaml`
 
-```yaml
+```yaml test.yaml
 $schema: ../../../_schema/test.schema.json
 
 testData:
@@ -402,175 +401,26 @@ This catches the class of mistake no static check can. A real example: Handlebar
 produces a string, so `max_output_tokens: "{{ config.maxTokens }}"` once sent `"2048"` and
 the API rejected it. Only running it showed that.
 
-## `kind` is declared, and verified
+## Declaring `kind`
 
-State `PromiseNode` or `CallbackNode` in `node.yaml`. It could be inferred, but it is the
-first thing anyone wants to know about a node.
-
-Lint checks the declaration instead of trusting it. A node is a **CallbackNode** when:
-
-- its **last** call's transport streams (`sse` or `ws`), **or**
-- it declares a `toolExchange`, since a tool loop is multi-turn by definition, **or**
-- an input declares a `SPAWN` signal.
-
-Only the last call is considered, because that call is the node's answer. Every earlier one
-settles by definition, so a node can page through a list and then stream its reply.
-
-Declare `PromiseNode` while doing any of them and lint names the one that contradicts you.
+Every node states `PromiseNode` or `CallbackNode` in `node.yaml`, and lint checks the
+declaration rather than trusting it. [Node types](/nodes/node-types) covers which to choose
+and what makes a node one or the other.
 
 ## Templates and expressions
 
-Two syntaxes, and which one applies is decided by the field, never by the node.
+Two syntaxes read values out of the run and shape them into a call, and which one applies
+is decided by the field: a `string` takes a `{{ }}` template, while an `object` or `array`
+takes a `return` expression.
 
-**`{{ }}` is a Handlebars template**, resolved against the run context below.
+[Templates and expressions](/nodes/expressions) is the full grammar, the sandbox, and every
+root your calls can see.
 
-Registered helpers work anywhere a template does: `eq`, `contains`, `filter`, `toJSON`.
-So conditional prompt text is an ordinary `{{#if}}`, including inside a System Prompt a
-user typed:
-
-```yaml
-instructions: |-
-  {{#if (eq config.tone "warm")}}Be warm.{{else}}Be terse.{{/if}}
-  {{prompt.markdownGuidelines}}
-```
-
-There is **no `{{input.*}}` root.** A wrong path resolves to empty silently. Array
-elements and object keys are dot segments, never brackets: `records.0.Name`.
-
-`prompt.<blockName>` is why a manifest should never hard-code instruction text. Blocks live
-in `prompts/blocks/**/*.md`, are toggleable, and are camelCased from the filename
-(`markdown-guidelines.md` becomes `{{prompt.markdownGuidelines}}`). A copy of a block's
-words baked into a node is a fork that silently stops tracking the block.
-
-**A string starting with `return ` is a sandboxed expression**, evaluated at any depth. Use
-it when a value's SHAPE depends on the run: an array member that is only sometimes present,
-or a key whose name varies by model. It is the same evaluator config template fields
-already use, so it is not a second language to learn.
-
-Security is by absence. There is no `process`, `require`, `fetch`, `eval`, `new`,
-assignment or `constructor` for an expression to reach, because the interpreter never
-implements them.
-
-Available: member access, indexing, literals, spread, template strings, operators,
-ternaries, arrow callbacks, and `JSON`, `Math`, `Number`, `String`, `Boolean`, `parseInt`,
-`parseFloat`, `encodeURIComponent`, `Object.*` and `Array.*`. Plus a few the platform adds,
-because without them a node could not be a manifest at all:
-
-- **`Date.now()` and `Date.iso(ms)`.** Half the APIs a node calls take a date range and want
- an ISO string. `Date.iso(Date.now() - 30 * 86400000).split('T')[0]` is thirty days ago as
- `YYYY-MM-DD`. There is no `new Date(...)`, because that is a construction the sandbox
- refuses.
-- **`sha256(value)`.** A stable id derived from content, which downstream dedup joins on.
-- **`toBase64(value)`.** Plain text as UTF-8 bytes in base64, the form bytes take on the
- way to an `encoding: binary` body. Storing text a workflow already holds (markdown back
- to S3) is the case; the sandbox has no other encoder.
-
-Nothing mutates. Use `.at(-1)` and never `.pop()`, `.toSorted()` and never `.sort()`. The
-array you would be sorting is a live upstream output, so sorting it in place would reorder
-it for every other node reading the same value.
-
-### Give a long expression a name
-
-An expression is one string, which is fine for `return response.data` and bad for a row
-projection. When one grows past a few lines, declare it as a **helper** in any `shared/*.yaml`
-file. Helpers are collected across the package and callable from every expression in it:
-
-```yaml
-# shared/helpers.yaml
-helpers:
-  keptMeta:
-    args: [metadata, keep]
-    body: >-
-      return keep.filter(k => metadata[k] != null && metadata[k] !== '')
-        .reduce((acc, k) => Object.assign(acc, { [k]: metadata[k] }), {})
-  row:
-    args: [r]
-    body: "return { id: r.id, title: r.title, meta: helpers.keptMeta(r.metadata, ['tagline']) }"
-```
-
-```yaml
-# api/service.yaml
-returns: "return response.items.map(helpers.row)"
-```
-
-A helper sees **only its arguments and its sibling helpers**. Not `config`, not
-`credentials`, not the scope of whatever called it: a named function whose answer depends on
-state it never named is the thing worth avoiding, and `credentials` is in scope at most call
-sites. Same sandbox, no extra authority, and a broken body fails when the package loads
-rather than on the first request that reaches it.
-
-Declare them next to the call they shape rather than in one big file. Two files declaring the
-same helper name is an error, not a merge.
-
-## The run context
-
-What your calls can see, and where each piece comes from.
-
-### Your node's own surroundings
-
-| Root | Is |
-|---|---|
-| `config.<field>` | this node's settings, already resolved |
-| `credentials.<name>.<field>` | a credential this node declared |
-| `signal.<nodeId>.<output>.<field>` | an upstream node's output |
-| `services.<connector>` | what is wired at run time, such as `services.mcpService.tools` |
-| `prompt.<blockName>` | a prompt block from the library |
-
-### The run it is part of
-
-| Root | Is |
-|---|---|
-| `user.email`, `user.id`, `user.name` | the signed-in person |
-| `scope.workflowId`, `scope.userId` | which run this is |
-| `calls.<name>` | the reply from a call made earlier in this node |
-| `params.<name>` | arguments a caller passed, for a service method |
-| `token.instanceUrl` | where an OAuth2 exchange said to talk, when an API returns one |
-
-**`user` is identity, and nothing that authenticates as them.** Email, id and name, never
-the caller's access token. That is deliberate: a token *is* the user against our own
-services, so a node holding one could send it to any host its package allows. An email
-authenticates nothing.
-
-It is a first-class root because "who is asking" is the join key for every CRM, support and
-account node. Reading identity out of the request instead would let a caller fetch somebody
-else's record.
-
-```yaml
-- name: contact
-  method: GET
-  url: https://api.example.com/contacts
-  transport: json
-  query:
-    email: "{{ user.email }}"
-```
-
-**`calls.<name>` is how a second call uses the first.** A call skipped by its `when` leaves
-no key at all, so `calls.x` is also how you ask whether it ran.
-
-### Workflow-level values
-
-Set on the workflow and shared by every node in it: `workflow.variables`, plus
-`workflow.id`, `workflow.name`, `workflow.runId`, `workflow.userId` and
-`workflow.conversationId`. Inside a loop, `loop` carries the current item, and `saved`
-carries outputs other nodes chose to keep.
-
-These resolve **before your node runs**, while its settings are being prepared. So they
-belong in a `config.yaml` field, and your calls read the result as `{{ config.<field> }}`.
-
-```yaml config.yaml
-region:
-  type: string
-  title: Region
-  default: "{{workflow.variables.region}}"
-```
-
-[Config Schema](/nodes/config-schema) covers that layer in full.
-
-## AllowedHosts: declare every host you call
+## Allowed hosts
 
 `package.yaml` lists the only hosts this package's nodes may reach. **Deny by default.**
 
-```yaml
+```yaml test.yaml
 allowedHosts:
   - api.openai.com
 ```
@@ -583,7 +433,7 @@ Enforced twice: statically by lint, and at run time **after** templating, becaus
 can itself be templated. Non-https is refused outright, since a credential must never
 travel in clear text. `*.example.com` matches exactly one subdomain level.
 
-## Check it before you run it
+## Check it
 
 ```bash
 unoverse node lint
@@ -603,8 +453,10 @@ It catches what would otherwise surface much later, in a workflow, as nothing ha
 
 ## Next steps
 
-Read [Node Discoverability](/nodes/node-discoverability) before you write `whenToUse`. It
-decides whether the AI workflow builder ever offers your node.
+<Card title="Node Discoverability" icon="search" href="/nodes/node-discoverability" horizontal>
+Read this before writing `whenToUse`. It decides whether your node is ever offered.
+</Card>
 
-[Config Schema](/nodes/config-schema) covers every field type your settings form can hold,
-and [Credentials](/nodes/credentials) covers authenticating against a real service.
+<Card title="node.yaml" icon="book-marked" href="/reference/node-envelope" horizontal>
+Every field a node envelope takes, generated from the schema.
+</Card>

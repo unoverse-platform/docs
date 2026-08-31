@@ -70,7 +70,7 @@ booking flow, a dashboard.
 
 An app owns its own states and layouts, and arranges components inside it.
 
-Lives in `design/<project>/apps/`. [How apps work](/design/templates).
+Lives in `design/<project>/apps/`. [How apps work](/design/apps).
 </Accordion>
 
 <Accordion title="Components" icon="square-dashed">

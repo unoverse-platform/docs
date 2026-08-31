@@ -17,7 +17,7 @@ name: airtable
 displayName: Airtable
 description: Read and write records in Airtable bases.
 version: 1.0.0
-category: Storage & Data
+category: storage
 requires:
   credential: [bearer]
   transport: [json]

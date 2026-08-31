@@ -3,13 +3,12 @@ sidebarTitle: "Analytics"
 title: "Analytics"
 ---
 
-**Add one key to a node and that interaction is reported to the page's analytics. You choose the moments. Nothing is measured unless you say so.**
+Add one key to a node and that interaction is reported to the page's analytics. You choose
+the moments, and nothing is measured unless you say so.
 
-Analytics here means what a person did in your experience. Which items they opened, what
+Analytics here means what a person did in your experience: which items they opened, what
 they clicked, where they stopped. It is separate from platform monitoring, which measures
 whether the machinery is healthy.
-
----
 
 ## The one key
 
@@ -25,24 +24,20 @@ whether the machinery is healthy.
       item_id: "{{universal_id}}"
 ```
 
-Two fields. `event` is the name that arrives in the analytics tool. `params` are the values
-sent with it.
-
-`{{...}}` reads the data already in scope at that node. It is the same binding an action's
-`values` use, so there is nothing new to learn.
+Two fields. `event` is the name that arrives in the analytics tool, and `params` are the
+values sent with it. `{{...}}` reads the data already in scope at that node, which is the
+same binding an action's `values` use.
 
 A node with no `analytics` block reports nothing. Silence is the default.
 
----
+## Moments a click does not cover
 
-## Opening a view is a moment, not a click
-
-A card and its detail view are one instance. The detail can open several ways: the card is
+A card and its detail are one instance, and the detail opens several ways: the card is
 tapped, the workflow pushes it open, a suggestion lands on it. Reporting the tap alone
 misses the rest.
 
-So the view event is declared in the **manifest**, beside the lifecycle hooks, and it uses
-their grammar. It fires when the state is entered, however it was entered.
+So a view event is declared in the manifest, beside the lifecycle hooks, using their
+grammar. It fires when the state is entered, however it was entered:
 
 ```yaml manifest.yaml
 lifecycle:
@@ -58,11 +53,11 @@ analytics:
       item_name: "{{title}}"
 ```
 
-`layouts` names the STATES that fire it, exactly as it does for a hook. The component
-already reports entering a state, because that is the moment `onEnterView` exists for. The
-declaration rides the same moment, so there is nothing to wire and no action to chain.
+`layouts` names the states that fire it, exactly as it does for a hook
+([Lifecycle hooks](/design/lifecycle-hooks)). The component already reports entering a
+state, so the declaration rides that moment and there is nothing to wire.
 
-A server action takes a manifest entry too. Key it by `action` instead of `phase`:
+A server action takes a manifest entry too, keyed by `action` instead of `phase`:
 
 ```yaml
 analytics:
@@ -73,21 +68,17 @@ analytics:
       item_id: "{{universal_id}}"
 ```
 
-An `action` entry fires when your universe receives that action from the component. Not
-on the click, which an ad-blocker can silence, and not on the workflow finishing. The
-submission arrived; that is the fact it reports.
+An `action` entry fires when your universe receives that action, rather than on the click,
+which an ad-blocker can silence, and rather than on the workflow finishing. The submission
+arrived, and that is the fact it reports. A button whose action stays on the page keeps its
+`analytics` key on the node.
 
-A button whose action stays on the page still carries its `analytics` key on the node,
-as above.
+## Naming events
 
-## Choosing event names
-
-Use the analytics tool's own vocabulary where it has a word for what happened. GA4 defines
-`view_item`, `generate_lead`, `select_item` and others. Those names populate its built-in
-reports with no setup.
-
-Invent a name only when no standard one fits. Prefix it with `unoverse_` so it cannot
-collide with an event the page already fires.
+Use the analytics tool's own vocabulary wherever it has a word for what happened. GA4
+defines `view_item`, `generate_lead`, `select_item` and others, and those names populate
+its built-in reports with no setup. Invent a name only when no standard one fits, and
+prefix it with `unoverse_` so it cannot collide with an event the page already fires.
 
 | Moment | Name |
 |---|---|
@@ -95,18 +86,28 @@ collide with an event the page already fires.
 | Somebody submits an enquiry form | `generate_lead` |
 | Somebody opens the experience | `unoverse_experience_opened` |
 
-Names are yours to choose. The platform holds no list.
+**One event per kind of thing.** A course, a product and a service are the same moment:
+somebody looked at one thing in detail. Give them one event and separate them with a param.
 
----
+```yaml
+analytics:
+  event: view_item
+  params:
+    item_category: "course"
+```
+
+Splitting them into `view_course` and `view_product` fragments the reporting. An analytics
+tool breaks one event down by param automatically, and it cannot recombine two event names
+into one funnel.
 
 ## Choosing params
 
-Send what answers a question somebody will ask. Leave out anything that only describes the
-machinery.
+Send what answers a question somebody will ask, and leave out anything that only describes
+the machinery.
 
 Match the field names the customer's own analytics already uses. Their reports and filters
-are built on those names, so a matching param joins work they have already done. A generic
-name arrives as a column somebody has to map by hand.
+are built on those names, so a matching param joins work they have already done, while a
+generic name arrives as a column somebody has to map by hand.
 
 ```yaml
 analytics:
@@ -117,24 +118,19 @@ analytics:
     item_category: "{{object_type}}"
 ```
 
-A param that resolves to nothing is dropped. An absent value is absent in the report, never
-an empty column that reads as data.
+A param that resolves to nothing is dropped, so an absent value is absent in the report
+rather than an empty column that reads as data.
 
----
+**Three things never go in an event**, and breaking any of them is a data protection
+problem rather than a bug:
 
-## What never goes in an event
+- **No personal data.** No name, email, phone or date of birth. Analytics tools prohibit
+  it, and the property receiving it belongs to your customer.
+- **No authored content.** Report which item somebody opened, never what it said.
+- **No typed text.** A person's question or form entry stays out, because both routinely
+  contain personal detail.
 
-Three rules, and breaking any of them is a data protection problem rather than a bug.
-
-**No personal data.** No name, email, phone or date of birth. Analytics tools prohibit it,
-and the property receiving it belongs to your customer.
-
-**No authored content.** Report which item somebody opened. Never report what it said.
-
-**No typed text.** A person's question or form entry stays out. Both routinely contain
-personal detail.
-
-An enquiry event carries an opaque reference to the record, never the record.
+An enquiry event carries an opaque reference to the record, never the record:
 
 ```yaml
 analytics:
@@ -144,42 +140,61 @@ analytics:
     item_id: "{{universal_id}}"
 ```
 
----
+## Connecting Google Analytics
 
-## One event per kind of thing
+You declare what happened, and the host page declares where it goes.
 
-A course, a product and a service are the same moment. Somebody looked at one thing in
-detail. Give them one event and separate them with a param.
+That split is deliberate. A visitor's analytics client id lives in a first-party cookie on
+the customer's own domain, which code in the host page can read and a server call cannot.
+Sending from the server would file your events under a separate, unjoinable visitor: data
+that looks real and is unusable. Running in the page also inherits the consent state,
+regional configuration and retention terms the customer has already set, rather than
+reimplementing all of it per customer.
 
-```yaml
-analytics:
-  event: view_item
-  params:
-    item_category: "course"
+Name the destination on `window.unoverseConfig`, beside the embed:
+
+```html
+<script>
+  window.unoverseConfig = {
+    analytics: { target: "gtag", measurementId: "G-XXXXXXX" }
+  };
+</script>
+<script async src="https://universe.example.com/embed.js" data-app="acme/acme-chat"></script>
 ```
 
-Splitting them into `view_course` and `view_product` fragments the reporting. An analytics
-tool breaks one event down by param automatically. It cannot recombine two event names into
-one funnel.
+| Field | What it does |
+|---|---|
+| `target` | `gtag`, `dataLayer` or `custom` |
+| `measurementId` | `gtag` only. Pins one GA4 property |
+| `global` | The window global to write to, when it is not the default |
+| `debug` | Prints each event to the console as it fires |
 
----
+**Which target to name.** A bare GA4 snippet is `gtag`, because a dataLayer push only
+becomes a GA event under Tag Manager. A page running GTM is `dataLayer`.
 
-## Where events go is not your decision
+**The target is never detected.** A customer page routinely carries several analytics tools
+at once, and picking whichever global happens to exist would eventually push one customer's
+behavioural data into a different vendor's property. That is a data protection incident
+rather than a bug, so the destination is always named, and an absent one means silence,
+warned once.
 
-You declare what happened. The destination is configured per customer, outside `design/`.
+### Where events reach
 
-The reason is practical. The same app runs on a customer's site, in the unoverse
-client, and inside an MCP app host. Each has a different destination, or none. An app
-cannot know which one it is in.
+| Surface | Do events reach their analytics? |
+|---|---|
+| Embedded on a customer's own site | Yes. The host page carries their tag |
+| The unoverse client | Not applicable, because the host page is ours |
+| An MCP app host, such as ChatGPT | No. The widget is sandboxed under an enforced CSP |
 
-Analytics is off unless a customer has been configured. Your declarations sit dormant until
-then, and cost nothing.
+Events fire on all three and only delivery differs, so with no listening host the post is a
+silent no-op rather than a broken call.
 
----
+**Expect undercounting.** Content blockers stop some of these calls, so never reconcile
+these numbers against server-side totals as though the gap were a bug.
 
 ## Checking your events
 
-Turn on debug for the channel you are testing. Each event prints as it fires.
+Turn on debug for the channel you are testing, and each event prints as it fires.
 
 ```
 [unoverse:analytics] view_item {item_id: "...", item_name: "..."}
@@ -187,25 +202,15 @@ Turn on debug for the channel you are testing. Each event prints as it fires.
 
 Filter the browser console on `unoverse:analytics` to see only these.
 
----
-
-## Troubleshooting
+### When an event misbehaves
 
 | Symptom | Fix |
 |---|---|
-| No event at all | the node has no `analytics` block, or the interaction runs on a different node than you think |
-| Event fires, params empty | the `{{field}}` name is not in scope at that node: check the field the node's own binds use |
-| Event fires twice | two nodes declare it, commonly a wrapper and the element inside it |
-| Nothing reaches the analytics tool | the destination is not configured for that channel, which is the default |
-| Params arrive under the wrong names | match the customer's vocabulary, not a generic one |
-
----
-
-## Related
-
-- [Components](/design/components) for the node grammar
-- [State](/design/state) for how a view change is a state write
-- [Lifecycle Hooks](/design/lifecycle-hooks) for fetching data at a moment, which is a different job
+| No event at all | The node has no `analytics` block, or the interaction runs on a different node than you think |
+| Event fires, params empty | The `{{field}}` name is not in scope at that node. Check the fields the node's own binds use |
+| Event fires twice | Two nodes declare it, commonly a wrapper and the element inside it |
+| Nothing reaches the analytics tool | The destination is not configured for that channel, which is the default |
+| Params arrive under the wrong names | Match the customer's vocabulary rather than a generic one |
 
 ## Next steps
 

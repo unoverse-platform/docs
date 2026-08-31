@@ -110,4 +110,13 @@ is how a streaming node also produces a settled final value.
 | What leaves the node, and when? | `api/events.yaml` |
 | What has to arrive before it runs? | `interface.yaml`, as `required` |
 
-[Anatomy of a Node](/nodes/manifest-nodes) walks through all of them.
+
+## Next steps
+
+<Card title="Anatomy of a node" icon="boxes" href="/nodes/manifest-nodes" horizontal>
+The folder, the five files, and how a call is described.
+</Card>
+
+<Card title="node.yaml" icon="book-marked" href="/reference/node-envelope" horizontal>
+Where `kind` sits, with every other envelope field.
+</Card>

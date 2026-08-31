@@ -128,12 +128,9 @@ runs once per item like any other step.
 
 That keeps a node simple: it takes what it is given, does one job, and emits.
 
-## Service connectors are different
-
-The dots covered here carry data through a workflow. A node can also offer a capability that
-other nodes call directly, which uses a service edge instead.
-
-That is [Service Connectors](/nodes/service-connectors).
+A service connector is a different thing entirely: it is a node calling another node on
+demand, rather than a value travelling along an edge, and it fires no outputs. See
+[Service Connectors](/nodes/service-connectors).
 
 ## When it goes wrong
 
@@ -146,6 +143,12 @@ That is [Service Connectors](/nodes/service-connectors).
 | Lint: this must be a `CallbackNode` | The transport streams, or the node declares a `toolExchange` |
 | A downstream node gets one word at a time | The row needs `accumulate: true` |
 
----
+## Next steps
 
-**Next**: [Discoverability](/nodes/node-discoverability)
+<Card title="Node types" icon="split" href="/nodes/node-types" horizontal>
+Settling once or emitting many times, and how the platform tells.
+</Card>
+
+<Card title="api/events.yaml" icon="book-marked" href="/reference/node-events" horizontal>
+Every field an events row takes, generated from the schema.
+</Card>

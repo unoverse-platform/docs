@@ -6,7 +6,7 @@ title: "Testing Nodes"
 Run your node against the real service before you put it in a workflow. **studio** has a
 Nodes tab for exactly that, and nothing has to be published first.
 
-## In Studio
+## In studio
 
 Open the **Nodes** tab and pick your node. You get three panes.
 
@@ -28,7 +28,7 @@ now rather than after someone else meets it.
 
 ## Load sample
 
-If your node has `test.yaml`, Studio shows a **Load sample** button. It fills the form from
+If your node has `test.yaml`, **studio** shows a **Load sample** button. It fills the form from
 `testData.config` and the inputs from `testData.inputs`, so you are one click from a run
 rather than typing settings each time.
 
@@ -124,6 +124,12 @@ When that happens, the difference is almost always a template path: the node id 
 output name does not match the edge you drew. [Troubleshooting](/nodes/troubleshooting)
 covers it.
 
----
+## Next steps
 
-**Next**: [Discoverability](/nodes/node-discoverability)
+<Card title="Packages" icon="package" href="/nodes/package-marketplace" horizontal>
+The envelope around a set of nodes, and publishing it.
+</Card>
+
+<Card title="test.yaml" icon="book-marked" href="/reference/node-test" horizontal>
+Every field a fixture takes, generated from the schema.
+</Card>

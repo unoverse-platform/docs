@@ -53,7 +53,7 @@ and hosts can see, place at spawn, and react to. Everything nested below is
 state sits in the tree), not a judgment call. The old VIEW test (three questions) is
 superseded by this one rule, and the `<face>-<step>` filename convention is
 superseded as MECHANISM only: ownership lives in the tree, while the axis prefix
-survives as the naming convention for step drawings (the same-name bullet, below). The
+survives as the naming convention for step drawings (the naming bullet, below). The
 rearrange rule survives as its guide:
 
 > **If the app must rearrange to show it, make it a PUBLIC state.
@@ -113,22 +113,19 @@ The root's `state:` block IS the design, readable top to bottom:
 
 ```yaml
 # product-card.yaml (the sab pilot, as shipped)
-state:
-  view:
-    initial: products
+states:                       # TOP LEVEL (2026-08-29); `state.view` is the legacy wrapper
+  products:
+    layout: layouts/products  # REQUIRED path: nothing assumed
+  detail:
+    layout: layouts/product
+    on: step
     states:
-      products: {}                # same-name convention: draws layouts/products
-      detail:
-        layout: product           # declared ONLY because the filename differs
-        on: step
-        initial: detail
-        states:
-          detail: { layout: product-detail }
-          apply:  { layout: product-apply }
+      detail: { layout: layouts/product-detail }
+      apply:  { layout: layouts/product-apply }
 ```
 
-`layout:` is optional and `{}` is a complete state: no declaration means the state
-draws the layout of its own name (STATE_MODEL §5 rule 1). A state's own layout is
+`layout:` is REQUIRED and its value is a root-relative path (2026-08-29 ruling; the
+same-name default and `{}`-is-complete are retired — STATE_MODEL §5 rule 1). A state's own layout is
 its SHELL (always on while active, never a choice); its substates are the STEPS,
 the only choices inside it, addressed by their state names.
 
@@ -270,14 +267,14 @@ state:
   view:
     initial: inline
     states:
-      inline:  { layout: inline }
+      inline:  { layout: layouts/inline }
       focused:
         layout: focused          # shell: stepper + Switch on step
         initial: question
         states:
-          question: { layout: question }   # binds the CURRENT step's data
-          summary:  { layout: summary }
-          result:   { layout: result }
+          question: { layout: layouts/question }   # binds the CURRENT step's data
+          summary:  { layout: layouts/summary }
+          result:   { layout: layouts/result }
 ```
 
 The `step` value selects which data the `question` layout binds; only genuinely

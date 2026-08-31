@@ -96,22 +96,26 @@ using a newer capability would publish cleanly and then fail when something ran 
 
 Two folders sit beside `nodes/`, and both exist so a value has one home.
 
-```
-example/
-├── package.yaml
-├── credentials/
-│   └── exampleCredential.yaml
-├── shared/
-│   ├── endpoints.yaml
-│   └── models.yaml
-└── nodes/
-```
+<Tree>
+  <Tree.Folder name="example" defaultOpen>
+    <Tree.File name="package.yaml" />
+    <Tree.Folder name="credentials" defaultOpen>
+      <Tree.File name="exampleCredential.yaml" />
+    </Tree.Folder>
+    <Tree.Folder name="shared" defaultOpen>
+      <Tree.File name="endpoints.yaml" />
+      <Tree.File name="models.yaml" />
+    </Tree.Folder>
+    <Tree.Folder name="nodes" />
+  </Tree.Folder>
+</Tree>
 
 `credentials/` describes each credential the package's nodes ask for. `shared/` holds
 fragments more than one node reuses, reached with `$ref`.
 
 ```yaml
-url: { $ref: endpoints#search }
+url:
+  $ref: endpoints#search
 ```
 
 When the API moves an endpoint, one file changes rather than every node.
@@ -125,6 +129,12 @@ When the API moves an endpoint, one file changes rather than every node.
 | Lint: unknown category | A node category used on a package, or the reverse |
 | A node calls out and is refused at run time | The URL resolved to a host outside `allowedHosts` |
 
----
+## Next steps
 
-**Next**: [Troubleshooting](/nodes/troubleshooting)
+<Card title="Troubleshooting" icon="wrench" href="/nodes/troubleshooting" horizontal>
+When a node loads but does nothing.
+</Card>
+
+<Card title="package.yaml" icon="book-marked" href="/reference/node-package" horizontal>
+Every field the package envelope takes, generated from the schema.
+</Card>

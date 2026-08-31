@@ -13,7 +13,7 @@ data stores plus two small artifacts, and the VM is disposable.
 | | Postgres | Redis |
 | --- | --- | --- |
 | Workflows, and the runs of them | Yes | |
-| Your components, templates, skills and prompts | Yes | |
+| Your components, apps, skills and prompts | Yes | |
 | Installed nodes, and what should be installed | Yes | |
 | Conversations, memory and traces | Yes | |
 | Credentials, encrypted | Yes | |

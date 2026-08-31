@@ -104,18 +104,3 @@ whether to call it. Write what the tool achieves.
 
 If the Agent has no tools at all, nothing is wired to the `mcp` connector.
 
-## Testing without the platform
-
-`unoverse node test` needs no server. It reads keys from your own `.env` as
-`<CREDENTIAL>_<FIELD>` in upper snake case, so `openAICredential.apiKey` is
-`OPENAI_API_KEY`, and it names any that are missing before it runs.
-
-If a node passes on the bench and fails in a workflow, the difference is what reaches it.
-The bench uses `testData.inputs`; the workflow uses whatever the edges carry.
-
-## Still stuck
-
-- [Anatomy of a Node](/nodes/manifest-nodes) for the format
-- [Config Schema](/nodes/config-schema) for templates and the run context
-- [Credentials](/nodes/credentials) for keys and auth schemes
-- `unoverse node lint` again, because most of this is a rule it already knows

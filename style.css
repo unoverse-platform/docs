@@ -609,16 +609,18 @@
 /* Rhythm: reference rows are denser than prose. The theme spaces them for reading. */
 #content-area .param-head { padding-bottom: 0.15rem; }
 
-/* Scales tables: this page is 27 values with one number each, so a table is right —
-   it just has to look like the same design as the field cards beside it. */
+/* Table code: no pill, and QUIET in body cells. A cell listing six field names must
+   read as one sentence, not six purple flares — the mono face alone marks the code.
+   The first column is the row's key, so it keeps the accent for scanning. */
 #content-area table code {
   font-size: 0.8125rem;
   background: none;
   padding: 0;
-  color: #4c3fd1;
+  color: inherit;
   font-weight: 500;
 }
-.dark #content-area table code { color: #8b7ef8; }
+#content-area td:first-child code { color: #4c3fd1; }
+.dark #content-area td:first-child code { color: #8b7ef8; }
 
 /* Reference tables carry one short value per row, so the theme's reading-height rows leave a
    27-step scale two screens tall. Tighten to a scannable rhythm. */
@@ -677,6 +679,54 @@
 }
 :root {
   --u-ref-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19.5A2.5 2.5 0 0 1 6.5 17H20'/%3E%3Cpath d='M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'/%3E%3C/svg%3E");
+}
+
+/* ── Section links ───────────────────────────────────────────────────────────
+   A link to a section further down the same page gets the same pill, marked
+   with a jump arrow so the reader knows they are staying on this page.
+
+   Selected by HREF, by the same reasoning as the reference pill. Scoped to
+   prose containers so the theme's own heading anchors and TOC never match. */
+#content-area :is(p, li, td) > a[href^="#"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.08rem 0.42rem 0.08rem 0.34rem;
+  border-radius: 0.3rem;
+  background: rgb(109 93 246 / 0.09);
+  border: 1px solid rgb(109 93 246 / 0.22);
+  color: #4c3fd1;
+  font-weight: 500;
+  text-decoration: none;
+  line-height: 1.35;
+  white-space: nowrap;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+#content-area :is(p, li, td) > a[href^="#"]:hover {
+  background: rgb(109 93 246 / 0.16);
+  border-color: rgb(109 93 246 / 0.4);
+}
+.dark #content-area :is(p, li, td) > a[href^="#"] {
+  background: rgb(139 126 248 / 0.13);
+  border-color: rgb(139 126 248 / 0.28);
+  color: #8b7ef8;
+}
+.dark #content-area :is(p, li, td) > a[href^="#"]:hover {
+  background: rgb(139 126 248 / 0.22);
+  border-color: rgb(139 126 248 / 0.45);
+}
+#content-area :is(p, li, td) > a[href^="#"]::before {
+  content: "";
+  width: 0.82em;
+  height: 0.82em;
+  flex: none;
+  background: currentColor;
+  opacity: 0.75;
+  -webkit-mask: var(--u-jump-icon) center / contain no-repeat;
+  mask: var(--u-jump-icon) center / contain no-repeat;
+}
+:root {
+  --u-jump-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='15 10 20 15 15 20'/%3E%3Cpath d='M4 4v7a4 4 0 0 0 4 4h12'/%3E%3C/svg%3E");
 }
 
 /* ── Concept sections ────────────────────────────────────────────────────────

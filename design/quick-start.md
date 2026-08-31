@@ -45,15 +45,19 @@ unoverse: "1.0"
 type: component
 name: pricecard
 category: Commerce
-description: A card showing a product name, price and short description.
-whenToUse: Show a single product or plan with its price.
 props:
-  title: { type: string, default: Pro Plan, input: true }
-  price: { type: string, default: $29/month, input: true }
+  title:
+    type: string
+    input: true
+    default: Pro Plan
+  price:
+    type: string
+    input: true
+    default: $29/month
   description:
     type: string
-    default: Everything in Basic, plus priority support.
     input: true
+    default: Everything in Basic, plus priority support.
 root:
   type: Box
   style:
@@ -81,14 +85,27 @@ Reading it top to bottom:
 
 | Part | What it does |
 |---|---|
-| `unoverse` `kind` `name` | The envelope. It marks the file as a component definition |
-| `whenToUse` | How an Agent finds your component. Write the words a user would say |
+| `unoverse` `type` `name` | The envelope. It marks the file as a component definition |
+| `category` | The job's domain. The rest of the discovery meta lives in the manifest |
 | `props` | Every field a workflow can fill. `input: true` marks a field as workflow-fed |
 | `default` | The value **studio** previews from, so make each one realistic content |
 | `root` | The layout, composed only from the closed primitive set |
 | `bind` | Maps a primitive's target to a field: `{ value: title }`, `{ src: image }` |
 | `visibleWhen` | A bare field name is a truthy test, so the row hides when the field is empty |
 | `style` | Token names only. Never `12px`, never `#fff` |
+
+## Add the manifest
+
+A `manifest.yaml` beside the definition is how an Agent finds the component. A flat file
+you only place yourself can skip it; anything an Agent should find carries one:
+
+```yaml
+description: A card showing a product name, price and short description.
+whenToUse: Show a single product or plan with its price.
+```
+
+The definition says what the component is. The manifest says when to reach for it, and
+that split never blurs: discovery meta lives here and nowhere else.
 
 ## Catch mistakes as you type
 

@@ -3,73 +3,113 @@ sidebarTitle: "Styles and tokens"
 title: "Styles and tokens"
 ---
 
-**LAW 1: definitions own ZERO style values. Token names only.**
+Your brand lives in `styles/`, as the values every definition resolves against. A
+definition never holds a colour, a size or a typeface. It names a token, and the theme
+decides what that name means.
 
-The SDK renderer owns no styles either: it only *resolves* token names against the theme served live from the platform (`unoverse://theme/<name>`, an MCP resource, never baked into a bundle). A color change is a refresh, not a release.
-
----
+The SDK owns no styles either. It resolves token names against the theme your platform
+serves live, at `unoverse://theme/<name>`, so a colour change is a refresh rather than a
+release.
 
 ## The law
 
-```yaml
-# ❌ NEVER: raw values in a definition
-style: { padding: 12px, color: "#4F46E5", fontSize: 1.25rem }
-
-# ✅ ALWAYS: token names
-style: { padding: "4", color: text.primary, font: headline.sm }
-```
-
-- No `px` / `rem` / `em` / `#hex` anywhere in any component, atom, or app definition. the deploy lint scans for exactly this and blocks ([Validate and ship](/design/validate-and-ship)).
-- Sizes use the **space scale**: step N is N × 0.25rem, so `width: "8"` is 2rem. Only real steps exist, and [Scales](/reference/scales) lists every one with what it resolves to. An invented step such as `"26"` is not rounded. It falls through as broken CSS and the element silently reverts to auto sizing, which the deploy lint catches.
-- **Page widths have NAMES** (`semantic/layout.yaml`): `compact` 30rem · `narrow` 35rem · `reading` 40rem · `page` 45rem · `wide` 50rem. They are aliases onto the same scale, so `maxWidth`/`hideBelow`/`stackBelow` read as what they are (`"maxWidth": "reading"`, not `"160"`). **The rule, so one value never gets two spellings:** a PAGE-level cap uses a name; an ELEMENT's own size (an image tile's height, a card's max) stays a scale step. An image tile is not a page.
-- ❌ No invented component-named tokens (`cardMin`, `wizardWidth`): use the generic scale steps. If the scale genuinely lacks a step, extend the scale in `styles/`, don't smuggle a value into a definition.
-
-## Style KEYS are closed too: the cross-platform contract
-
-It's not just values: the set of style **keys** (`padding`, `direction`, `radius`, `hover`, …) is a closed vocabulary, exactly the neutral intents the SDK style interpreter maps, and the contract every renderer (web today; iOS, Android, React Native, Flutter as they land) implements. An unknown key is ignored by **every** renderer, so it is always a typo (`colour`) or a web-ism that would never port (`backdropFilter`, `gridTemplateColumns`).
-
-Both the schema (editor squiggle) and the deploy lint (error) enforce the key set, including inside `hover`/`active` and `when[].apply`. If a design genuinely needs an intent the vocabulary lacks, that's a platform conversation (a new key every renderer must implement): never a definition-side workaround.
-
-**Why so strict:** brand and dark-mode swaps must touch `styles/` only. One raw hex in one definition breaks that guarantee for the whole org.
-
----
-
-## The grid: `columns` + `span`
-
-Equal splits need nothing but a column count. Two children in a two-column grid are halves; four in a four-column grid are quarters.
+**A definition owns zero style values.** Token names only.
 
 ```yaml
-style: { columns: "2", gap: "4" }   # two halves
-style: { columns: "4", gap: "4" }   # four quarters
+# Never: raw values in a definition
+style:
+  padding: 12px
+  color: "#4F46E5"
+  fontSize: 1.25rem
+
+# Always: token names
+style:
+  padding: "4"
+  color: text.primary
+  font: headline.sm
 ```
 
-**`span` is for UNEQUAL splits.** Put a 12-column grid on the container and let each child say how many columns it covers. 6 is a half, 4 a third, 3 a quarter.
+Three rules follow from it:
+
+- **No `px`, `rem`, `em` or `#hex`** in any component, atom, template or app. The deploy
+  lint scans for exactly this and blocks ([Validate and ship](/design/validate-and-ship)).
+- **Sizes use the space scale.** Step N is N × 0.25rem, so `width: "8"` is 2rem. Only real
+  steps exist, and an invented one such as `"26"` is not rounded: it falls through as
+  broken CSS and the element silently reverts to auto sizing. [Scales](/reference/scales)
+  lists every step.
+- **Never invent a component-named token** such as `cardMin` or `wizardWidth`. If the
+  scale genuinely lacks a step, extend the scale in `styles/` rather than smuggling a
+  value into a definition.
+
+**Page widths have names**, in `semantic/layout.yaml`: `compact`, `narrow`, `reading`,
+`page` and `wide`. They are aliases onto the same scale, so a cap reads as what it is.
+Use a name for a page-level cap on `maxWidth`, `hideBelow` or `stackBelow`, and a scale
+step for an element's own size. An image tile is not a page.
+
+Brand and dark-mode swaps must touch `styles/` alone, and one raw hex in one definition
+breaks that guarantee for the whole project.
+
+## Style keys
+
+The set of style keys is closed too. `padding`, `direction`, `radius`, `hover` and the
+rest are the neutral intents the SDK interprets, and the contract every renderer
+implements: web today, and iOS, Android and Flutter as those SDKs land.
+
+An unknown key is ignored by every renderer, so it is always a typo such as `colour`, or a
+web-ism that would never port, such as `backdropFilter` or `gridTemplateColumns`. The
+schema squiggles it as you type and the deploy lint errors on it, including inside `hover`,
+`active` and `when[].apply`.
+
+A design that genuinely needs an intent the vocabulary lacks is a platform conversation,
+because every renderer has to implement it. It is never a definition-side workaround.
+
+## Layout
+
+Equal splits need nothing but a column count. Two children in a two-column grid are halves,
+and four in a four-column grid are quarters.
+
+```yaml
+style:
+  columns: "2"
+  gap: "4"
+```
+
+**`span` is for unequal splits.** Put a twelve-column grid on the container and let each
+child say how many columns it covers, so 6 is a half, 4 a third and 3 a quarter:
 
 ```yaml
 type: Box
-style: { columns: "12", gap: "4" }
+style:
+  columns: "12"
+  gap: "4"
 children:
-  - { type: Box, style: { span: "8" } }   # two thirds
-  - { type: Box, style: { span: "4" } }   # one third
+  - type: Box
+    style:
+      span: "8"          # two thirds
+  - type: Box
+    style:
+      span: "4"          # one third
 ```
 
-Use the grid rather than percentage widths in a flex row. A grid subtracts its own gaps from the columns, so spans can never overflow; `"width": "50%"` twice plus a gap always does.
+Use the grid rather than percentage widths in a flex row. A grid subtracts its own gaps
+from the columns, so spans can never overflow, while `width: 50%` twice plus a gap always
+does.
 
-### Stacking is automatic
+**Stacking is automatic.** A spanning child gives up its span and takes the whole row once
+the grid runs out of space, so four quarter-width cards become four full-width cards,
+stacked. The threshold is `grid.stackBelow` in `semantic/grid.yaml`, and one grid can
+override it inline with `stackBelow`.
 
-A spanning child gives up its span and takes the whole row once the grid runs out of space, so four quarter-width cards become four full-width cards, stacked. Nothing to author.
+It measures the grid, not the browser window. A component reacts to the space it was
+actually given, so the same component stacks correctly in a narrow rail and lays out wide
+in a full panel, on any device. That is the same mechanism as `hideBelow` and `hideAbove`,
+and it is why there are no device breakpoints anywhere in `design/`.
 
-The threshold is `grid.stackBelow` in `semantic/grid.yaml` (starter: `space.120`, 30rem). Override it for the whole org there, or for one grid inline:
+## Atoms
 
-```yaml
-style: { columns: "12", stackBelow: "160" }   # hold the shape until 40rem
-```
-
-**It measures the grid, not the browser window.** A component reacts to the space it was actually given, so the same component stacks correctly in a 360px rail and lays out wide in a full panel, on any device. This is the same container-query mechanism as `hideBelow` / `hideAbove`, and it is why there are no device breakpoints anywhere in `design/`.
-
-## A shared look belongs in an atom, not in every component
-
-If several components draw the same card, the card's style is written once, in an atom, and composed by `Ref`. Repeating `background` + `border` + `radius` + `padding` in ten definitions is the same duplication LAW 1 exists to prevent, one level up: a token stops a value being repeated, an atom stops a *combination* of them being repeated.
+A token stops a value being repeated. An **atom** stops a combination of them being
+repeated. If several components draw the same card, the card's style is written once and
+composed with `Ref`:
 
 ```yaml
 # design/marketplace/atoms/card.yaml: the shape, once
@@ -86,15 +126,23 @@ root:
 ```
 
 ```yaml
-# any component: compose it, and layer on what is local to this use
-{ type: Ref, ref: card, style: { span: "3" }, children: [ … ] }
+# any definition: compose it, and layer on what is local to this use
+type: Ref
+ref: card
+style:
+  span: "3"
 ```
 
-**The `Ref`'s own `style` merges OVER the atom's**, so a component keeps the shared look and still overrides one thing (a tighter padding, no border) without forking the atom. That is the cascade: **atom = the look, `Ref` = this instance's exceptions.** Reach for a new atom the moment a second component needs the same combination; never copy the block.
+**The `Ref`'s own style merges over the atom's**, so a definition keeps the shared look
+and still overrides one thing, a tighter padding or no border, without forking the atom.
+The atom is the look, and the `Ref` is this instance's exceptions. Reach for a new atom
+the moment a second component needs the same combination, and never copy the block.
 
-A `Ref` also composes a whole flat **component**, which is how a shared piece of interface travels rather than a shared look. What is inlined reads the host's slice, because an embedded piece has no slice of its own. So **the piece's `state` initials come with it**: a renderer that starts on its first tab starts there in every component that embeds it. No host declares a default belonging to something it merely composes. The host's own values win on any key it declares, and the piece's `view` never travels, since arriving somewhere is the host's decision.
-
----
+A `Ref` also composes a whole flat component, which is how a shared piece of interface
+travels rather than a shared look. What it inlines reads the host's data, because an
+embedded piece has no slice of its own, so the piece's starting values come with it. The
+host's own values win on any key it declares, and the piece's public state never travels,
+because arriving somewhere is the host's decision.
 
 ## The token layers
 
@@ -106,73 +154,107 @@ A `Ref` also composes a whole flat **component**, which is how a shared piece of
     <Tree.File name={<><b>radius.yaml</b> <span className="tree-note">and shadow, border, motion</span></>} />
   </Tree.Folder>
   <Tree.Folder name={<><b>semantic</b> <span className="tree-note">named meanings, built from base</span></>} defaultOpen>
-    <Tree.File name={<><b>text-styles.yaml</b> <span className="tree-note">headline.lg, body.sm, referenced via font</span></>} />
-    <Tree.File name={<><b>layout.yaml</b> <span className="tree-note">page widths by name: compact, reading, page, wide</span></>} />
+    <Tree.File name={<><b>text-styles.yaml</b> <span className="tree-note">headline.lg, body.sm, named by role</span></>} />
+    <Tree.File name={<><b>layout.yaml</b> <span className="tree-note">page widths by name</span></>} />
     <Tree.File name={<><b>grid.yaml</b> <span className="tree-note">when a columns grid stacks</span></>} />
     <Tree.File name={<><b>app-sizes.yaml</b> <span className="tree-note">chat, rail, panel</span></>} />
     <Tree.File name={<><b>prose.yaml</b> <span className="tree-note">and fonts, icons, skeleton, keyframes, root</span></>} />
   </Tree.Folder>
   <Tree.Folder name={<><b>themes</b> <span className="tree-note">brand and dark-mode swaps</span></>} defaultOpen>
-    <Tree.File name={<><b>light.yaml</b> <span className="tree-note"></span></>} />
-    <Tree.File name={<><b>dark.yaml</b> <span className="tree-note"></span></>} />
+    <Tree.File name="light.yaml" />
+    <Tree.File name="dark.yaml" />
   </Tree.Folder>
 </Tree>
 
-| Layer | Answers | Definitions may reference? |
+| Layer | Answers | Definitions may reference it? |
 |---|---|---|
-| **base** | "what values exist" | ❌ never directly |
-| **semantic** | "what things mean" (`text.primary`, `surface.base`, space steps) | ✅ this is your vocabulary |
-| **themes** | "what this brand/mode maps them to" | ❌ selected at runtime, not referenced |
+| **base** | What values exist | No, never directly |
+| **semantic** | What things mean, such as `text.primary` and the space steps | Yes. This is your vocabulary |
+| **themes** | What this brand or mode maps them to | No. Selected at runtime, not referenced |
 
-Definitions speak **semantic**. Themes remap semantic → base per brand or mode; a theme-contract guard keeps token names consistent so every theme satisfies every definition.
+Definitions speak semantic. Themes remap semantic onto base per brand or mode, and a
+theme-contract guard keeps the names consistent, so every theme satisfies every definition.
 
-### Standard app sizes (`semantic/app-sizes.yaml`)
+Each project gets its own complete copy of this set, which is why two projects can take
+different looks from the same design-system component without either one forking it.
+`unoverse create` scaffolds the set, so rebranding is editing values rather than inventing
+structure.
 
-The named width blocks an app's `appWidth` can reference ([Apps](/design/apps)). The starter set:
+### Standard app sizes
+
+`semantic/app-sizes.yaml` holds the named widths an app's `appWidth` references
+([Apps](/design/apps)). The starter set:
 
 | Name | Starter value | Meant for |
 |---|---|---|
-| `chat` | `min(100vw, 680px)` | the core conversational surface: a panel that is always open |
-| `chat-slim` | `min(100vw, 480px)` | the narrow chat used when a voice panel/focus surface is open beside it |
-| `rail` | `min(100vw, 360px)` | a narrow stacked-cards slide-out |
-| `panel` | `min(100vw, 600px)` | a full detail/form slide-out |
+| `chat` | `min(100vw, 680px)` | The core conversational surface, a panel that is always open |
+| `chat-slim` | `min(100vw, 480px)` | The narrow chat used when a panel is open beside it |
+| `rail` | `min(100vw, 360px)` | A narrow stacked-cards slide-out |
+| `panel` | `min(100vw, 600px)` | A full detail or form slide-out |
 
-Every size carries a **viewport ceiling** (`min(100vw, …)`): the full designed width on desktop, never wider than the screen on mobile. (Panels side-by-side can still exceed a phone's width together: the dedicated mobile layout pass will decide stacking/overlay behavior; the ceiling keeps each panel individually safe until then.)
+Every size carries a viewport ceiling, so it is the full designed width on desktop and
+never wider than the screen on a phone. Names are optional, since raw CSS in `appWidth` is
+valid, but a name keeps every app in the project on one scale and makes retuning a single
+edit. These values are raw host-facing CSS on purpose: they size the app's outer panel,
+which the embedding page applies, and they are never inner styles.
 
-Names are **optional**: raw CSS in `appWidth` is always valid, but prefer them: every app in the org stays on the same scale, and retuning a size is one edit here. Add org-specific names freely (the linter validates that any name an app uses is declared). Unlike every other token home these values are raw host-facing CSS on purpose: they size the app's outer panel, which the embedding page applies, they are never inner styles.
+## Typography
 
----
+All type edits happen in your project's `styles/`. See the whole system live in
+**studio**'s Styles screen: every role as a specimen, with your overrides marked and
+everything else inherited from the design-system foundation.
 
-## Org scoping
+<Frame caption="Typography in studio: each role as a live specimen. A pencil marks an override; the rest is inherited.">
+  <img src="/images/design/design-system-styles.png" alt="studio's Styles screen showing typography roles as live specimens, each with its resolved family, size, weight and line height" />
+</Frame>
 
-- **Components live in TWO tiers.** The design system (the installed marketplace package: generic, universal: cards, charts, media) is shared by every org and references token *names* only. An **org component** (`design/<project>/components/`: the client's own microapp: their finder, their page) is **org-private**: it belongs to that client and is served under their org. Names are unique within a tier, and an org never shadows a design-system name (lint-enforced), so a bare reference resolves the design system or a uniquely-named org component; two orgs sharing a name each address theirs as `<org>/<name>`.
-- **Atoms are universal and authoring-time only**: `design/marketplace/atoms/`, one copy; the server expands every `Ref` before serving (atoms are never served or enumerable).
-- **Apps and styles are org-scoped**: `design/<project>/`. Each org gets its own complete token set and apps. There are **no overlays**: if two orgs need different looks from the *same* universal component, that difference is 100% in their `styles/`. A component only becomes an org component when it IS the client's product, not to restyle a shared one.
+There are three places to edit, and which one you want depends on what you are changing.
 
-Starting a new org scaffolds a complete copy of the default token set:
+**To change a typeface, override a family token** in `styles/base/typography.yaml`. There
+are four, and most rebrands touch exactly one:
 
-```bash
-mkdir acme && cd acme
-unoverse create
+| Token | Sets |
+|---|---|
+| `font.family.display` | Every heading. The one token a rebrand usually edits |
+| `font.family.sans` | Body copy, and everything not otherwise named |
+| `font.family.prose` | Long-form headings. Defaults to the display face, so override it when your display face cannot carry a page of copy |
+| `font.family.mono` | Code |
+
+**To load a webfont, list its stylesheet** in `styles/semantic/fonts.yaml`. The SDK injects
+one `<link>` per URL, so declaring the family and loading the file are two halves of one
+edit:
+
+```yaml
+fonts:
+  stylesheets:
+    $value: [ "https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" ]
 ```
 
-Every org starts from the same default set, so rebranding is editing values rather than inventing structure.
+**To retune sizes, weights and spacing, edit the composed roles** in
+`styles/semantic/text-styles.yaml`. A definition writes a role, and the role composes
+family, size, weight, line-height and letter-spacing from the base scale, so retuning the
+role retunes every use of it:
 
----
+```yaml
+# a definition asks for a role
+style:
+  font: headline.md
+```
 
-## Styling checklist
+```yaml
+# and the role composes the primitives, in semantic/text-styles.yaml
+headline:
+  md:
+    $value:
+      fontFamily: "{font.family.display}"
+      fontSize: "{font.size.headline.md}"
+      fontWeight: "{font.weight.semibold}"
+      lineHeight: "{font.lineHeight.headline}"
+```
 
-- [ ] Zero raw values in any definition (linter enforces)
-- [ ] Only **semantic** token names referenced (`text.primary`, not a palette entry)
-- [ ] No component-named tokens invented
-- [ ] New brand/mode = a new `themes/` file, zero definition edits
-- [ ] Theme keeps the full token contract (guard test)
-- [ ] Multi-column layout uses `columns` (+ `span` when unequal), never percentage widths in a flex row
-- [ ] A look two components share lives in an atom, composed by `Ref`, not copied
-
----
-
-**Next:** [Lifecycle hooks](/design/lifecycle-hooks), a component that fetches its own data.
+A family, size or weight value never appears in a definition, because `font: <role>` is the
+whole typographic vocabulary a definition has. The generic `size` and `lineHeight` keys
+keep the flat `xs` to `5xl` scale for the rare case that is not a role.
 
 ## Next steps
 

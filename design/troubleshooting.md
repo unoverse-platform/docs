@@ -3,49 +3,51 @@ sidebarTitle: "Troubleshooting"
 title: "Troubleshooting"
 ---
 
-**Symptom → cause → fix.** Debug in **studio**'s DevTools order: stream log → state inspector → definition ([studio](/design/studio)). See the data before editing anything.
-
----
+The mistakes that recur, with the cause behind each one. Debug in **studio**'s DevTools
+order: the stream log, then the state inspector, then the definition
+([studio](/design/studio)). See the data before editing anything.
 
 ## Rendering
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| Component renders blank / shows defaults while data clearly streams | a `bind` doesn't match the streamed field name, or the prop has no default so partial data blanks it | check the **stream log** for the actual `COMPONENT_DATA` keys; align `bind`; give every prop a default |
-| Definition edits do nothing | the change touched the component's **node** contract (props or discovery meta), so the published node is still the old one | publish again with `unoverse deploy studio`, then re-check |
-| Unknown type / element missing entirely | primitive typo, or an invented primitive | schema should have flagged it: wire the schema ([Quick start](/design/quick-start)); compose from the closed set ([How it works](/design/sdui-and-mcp-apps)) |
-| Style silently ignored | raw value (`12px`, `#fff`) or a token name that doesn't exist in the org's semantic set | tokens only; check `design/<project>/styles/semantic/` for the real name; the deploy lint catches raw values (`unoverse deploy studio`) |
-| Looks right in one theme, broken in another | definition references a **base** palette entry, or the theme is missing a token | reference **semantic** names only; run the theme-contract guard |
+| Renders blank, or shows defaults while data clearly streams | A `bind` does not match the streamed field name, or the prop has no default so partial data blanks it | Check the stream log for the actual delivered keys, align the `bind`, and give every prop a default |
+| Definition edits do nothing | The change touched the node contract, its props or discovery meta, so the published node is still the old one | Publish again with `unoverse deploy studio`, then re-check |
+| An element is missing entirely | A primitive typo, or an invented primitive | The schema should have flagged it, so wire the schema ([Quick start](/design/quick-start)) and compose from the closed set |
+| A style is silently ignored | A raw value such as `12px`, or a token name that does not exist in your semantic set | Token names only. Check `design/<project>/styles/semantic/` for the real name |
+| Right in one theme, broken in another | The definition references a base palette entry, or the theme is missing a token | Reference semantic names only, and run the theme-contract guard |
 
-## State & interactivity
-
-| Symptom | Cause | Fix |
-|---|---|---|
-| `visibleWhen` never fires | key written to the wrong **bucket** (set with `setValue`, read from app state: or vice versa), or a key-name mismatch | open the **state inspector**; find where the key actually landed; align action and read ([State](/design/state) decision table) |
-| Two views both visible / both hidden | N `visibleWhen`s with hand-negated conditions drifting apart | one `Switch` on one discriminant |
-| Wizard step never changes | the case content self-guards with a stale condition, or the button writes a value no case matches | remove self-guards; check the exact string values in the inspector |
-| Focus surface won't close | the component's ✕ isn't resetting ITS OWN state (or writes app state: the deprecated bridge) | the expanded state carries its own ✕: `setValue { view: "<its initial>" }` on the component's slice; the ladder walk re-runs and the app drops back ([State](/design/state)) |
-| Thinking dots never stop bouncing | the turn's `WORKFLOW_COMPLETED` never arrived on the stream: a delivery problem, not your definition | verify in the stream log, then report it; ❌ never gate the indicator on component text as a workaround |
-| Voice app stuck in one phase | branching on raw booleans instead of `callState`, or reading it from the wrong scope | `Switch` on the single `callState` value in app scope ([State](/design/state)) |
-| A `Switch` draws nothing until something is clicked | its discriminant has no starting value: nothing set the key, so no case matches and no `style.when` comparing it applies | give the axis an initial in the component that owns it, never in the ones embedding it: a `Ref`'d piece's initials travel with it ([Styles and tokens](/design/styles-and-tokens)) |
-
-## Apps & selection
+## State and interactivity
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| A focus panel shows the wrong / a stale component | the slot selects with no `where` (bare `from: "all"` is oldest-first) | select on the public axis: `where: { field: "view", eq: "focus" }, limit: 1`, most recent state-write wins ([Apps](/design/apps)) |
-| The AI never picks your component/app | `whenToUse` is layout-first or missing | rewrite outcome-first in the user's vocabulary ([Apps](/design/apps)) |
-| A wide component gets squashed / a card gets stretched | app is imposing sizes on components | delete the app rule; the component declares its own size in its definition |
-| App swap loses the conversation | app is holding data it shouldn't: state lives in the store, apps own nothing | move the data to the proper bucket; apps only project |
+| `visibleWhen` never fires | The key was written to one bucket and read from another, or the names do not match | Open the state inspector, find where the key actually landed, and align the action with the read ([State](/design/state)) |
+| Two views both visible, or both hidden | Several `visibleWhen` conditions, hand-negated, that have drifted apart | One `Switch` on one discriminant |
+| A wizard step never changes | The case content self-guards with a stale condition, or the button writes a value no case matches | Remove the self-guard, and check the exact string values in the inspector |
+| A focus surface will not close | The ✕ is not resetting the interface's own state, or it writes app state instead | The expanded state carries its own ✕, writing `state` back on its own slice. The walk re-runs and the app drops to its base ([State](/design/state)) |
+| Thinking dots never stop | The turn's completion never arrived on the stream, which is a delivery problem rather than your definition | Verify in the stream log and report it. Never gate the indicator on component text as a workaround |
+| A voice app is stuck in one phase | Branching on raw booleans instead of `callState`, or reading it from the wrong scope | `Switch` on the single `callState` value in app scope ([State](/design/state)) |
+| A `Switch` draws nothing until something is clicked | Its discriminant has no starting value, so no case matches | Give the axis a starting value in the definition that owns it, never in one that embeds it |
+
+## Templates and apps
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| A panel shows a stale interface | The slot selects with no `where`, and a bare `from: all` is oldest-first | Select on the public state, with `limit: 1`, so the most recent write wins ([Apps](/design/apps)) |
+| A template holds nothing | Nothing was delivered into it, or the delivery confirmed empty and cleared it | Check the stream log for the delivery. An empty template collapsing is correct behaviour ([Templates](/design/templates)) |
+| A card arrives but the template does not rearrange | The card's state name and the template's state names do not match | Use the standard `grid` and `page` names on both sides, because reactions are name-matches |
+| A copywriter part stays blank | The linked component carries no brief, so there is nothing to write to | Put a `brief` on the element that binds the field ([Components](/design/components)) |
+| An Agent never picks your app | `whenToUse` is layout-first, selector-shaped or missing | Rewrite it outcome-first, in the words a user would say ([Apps](/design/apps)) |
+| A component is squashed or stretched | The app is imposing a size on it | Delete the app rule. A component declares its own size |
 
 ## Pipeline
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| New definition rejected at boot | invalid YAML, or an envelope the schema rejects | the editor squiggle names the line. Wire the schema ([Quick start](/design/quick-start)) if you have not |
-| Component renders in **studio** but you cannot find it on the **canvas** | components are not in the node library. They reach a workflow by clipboard | in **studio**, select it and click **Copy for Canvas**, then paste on the canvas with `Cmd+V` ([studio](/design/studio)) |
-| Mock states don't appear in **studio**'s switcher | the definition declares no state tree: the viewer renders the served tree and never scans layouts; flat definitions list nothing | declare the `state.view` tree (component) or the manifest `states:` tree (app); pills appear automatically, in tree order ([studio](/design/studio)) |
+| A new definition is rejected at boot | Invalid YAML, or an envelope the schema rejects | The editor squiggle names the line. Wire the schema ([Quick start](/design/quick-start)) if you have not |
+| It renders in **studio** but you cannot find it on the **canvas** | Components are not in the node library, and reach a workflow by clipboard | Select it in **studio**, click **Copy for Canvas**, and paste on the canvas ([studio](/design/studio)) |
+| No state pills in **studio**'s switcher | The definition declares no state tree, and the viewer renders the served tree rather than scanning layouts | Declare the top-level `states:` tree. The pills appear automatically, in tree order |
 
----
-
-**Stuck beyond this?** Re-read the relevant concept doc: most persistent bugs are model misunderstandings (wrong bucket, app owning what a component owns, logic in the definition), not typos.
+**Stuck beyond this?** Re-read the concept page behind it. Most persistent bugs are
+misunderstandings of the model, such as the wrong bucket, an app owning what an interface
+owns, or logic that belongs in a workflow, rather than typos.

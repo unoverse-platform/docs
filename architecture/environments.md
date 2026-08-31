@@ -44,7 +44,7 @@ definition.
 it. This requires pinned tags rather than a floating latest, so that "production runs what
 UAT tested" is a fact rather than a hope.
 
-**Authored assets** move by publishing. Components, templates, skills and prompt blocks are
+**Authored assets** move by publishing. Components, apps, skills and prompt blocks are
 rows in a universe's database, and promoting one means publishing it to the next universe.
 That is the same mechanism a developer uses from **studio**, pointed at a different address.
 

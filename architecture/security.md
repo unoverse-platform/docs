@@ -5,7 +5,8 @@ mode: "wide"
 ---
 
 This page is written for the review, not for the brochure. Every control below is one you
-can find in the code or in the Terraform, and the last section lists what is still open.
+can find in the code or in the Terraform. The last section lists what is still open, including
+two gaps you should compensate for before going live.
 
 ## Who owns what
 
@@ -32,64 +33,87 @@ request that does not present a valid one is refused before anything executes.
 Because the check is in the application, no proxy is ever load bearing for security. A
 misconfigured load balancer is an availability problem, not an authentication bypass.
 
-Letting anonymous visitors reach a workflow is possible, and it is a per-workflow decision
-made on the trigger. Those callers arrive with a synthetic guest identity that carries no
-roles, so they fail every role requirement naturally.
+Letting anonymous visitors reach a workflow is possible, and the decision is made per
+trigger. Those callers arrive with a synthetic guest identity that carries no roles, so they
+fail every role requirement naturally.
+
+<Frame caption="Public entry is a toggle on the trigger, off by default. A guest's runs spend your AI and API budget, so the toggle names that before you turn it on.">
+  <img src="/images/architecture/auth-access.png" alt="A trigger's configuration panel in canvas, showing the Public Entry toggle" />
+</Frame>
 
 ## Authorization
 
-**Two levels, and the difference matters.** A person holds **roles**; a role grants
-**permissions**; the platform gates on permissions.
+**Two levels.** A person holds **roles**. A role grants **permissions**. The platform gates
+on permissions.
 
 | | | |
 | --- | --- | --- |
-| **Role** | who somebody is | `admin`, `developer` |
-| **Permission** | what they may do, always `noun:verb` | `workflow:author`, `marketplace:publish`, `admin:access` |
+| **Role** | who somebody is | `admin`, `author` |
+| **Permission** | what they may do, always `noun:verb` | `workflow:author`, `credentials:manage` |
 
-Both ride the access token as separate claims. Assigning `developer` to a person is one
-action that grants three permissions, and adding a capability later means adding a
-permission to a role rather than editing anyone's account. A node's `requires.role` matches
-against permissions, so a deployment can invent `finance:approve` without the platform
-knowing it exists.
+An author builds. They open **canvas**, create and delete workflows, write to **spatial**,
+manage nodes, and publish assets into the universe. An admin does all of that and holds the
+secrets as well: the credential store, and other people's memory.
 
-**How each ground provides it.** With `byo-oidc` the provider already models both, an Auth0
-tenant has roles containing permissions, and Terraform touches none of it. Cognito has only
-one level, groups, so the AWS ground holds the role-to-permission map and the pre-token
-Lambda applies it: your Cognito **groups are the roles**, and the Lambda expands them into
-the permissions claim.
+The difference between the two roles is exactly that. An author can build anything on the
+platform and cannot read an API key. Grant the role in your identity provider and the
+platform follows it.
 
-Flattening the two is a real failure mode rather than a tidiness argument. A pool built from
-permission-shaped groups gives an administrator every permission the platform grants and no
-`admin` role, so every gate passes except the one deciding whether Canvas opens at all, and
-the person is refused by the surface they own.
+An end user holds neither role. They sign in, chat, and run workflows. Nothing else opens
+to them.
 
-<Note>
-**One inconsistency, stated rather than hidden.** Canvas gates on the `admin` **role**, while
-every other surface gates on a permission. The permission for it already exists , 
-`admin:access`, and nothing reads it. Checking that instead would let a deployment grant
-Canvas to a `platform-operator` role without making somebody an administrator, which is the
-whole point of separating the two.
-</Note>
+**Every route declares what it needs, in one table.** The table names each route beside its
+requirement. One function reads it before any handler runs. A route missing from the table is
+refused, and the build fails until somebody adds it. Access cannot be left undecided by
+accident.
 
-Every node states who may run it, and the block is compulsory rather than optional. That is
-the point: a reviewer can tell the difference between a node that was considered and left
-open and a node nobody thought about. A node can demand a signed-in caller, or a specific
-claim, and the person building the workflow can demand more on top. Neither can loosen the
-other, and a node that reaches the executor with nothing declared is treated as requiring
-authentication.
+**How each ground provides it.** With `byo-oidc` the provider already models both levels. An
+Auth0 tenant has roles containing permissions, and Terraform touches none of it. Cognito has
+one level, groups, so the AWS ground holds the role-to-permission map. A pre-token Lambda
+applies it, so your Cognito **groups are the roles** and the Lambda expands them into the
+permissions claim.
+
+Flattening the two is a real failure mode. A pool built from permission-shaped groups gives
+an administrator every permission and no role. **canvas** checks the role before it renders,
+so the person is refused by the surface they own.
+
+**Identity comes from the token, never from the request.** A client sends a user id with
+every chat message, for routing replies. The server takes the subject from the verified token
+instead. A caller cannot run as somebody else, write into their memory, or subscribe to their
+conversation.
+
+**Every node states who may run it, and the block is compulsory.** A reviewer can tell a node
+that was considered and left open from a node nobody thought about.
+
+A node can demand a signed-in caller, or a specific claim. The person building the workflow
+can demand more on top. Neither can loosen the other. A node that reaches the executor with
+nothing declared is treated as requiring authentication.
+
+<Frame caption="Per step, on the canvas. The claim is yours to name: the platform never invents finance:approve, and your identity provider decides who carries it.">
+  <img src="/images/architecture/auth-RBAC.png" alt="A node's Require sign-in toggle and Require role field in canvas" />
+</Frame>
 
 [Who Can Run It](/nodes/who-can-run-it) is the developer-facing version of this.
 
 ## Credentials
 
-Credential values are encrypted at rest, per field, and only fields marked secret are
-encrypted. They are decrypted at the moment a node runs and handed to that node alone.
+**A secret is write-only.** You type it once. Nothing reads it back, including the screen
+you typed it into. Editing a credential shows dots and leaves the stored value untouched
+unless you type a new one.
 
-A node receives only the credentials it declared. Two nodes in one workflow cannot read each
-other's keys, whatever either of them writes, because credentials are addressed by name
-rather than discovered.
+Credential values are encrypted at rest, per field. Every field is encrypted unless it is
+declared public, so a new credential type cannot leak a key by omission. A region or an
+account id can be declared public; a key cannot.
 
-Nothing an author writes ever contains a value. The manifest names the credential; the value
+Values are decrypted at the moment a node runs, and handed to that node alone. A node
+receives only the credentials it declared. Two nodes in one workflow cannot read each other's
+keys, whatever either of them writes, because credentials are addressed by name rather than
+discovered.
+
+The store is admin-only. Reading and writing it needs `credentials:manage`, which the author
+role does not grant.
+
+Nothing an author writes ever contains a value. The manifest names the credential. The value
 is entered once in **canvas** and lives only in the database.
 
 ## What a node is allowed to do
@@ -144,16 +168,22 @@ is Splunk, ELK or Datadog.
 
 ## Still open
 
-Two items are honest gaps rather than controls. Both are known and both are tracked.
+Three items are honest gaps rather than controls. All three are known and tracked.
 
-**The credential encryption key has a fallback default in code.** A universe provisioned by
-the Terraform is given a generated key, so a correctly provisioned deployment does not use
-the default. The fallback should not exist, and removing it is required before any
-internet-facing deployment.
+**There is no rate limit and no spend cap.** Any signed-in caller can run workflows, and
+workflows spend money with your AI providers. Nothing in the platform slows a caller down or
+stops them. Set spend limits at the provider until this lands, because a provider limit holds
+even if the platform does not.
+
+**Decrypted credentials are cached in Redis for twenty minutes.** A Redis backup taken in
+that window contains plaintext keys. Treat those backups as secrets.
 
 **One connection carries its token in the query string.** That is why load balancer access
 logs are switched off in the entry point requirements. Moving the token to a header lifts both
 the gap and the restriction.
+
+The credential encryption key no longer has a fallback default. A universe refuses to start
+without a real key, so a deployment cannot silently run on a published one.
 
 ---
 

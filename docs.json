@@ -91,6 +91,7 @@
             "pages": [
               "design/overview",
               "design/quick-start",
+              "design/design-system",
               "design/sdui-and-mcp-apps",
               "design/coming-from-react"
             ]
@@ -98,13 +99,15 @@
           {
             "group": "Core Concepts",
             "pages": [
+              "design/essentials",
+              "design/interface-data",
               "design/components",
               "design/state",
+              "design/templates",
               "design/apps",
               "design/styles-and-tokens",
               "design/lifecycle-hooks",
-              "design/analytics",
-              "design/unoverse-markdown"
+              "design/analytics"
             ]
           },
           {
@@ -135,6 +138,7 @@
               "nodes/credentials",
               "nodes/who-can-run-it",
               "nodes/config-schema",
+              "nodes/expressions",
               "nodes/service-connectors",
               "nodes/mcp-services",
               "nodes/signal-routing",
@@ -338,10 +342,6 @@
     },
     {
       "source": "/design/05-templates",
-      "destination": "/design/apps"
-    },
-    {
-      "source": "/design/templates",
       "destination": "/design/apps"
     },
     {

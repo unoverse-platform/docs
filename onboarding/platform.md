@@ -121,7 +121,7 @@ runs on :4108 whether or not a platform is up. See [Studio](/onboarding/studio).
 
 Development is local first. The whole platform runs on your machine in Docker, and it is the same platform that runs in production. The loop:
 
-1. **Build your assets in Studio**: components, templates, custom nodes, services, and skills.
+1. **Build your assets in Studio**: components, apps, custom nodes, services, and skills.
 2. **Manage content and availability in Spatial**: ingest your content and control which assets your Agents can find.
 3. **Wire them into Agents in Canvas.**
 4. **Run and test locally**: step through nodes, preview components, talk to your Agent.
@@ -151,7 +151,7 @@ Don't mix them up. `.env` is local development on your laptop; production config
 | You build | In | Guide |
 | --- | --- | --- |
 | **Logic**: custom workflow nodes (YAML manifests) | Studio project `nodes/` | [Create Your First Node](/onboarding/create-your-first-node) |
-| **Design**: components, templates, styles | Studio project `design/` | [Create a component](/onboarding/create-a-component) |
+| **Design**: components, apps, styles | Studio project `design/` | [Create a component](/onboarding/create-a-component) |
 | **Behavior**: Agent skills and prompt blocks | Studio project `prompts/` | [Create Your First Agent](/onboarding/create-your-first-agent) |
 
 You don't have to build everything yourself. The **marketplace** offers the design system and ready-made nodes and services to install into your universe, per item.

@@ -123,6 +123,12 @@ together. That is strategy, and it is separate from the description of each meth
 | The provider runs but nothing reaches the workflow | Expected. A service call returns to its caller and fires no outputs |
 | A pure service node never triggers | Also expected. It has no inputs, so the graph never reaches it |
 
----
+## Next steps
 
-**Next**: [MCP Services](/nodes/mcp-services)
+<Card title="MCP Services" icon="wrench" href="/nodes/mcp-services" horizontal>
+Handing an Agent tools it can choose to call.
+</Card>
+
+<Card title="api/service.yaml" icon="book-marked" href="/reference/node-api" horizontal>
+Every field a service method takes, generated from the schema.
+</Card>

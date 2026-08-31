@@ -20,7 +20,7 @@ publish over the API. What changes is who runs the universe.
 
 **Connecting is the faster start.** You point **studio** at a universe that is already
 deployed. That might be a hosted unoverse you have an account on, or your own company's
-deployment you have permissions for. Your components, templates, skills and nodes publish
+deployment you have permissions for. Your components, apps, skills and nodes publish
 into that universe's database, and authoring never requires a deployment of your own.
 
 **Running your own puts the same platform in your account.** It suits a full enterprise
@@ -148,7 +148,7 @@ reach them, and [Data](/architecture/data) covers what each store holds.
 The platform runs on the VM as Docker images, pulled from the registry by tag. Everything
 you author lives in your universe's database and arrives by publishing.
 
-You author in **[Studio](/onboarding/studio)**: components, templates, skills and nodes. It is
+You author in **[Studio](/onboarding/studio)**: components, apps, skills and nodes. It is
 not one of the platform services. It is a developer tool you install from npm, it runs on
 your own machine against your own files, and it sends your work to a universe over the API
 when you publish. Nothing of **studio** is deployed with the platform.

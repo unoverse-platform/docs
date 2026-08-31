@@ -62,7 +62,7 @@ auth:
 - A manifest that reaches the executor with no `auth` block at all is treated as
   `required: true`. The platform's default is deny.
 
-**They set the rest, on the Canvas.** Every node carries the same two settings:
+**They set the rest, on the **canvas**.** Every node carries the same two settings:
 
 | Setting | |
 | --- | --- |
@@ -72,7 +72,7 @@ auth:
 Per box. The same node type legitimately faces staff on one workflow and customers on
 another, and only the person building that workflow knows which.
 
-## Why a role usually belongs to them, not you
+### Why a role usually belongs to them, not you
 
 `finance:approve` is a claim **one deployment's identity provider mints**. If your node is
 published and someone installs it in their universe, you have no idea what roles their
@@ -102,7 +102,7 @@ is a lint error rather than a promise that could never be kept.
 Letting anonymous visitors in at all is a decision about a *workflow*, not a node, so it is
 a separate toggle on the trigger.
 
-## Roles read as noun then verb
+### Roles read as noun then verb
 
 `finance:approve`. `payments:refund`. `crm:write`.
 
@@ -132,7 +132,7 @@ it is never run, so there is nobody to authorize.)
 ## Where it is enforced
 
 **On a trigger**, at the door, before anything runs. Whether an anonymous visitor gets
-through that door is the Canvas toggle above.
+through that door is the **canvas** toggle above.
 
 **Anywhere else**, as the node starts, against the identity the run already carries, and
 before any call is built. A refused run costs no vendor request and has no side effect.
@@ -141,7 +141,7 @@ That includes a node reached over a **service edge**. It is the easy one to forg
 node fires no connectors of its own, so it reads as an internal detail of whatever called
 it. It still runs your calls with your credentials, so it is gated like anything else.
 
-## A missing role is loud
+### A missing role is loud
 
 The node fails and names the claim it wanted. It does not quietly skip its work, and it
 does not carry on with a blank where the person should have been.
@@ -164,12 +164,18 @@ The token itself never reaches your manifest. You get to know who the caller is.
 get to hold the thing that proves it, because a manifest that could read it could also send
 it somewhere.
 
-## What a reviewer sees
+### What a reviewer sees
 
 Requirements appear on the acceptance screen next to the hosts your node calls and the
 credentials it needs. A node that starts demanding a role, or starts reading identity, is a
 change worth seeing before it goes live.
 
----
+## Next steps
 
-**Next**: [Config Schema](/nodes/config-schema)
+<Card title="Config Schema" icon="sliders-horizontal" href="/nodes/config-schema" horizontal>
+The settings form, and every field type it renders.
+</Card>
+
+<Card title="node.yaml" icon="book-marked" href="/reference/node-envelope" horizontal>
+Every envelope field including `auth`, generated from the schema.
+</Card>

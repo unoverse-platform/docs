@@ -65,7 +65,7 @@ Every component, app, and atom is one JSON file with the same envelope:
   |---|---|---|
   | component (design system) | `design/marketplace/components/<name>/<name>.json` + optional `manifest.json` (discovery) + `layouts/` (one file per state that owns an arrangement) + optional `components/` (shapes 2+ layouts share) | flat `design/marketplace/components/<name>.json` for a simple one-layout card; **generic + org-neutral: any org can use it**. Addressed `unoverse://components/<name>` |
   | component (org) | `design/orgs/<org>/components/<name>/`: same anatomy; **org-private** (the client's own microapp). Addressed `unoverse://components/<org>/<name>`; the server injects `org` from the folder. Names unique within the org; never shadow a design-system name (lint-enforced); two orgs may share a name | the client's finders/pages, never a restyle of a shared component (that's the theme's job) |
-  | app | `design/orgs/<org>/apps/<name>/`, **manifest-only**: `manifest.json` IS the envelope; it declares the app tree in `states:`; root = `layouts/<manifest.layout>.json` (+ `states/` for the base's contained substate files, + `components/`) | org-scoped; no `<name>.json` |
+  | app | `design/orgs/<org>/apps/<name>/`, **one folder grammar (2026-08-29)**: `<name>.yaml` = the ENVELOPE (`type: app` + the `states:` tree, each state declaring its layout path + preview); `manifest.yaml` = the MCP face (whenToUse/inputSchema/binding/makeMCP). A manifest-held tree is the legacy read. Root = the base state's declared layout (+ `components/`) | org-scoped |
   | atom | `design/marketplace/atoms/<name>.json` | shared partials, **authoring-time only**: the server always expands them before serving (never served, never enumerable, no Studio view) |
 
 ### The state tree: the root declares the machine (State Model v2)
@@ -76,18 +76,17 @@ file anatomy in `UNOVERSE_LAYERS.md` §3):
 
 ```yaml
 # product-card.yaml (the sab pilot, as shipped)
-state:
-  view:                    # the PUBLIC axis
-    initial: products
-    states:
-      products: {}                        # same-name default: draws layouts/products
-      detail:
-        layout: product                   # declared ONLY because the filename differs
-        on: step
-        initial: detail
-        states:                           # PRIVATE substates (the steps)
-          detail: { layout: product-detail }
-          apply:  { layout: product-apply }
+states:                    # TOP LEVEL (2026-08-29): the tree, like every kind —
+  products:                #   the `state.view` wrapper is the legacy spelling
+    layout: layouts/products          # REQUIRED path: nothing assumed
+  detail:
+    layout: layouts/product
+    on: step
+    states:                           # PRIVATE substates (the steps)
+      detail: { layout: layouts/product-detail }
+      apply:  { layout: layouts/product-apply }
+# `state:` holds SCALARS only (progressPct, …). The public-axis word is `state`
+# (setValue key, Switch on, select.where.field); `view`/`defaultState` are legacy.
 ```
 
 - **Each state owns its layout(s); `layout:` is OPTIONAL.** A state with no
@@ -104,9 +103,10 @@ state:
   mood (condition-guarded; the app has the state, components just react) — never
   component named substates, never another field's values as state names (bpp
   `text-chat`).
-- **The root still composes a `Switch` on `view`** whose cases `$include` the state
-  layouts (guard-enforced); the server compiles the tree into the served projections
-  (`publicStates`, `initialView`, `stateTree`).
+- **The root is SYNTHESIZED from the tree** (2026-08-29 late): the compiler builds
+  the `Switch on state` from `states:`, and the server compiles the served
+  projections (`publicStates`, `initialView`, `stateTree`). Author a root ONLY as a
+  real shell (chrome beyond the plain Switch); a restated Switch is linted.
 - **The `states/` folder role changed per tier** (LAYERS §3): at the COMPONENT tier
   the v1 `states/` folder is absorbed by the tree (a private substate is a tree entry
   owning a layout, not a sibling file). At the APP tier `states/` still holds
@@ -652,10 +652,14 @@ defaultState: app        # APP-LEVEL load state (protocol §4b), NOT the compone
 states:
   main:                       # the base arrangement (named for `layout:` below)
     states:
-      welcome: {}             # contained substate; first declared = the landing default
-  focus: {}                   # the reaction ladder, in priority order
-  products: {}
-  detail: {}
+      welcome:                # contained substate; first declared = the landing default
+        layout: layouts/main-welcome
+  focus:                      # the reaction ladder, in priority order
+    layout: layouts/focus
+  products:
+    layout: layouts/products
+  detail:
+    layout: layouts/detail
 preview:                      # PURE HINT per state: what to seed in mock/workbench views
   products: [ product-card, product-card, product-card ]
   detail: [ product-card ]
@@ -665,8 +669,6 @@ inputSchema:
     message: { type: string, description: The user's request }
 binding: { workflow: wf-r4jzo7, trigger: inputtrigger9 }   # app owns its workflow + trigger
 autoTrigger: false            # true = fire on load; false = wait for the user
-expose: { openaiApps: false }
-layout: main                  # the base arrangement = layouts/main
 ```
 
 What the tree gives you, with nothing else authored:
@@ -684,12 +686,13 @@ What the tree gives you, with nothing else authored:
   is its SHELL, not a substate: declaring a state contains it.
 - **Arrival**: the host honors an arriving component's declared `initial` whenever it
   has a state of that name, and scans its own declared order only when it does not.
-- Each top-level state draws `layouts/<name>` by the same-name default, exactly like
+- Each top-level state declares the layout it draws as a root-relative path
+  (`layout: layouts/<name>` — REQUIRED, 2026-08-29 ruling), exactly like
   a component state.
 
 **`defaultState` in the manifest is a DIFFERENT axis**: it is the app-level load state
 the channel router branches on (`app` = swap the whole surface; `focus` = stream
-into the current template and open in focus; see `UNOVERSE_MCP_APP_PROTOCOL.md`
+into the current app and open in focus; see `UNOVERSE_MCP_APP_PROTOCOL.md`
 §4b). It is unrelated to the component `view` axis despite the shared word. The legacy
 `type` + `fluidHeight` + `previewComponents` manifest fields are derived from or
 superseded by `defaultState` + `preview`.
@@ -736,7 +739,8 @@ Run each definition against these. A "no" is a finding to fix.
 - [ ] A stateful component declares a **`state.view` tree** (§2): public states at the top
       level, private steps nested, an `initial` at every level with substates.
 - [ ] Each state **owns its layout**; `layout:` is written only when the filename differs
-      from the state name (same-name is the default; `{}` is a complete state).
+      from nothing: every state declares `layout: layouts/<file>` as a path
+      (2026-08-29 ruling; no same-name default, `{}` is not a complete state).
 - [ ] A state is **public only if apps should rearrange for it**: an ignored public
       state falls inline (STATE_MODEL §5 rule 6); steps that never move the page nest.
 - [ ] Other state is a **few shallow discriminants** (`step`), not a soup of booleans.

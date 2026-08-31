@@ -103,12 +103,12 @@ catch-all.
 Ranking uses what is published and accepted, so publish the node before expecting new
 wording to change what gets picked.
 
-## The same rule for templates and skills
+## The same rule for apps and skills
 
-Templates and agent skills are discovered the same way, with one difference that matters.
+Apps and agent skills are discovered the same way, with one difference that matters.
 
 Nodes are matched against a **planner's task**, so "Pick when a step needs…" reads correctly.
-Templates and skills are matched against **what a person actually said**, so write the words
+Apps and skills are matched against **what a person actually said**, so write the words
 they would use.
 
 ```yaml
@@ -123,6 +123,12 @@ whenToUse: Talk to the assistant by voice, hands free, instead of typing.
 outrank them for their own jobs. A fallback owns general help and questions, and cedes
 specific jobs by property without naming them.
 
----
+## Next steps
 
-**Next**: [Testing](/nodes/testing-nodes)
+<Card title="Testing" icon="flask-conical" href="/nodes/testing-nodes" horizontal>
+Run the node against the real service before you wire it up.
+</Card>
+
+<Card title="node.yaml" icon="book-marked" href="/reference/node-envelope" horizontal>
+Where `whenToUse` sits, with every other envelope field.
+</Card>

@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 430" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="aarr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9ca3af"/>
+    </marker>
+    <marker id="aarrp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6D5DF6"/>
+    </marker>
+  </defs>
+
+  <!-- ============ lane 1: streamed ============ -->
+  <text x="40" y="40" font-size="12" font-weight="600" fill="#6b7280" letter-spacing="0.08em">STREAMED</text>
+  <rect x="40" y="52" width="220" height="66" rx="10" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+  <text x="56" y="78" font-size="13" font-weight="600" fill="#111827">spatial</text>
+  <text x="56" y="96" font-size="11.5" fill="#6b7280">the search answers with interfaces</text>
+
+  <g>
+    <rect x="318" y="46" width="60" height="74" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+    <rect x="326" y="54" width="44" height="26" rx="5" fill="#ece9fd"/>
+    <rect x="326" y="88" width="36" height="5" rx="2.5" fill="#d1d5db"/>
+    <rect x="326" y="98" width="26" height="5" rx="2.5" fill="#e5e7eb"/>
+  </g>
+  <g>
+    <rect x="392" y="60" width="60" height="74" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+    <rect x="400" y="68" width="44" height="26" rx="5" fill="#ece9fd"/>
+    <rect x="400" y="102" width="36" height="5" rx="2.5" fill="#d1d5db"/>
+    <rect x="400" y="112" width="26" height="5" rx="2.5" fill="#e5e7eb"/>
+  </g>
+  <path d="M266 85 h44" fill="none" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#aarr)"/>
+  <path d="M460 96 C 520 96, 560 108, 630 112" fill="none" stroke="#6D5DF6" stroke-width="1.5" marker-end="url(#aarrp)"/>
+  <text x="530" y="86" font-size="11" fill="#6b7280">complete with data</text>
+
+  <!-- ============ lane 2: queried ============ -->
+  <text x="40" y="188" font-size="12" font-weight="600" fill="#6b7280" letter-spacing="0.08em">QUERIED</text>
+  <rect x="40" y="200" width="220" height="66" rx="10" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+  <text x="56" y="226" font-size="13" font-weight="600" fill="#111827">a query</text>
+  <text x="56" y="246" font-size="11.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#4C3FD1">query: { type: product }</text>
+
+  <g>
+    <rect x="330" y="196" width="60" height="74" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+    <rect x="338" y="204" width="44" height="26" rx="5" fill="#ece9fd"/>
+    <rect x="338" y="238" width="36" height="5" rx="2.5" fill="#d1d5db"/>
+    <rect x="338" y="248" width="26" height="5" rx="2.5" fill="#e5e7eb"/>
+  </g>
+  <path d="M266 233 h56" fill="none" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#aarr)"/>
+  <path d="M398 233 C 480 233, 550 226, 630 222" fill="none" stroke="#6D5DF6" stroke-width="1.5" marker-end="url(#aarrp)"/>
+  <text x="430" y="216" font-size="11" fill="#6b7280">interfaces answer, not rows</text>
+
+  <!-- ============ lane 3: carried ============ -->
+  <text x="40" y="336" font-size="12" font-weight="600" fill="#6b7280" letter-spacing="0.08em">CARRIED</text>
+  <rect x="40" y="348" width="220" height="66" rx="10" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+  <text x="56" y="374" font-size="13" font-weight="600" fill="#111827">the definition</text>
+  <text x="56" y="392" font-size="11.5" fill="#6b7280">its data authored in, self-contained</text>
+
+  <path d="M266 381 C 420 381, 540 356, 630 336" fill="none" stroke="#6D5DF6" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#aarrp)"/>
+  <text x="430" y="352" font-size="11" fill="#6b7280">already part of the template</text>
+
+  <!-- ============ the template ============ -->
+  <text x="644" y="40" font-size="12" font-weight="600" fill="#6b7280" letter-spacing="0.08em">THE TEMPLATE HOLDS THEM</text>
+  <rect x="644" y="52" width="256" height="356" rx="14" fill="#f7f6fe" stroke="#6D5DF6" stroke-width="1.5"/>
+  <text x="662" y="78" font-size="12" font-weight="700" fill="#4C3FD1">template</text>
+
+  <rect x="662" y="90" width="220" height="92" rx="8" fill="#ffffff" stroke="#c7c1fb" stroke-width="1.5"/>
+  <rect x="674" y="102" width="70" height="52" rx="5" fill="#ece9fd"/>
+  <rect x="756" y="106" width="98" height="7" rx="3.5" fill="#d1d5db"/>
+  <rect x="756" y="121" width="112" height="5" rx="2.5" fill="#e5e7eb"/>
+  <rect x="756" y="131" width="88" height="5" rx="2.5" fill="#e5e7eb"/>
+  <rect x="756" y="145" width="44" height="12" rx="6" fill="#6D5DF6"/>
+
+  <rect x="662" y="196" width="220" height="92" rx="8" fill="#ffffff" stroke="#c7c1fb" stroke-width="1.5"/>
+  <rect x="674" y="208" width="70" height="52" rx="5" fill="#ece9fd"/>
+  <rect x="756" y="212" width="98" height="7" rx="3.5" fill="#d1d5db"/>
+  <rect x="756" y="227" width="112" height="5" rx="2.5" fill="#e5e7eb"/>
+  <rect x="756" y="237" width="88" height="5" rx="2.5" fill="#e5e7eb"/>
+  <rect x="756" y="251" width="44" height="12" rx="6" fill="#6D5DF6"/>
+
+  <rect x="662" y="302" width="220" height="92" rx="8" fill="#ffffff" stroke="#c7c1fb" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <rect x="674" y="314" width="196" height="10" rx="5" fill="#ece9fd"/>
+  <rect x="674" y="332" width="168" height="6" rx="3" fill="#e5e7eb"/>
+  <rect x="674" y="344" width="184" height="6" rx="3" fill="#e5e7eb"/>
+  <rect x="674" y="356" width="140" height="6" rx="3" fill="#e5e7eb"/>
+  <text x="772" y="384" font-size="10.5" fill="#9ca3af" text-anchor="middle">authored content, always there</text>
+</svg>

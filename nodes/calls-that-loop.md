@@ -30,7 +30,9 @@ What decides `kind` is the **last** call's transport, because that is the node's
 Every earlier call settles by definition, so an earlier step can do anything at all. See
 [Node Types](/nodes/node-types).
 
-## `paginate`: many requests, one call
+## The capabilities
+
+### `paginate`
 
 Walk the pages and accumulate the results.
 
@@ -62,7 +64,7 @@ consumer can tell "that is everything" from "that is the first hundred".
 There is a ceiling of 100 requests per call whatever `max` says, because an API that keeps
 returning the same cursor would otherwise loop forever.
 
-## `chunk`: many requests over one collection
+### `chunk`
 
 The mirror of `paginate`. That one loops because the API decides how much comes back. This
 one loops because the API limits how much you may send at once.
@@ -91,7 +93,7 @@ walk continues, so check `errors` rather than assuming all or nothing.
 
 There is a ceiling of 200 per batch whatever `size` says.
 
-## `poll`: one call, a job
+### `poll`
 
 Start work, then ask until it is done. Every crawler, render farm, transcription and batch
 import works this way.
@@ -125,7 +127,7 @@ handle would fail on exactly the fast case.
 
 `intervalMs` is capped at 60 seconds and `maxAttempts` at 300.
 
-## `state`: remembering between runs
+### `state`
 
 Sometimes an entry in the list is not a request at all.
 
@@ -170,7 +172,7 @@ somewhere nothing reads.
 `save` is the exception: it takes no `key`, and lint refuses one. It belongs to this run,
 and a later node reads it as `saved.<nodeId>`.
 
-## `loop`: iterating a collection across the workflow
+### `loop`
 
 `LoopStart` and `LoopEnd` are a pair, and `loop` is how each half keeps its place. It makes
 no request.
@@ -189,7 +191,7 @@ One capability rather than a handful of state operations, which is the point: ex
 this by hand took eight different store operations between them, and the ordering lived in
 whoever wrote it.
 
-## `presign`: shareable links, minted not fetched
+### `presign`
 
 Makes no request at all. It computes signed URLs from the credentials and the clock.
 
@@ -214,7 +216,7 @@ shapes would push the difference onto every reader.
 It earns its place in the ordered list for the same reason `state` does: listing a bucket
 and then minting a link for each object found is one sequence.
 
-## A socket that stays open
+### `transport: ws`
 
 `transport: ws` is for a service you hold a conversation with rather than call: realtime
 voice, above all. Three lists cover the whole lifecycle, and each holds messages you send.
@@ -283,6 +285,12 @@ queue would never drain, with nothing anywhere reporting it.
 | `state` | [ApolloCompany](https://github.com/unoverse-platform/marketplace/tree/main/definitions/nodes/gtm/ApolloCompany) |
 | `presign` | [aws-s3](https://github.com/unoverse-platform/marketplace/tree/main/definitions/nodes/aws-s3) |
 
----
+## Next steps
 
-**Next**: [Testing](/nodes/testing-nodes)
+<Card title="Testing" icon="flask-conical" href="/nodes/testing-nodes" horizontal>
+Run the node against the real service before you wire it up.
+</Card>
+
+<Card title="api/run.yaml" icon="book-marked" href="/reference/node-api" horizontal>
+Every field a call takes, generated from the schema.
+</Card>

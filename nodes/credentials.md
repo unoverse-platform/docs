@@ -185,6 +185,12 @@ reachable by accident either.
 | points at credential id N, which does not exist in this universe | The workflow was copied from another universe, and a credential reference is a per-universe id, so it came over pointing at nothing | Open the node's settings in **canvas**, re-select the credential, save the workflow |
 | needs a `<credential>` and none is attached | A pasted or newly placed node starts with no credential selected, and this node requires one | Open the node's settings in **canvas**, select the credential, save the workflow |
 
----
+## Next steps
 
-**Next**: [Who Can Run It](/nodes/who-can-run-it)
+<Card title="Who can run it" icon="shield-check" href="/nodes/who-can-run-it" horizontal>
+Requiring sign-in or a role before your node runs.
+</Card>
+
+<Card title="Credential files" icon="book-marked" href="/reference/node-credentials" horizontal>
+Every field a credential declares, generated from the schema.
+</Card>

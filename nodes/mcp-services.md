@@ -162,6 +162,12 @@ Agent skills are a different thing, authored in `prompts/skills/` and discovered
 | The loop runs and runs | Check `maxTurns`, then `stuckAfterRepeats` |
 | A tool returns but the workflow does not react | Expected. A service call returns to its caller and fires no outputs |
 
----
+## Next steps
 
-**Next**: [Connectors & Signals](/nodes/signal-routing)
+<Card title="Connectors and signals" icon="git-branch" href="/nodes/signal-routing" horizontal>
+Wiring nodes together, and putting values on an output.
+</Card>
+
+<Card title="api/service.yaml" icon="book-marked" href="/reference/node-api" horizontal>
+Every field `toolExchange` takes, generated from the schema.
+</Card>

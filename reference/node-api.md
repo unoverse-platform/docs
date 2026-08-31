@@ -62,6 +62,10 @@ A second, cheaper model writing a status line while the main call runs. A `from:
 A write straight into the caller's screen state, pushed after the node settles. A side channel to the person watching, never an output.
 </ResponseField>
 
+<ResponseField name="renderComponents" type="expression">
+Rows to draw as content cards on the caller's live screen, such as `return response.results`. A row naming a component renders it as the node settles, so a card appears without the model choosing to show one. Evaluated after the events table, over the full settled reply, because a card needs the whole row that an events projection strips. Fire and forget: with no live session it does nothing.
+</ResponseField>
+
 <ResponseField name="audio" type="audio.schema.json">
 Binds a voice node to the platform's audio lane, which is a separate socket. Everything that is not audio belongs in `events`.
 </ResponseField>

@@ -17,56 +17,28 @@ makes it.
 
 [Anatomy of a Node](/nodes/manifest-nodes) is the place to start.
 
-## Documentation
-
-### Getting started
-
-| Page | Covers |
-|---|---|
-| [Anatomy of a Node](/nodes/manifest-nodes) | The folder, the five files, and how a call is described |
-| [Node Types](/nodes/node-types) | Settling once or emitting many times, and how the platform tells |
-
-### Building blocks
-
-| Page | Covers |
-|---|---|
-| [Credentials](/nodes/credentials) | Authenticating against a real service |
-| [Who Can Run It](/nodes/who-can-run-it) | Requiring a role before your node runs |
-| [Config Schema](/nodes/config-schema) | The settings form: every field type and how it renders |
-| [Service Connectors](/nodes/service-connectors) | Handing a capability to another node |
-| [MCP Services](/nodes/mcp-services) | Giving an Agent tools it can choose to call |
-| [Connectors & Signals](/nodes/signal-routing) | Wiring nodes together, and putting values on an output |
-| [Beyond One Request](/nodes/calls-that-loop) | Paging, batching, waiting on a job, remembering, and sockets |
-
-### Ship it
-
-| Page | Covers |
-|---|---|
-| [Discoverability](/nodes/node-discoverability) | Writing the words that decide whether the AI builder offers your node |
-| [Testing](/nodes/testing-nodes) | Running a node against the real API before you wire it up |
-| [Packages](/nodes/package-marketplace) | The envelope around a set of nodes |
-| [Troubleshooting](/nodes/troubleshooting) | When a node loads but does nothing |
-
----
-
 ## The shape of a node
 
-```
-nodes/<package>/            # in your Studio project workspace
-├── package.yaml
-├── credentials/
-├── shared/
-└── nodes/
-    └── YourNode/
-        ├── node.yaml
-        ├── interface.yaml
-        ├── config.yaml
-        ├── api/
-        │   ├── run.yaml
-        │   ├── events.yaml
-        │   └── service.yaml
-        └── test.yaml
-```
+<Tree>
+  <Tree.Folder name={<><b>nodes/&lt;package&gt;</b> <span className="tree-note">in your studio project workspace</span></>} defaultOpen>
+    <Tree.File name={<><b>package.yaml</b> <span className="tree-note">the package envelope</span></>} />
+    <Tree.Folder name={<><b>credentials</b> <span className="tree-note">the credentials its nodes ask for</span></>} />
+    <Tree.Folder name={<><b>shared</b> <span className="tree-note">fragments more than one node reuses</span></>} />
+    <Tree.Folder name="nodes" defaultOpen>
+      <Tree.Folder name="YourNode" defaultOpen>
+        <Tree.File name={<><b>node.yaml</b> <span className="tree-note">what it is</span></>} />
+        <Tree.File name={<><b>interface.yaml</b> <span className="tree-note">what it connects to</span></>} />
+        <Tree.File name={<><b>config.yaml</b> <span className="tree-note">the settings form</span></>} />
+        <Tree.Folder name="api" defaultOpen>
+          <Tree.File name={<><b>run.yaml</b> <span className="tree-note">the calls it makes</span></>} />
+          <Tree.File name={<><b>events.yaml</b> <span className="tree-note">everything that leaves it</span></>} />
+          <Tree.File name={<><b>service.yaml</b> <span className="tree-note">methods other nodes call</span></>} />
+        </Tree.Folder>
+        <Tree.File name={<><b>test.yaml</b> <span className="tree-note">a fixture that runs</span></>} />
+      </Tree.Folder>
+    </Tree.Folder>
+  </Tree.Folder>
+</Tree>
 
 One folder is one node. The package around it holds anything its nodes share.
 
@@ -138,6 +110,12 @@ Whole packages worth reading: [airtable](https://github.com/unoverse-platform/ma
 [salesforce](https://github.com/unoverse-platform/marketplace/tree/main/definitions/nodes/salesforce), [search](https://github.com/unoverse-platform/marketplace/tree/main/definitions/nodes/search), [slack](https://github.com/unoverse-platform/marketplace/tree/main/definitions/nodes/slack) and
 [x-search](https://github.com/unoverse-platform/marketplace/tree/main/definitions/nodes/x-search).
 
----
+## Next steps
 
-**Next**: [Anatomy of a Node](/nodes/manifest-nodes)
+<Card title="Anatomy of a node" icon="boxes" href="/nodes/manifest-nodes" horizontal>
+The folder, the five files, and how a call is described.
+</Card>
+
+<Card title="Reference" icon="book-marked" href="/reference/node-envelope" horizontal>
+Every field a node declares, generated from the schemas.
+</Card>

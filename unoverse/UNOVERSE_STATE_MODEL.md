@@ -77,13 +77,14 @@ That is the entire surface. The SDK hardcodes no UI concept: `openPanel`, a tab,
 wizard step are all just keys the dev names, written via these two actions. Adding a
 feature is data, never a new bucket, action, or `case` in `core`.
 
-### The `view` field (renamed from `defaultState`, 2026-08-08)
+### The `state` field (renamed from `view` 2026-08-29; from `defaultState` 2026-08-08)
 
-The component's **public state** lives in its slice under the key **`view`**. The old
-name `defaultState` was wrong twice over: the field holds the CURRENT state, not a
-default, and the same word also names an unrelated app-level manifest field (the load
-state, `UNOVERSE_MCP_APP_PROTOCOL.md` §4b). During migration the SDK reads
-`defaultState` as a legacy alias for `view`; new authoring writes `view`.
+The component's **public state** lives in its slice under the key **`state`** — the
+word ruled 2026-08-29, finishing the rename journey: `defaultState` was wrong twice
+over (it holds the CURRENT state, not a default, and collides with the app-level load
+mode), and `view` was an invented intermediate. New authoring writes `state`
+(`setValue key: state`, `Switch on: state`, `select.where.field: state`); the SDK
+reads `view` and `defaultState` as legacy aliases and nobody writes them.
 
 ---
 
@@ -141,31 +142,46 @@ NAMED after the latest surfaced view), and the VIEW test (`UNOVERSE_LAYERS.md` o
 A component declares a state tree, and every state names the layout that draws it:
 
 ```yaml
-# product-card.yaml (the sab pilot, as shipped)
-state:
-  view:                      # the public axis
-    initial: products
-    states:
-      products: {}                          # the rail card, no layout key needed
-      detail:                               # the full page
-        layout: product                     # declared only because the filename differs
-        on: step
-        initial: detail
-        states:                             # PRIVATE substates (the steps)
-          detail: { layout: product-detail }
-          apply:  { layout: product-apply }
+# product-card.yaml (updated to the 2026-08-29 rulings: explicit paths, and the
+# tree at TOP-LEVEL `states:` like every kind — the `state.view` wrapper is legacy)
+states:                      # ORDER IS THE PRIORITY: the first state is the arrival
+  products:                               # the rail card
+    layout: layouts/products
+  detail:                                 # the full page
+    layout: layouts/product
+    on: step
+    states:                               # PRIVATE substates; first one starts the axis
+      detail: { layout: layouts/product-detail }
+      apply:  { layout: layouts/product-apply }
+values:                      # STARTING VALUES of keys the component writes
+  progressPct: 10%             #   (`state:` scalars = the legacy spelling)
 ```
+
+**No `root` needed** (same ruling): the tree IS the machine, so the compiler
+synthesizes the root Switch from `states:`. An authored root survives only as a
+REAL SHELL (chrome beyond the plain Switch — text-chat's condition-guarded moods);
+a root that merely restates the tree is linted as redundant.
+
+**THE WORD IS `state`** (owner ruling 2026-08-29): the public-axis slice key,
+`setValue` writes, `Switch on:`, and `select.where.field` all say `state`; `view` and
+`defaultState` are legacy spellings every reader still accepts and nobody writes.
 
 Read top to bottom it answers, in order: what states exist, which are public, which
 nest privately, and what draws each one. The state machine is the spine; a layout is a
 projection a state owns. A layout is never addressable on its own, at any tier: the
 only thing that ever selects a layout is the owner's own state.
 
-**`layout:` is OPTIONAL: same-name is the default** (decided at the sab checkpoint,
-2026-08-08). A state with no declaration draws the layout of its own name; `{}` is a
-complete state. Write `layout:` only when the filename differs (a state renamed for
-meaning keeping its historical files). Name states for what they MEAN (`detail`), not
-for their drawing.
+**`layout:` is REQUIRED, and its value is a PATH** (owner ruling 2026-08-29,
+superseding the sab-checkpoint same-name default of 2026-08-08). Every state declares
+the layout it draws as a path relative to the definition folder — `layout:
+layouts/standard` — the same path grammar `$include` has always used. Nothing is
+assumed: no magic `layouts/` folder, no name-matching, no `{}`-is-complete. The
+ruling's reason: the same-name convention hardcoded a folder and hid the link — a
+reader had to know the convention to follow it, and complicated apps could not
+organize their drawings into subfolders. `layouts/` survives as the conventional
+home, not a platform-known name. The ONE exception: a FLAT component (no `layouts/`
+folder — the drawing IS the root) declares face-only states with no `layout:`.
+Name states for what they MEAN (`detail`), not for their drawing.
 
 **The shell vs the steps.** A state's own layout is its SHELL: always on while the
 state is active, never a choice. Its nested substates are the STEPS: the only
@@ -177,7 +193,7 @@ has several arrangements (horizontal / vertical):
 
 ```yaml
 focused:
-  layouts: { horizontal: focused-h, vertical: focused-v }
+  layouts: { horizontal: layouts/focused-h, vertical: layouts/focused-v }
 ```
 
 Variants must bind the SAME fields and differ only in arrangement; anything that
@@ -268,10 +284,14 @@ currently matches:
 states:
   main:                 # the base arrangement
     states:
-      welcome: {}       # contained substate; first = the landing default
-  focus: {}             # the reaction ladder, in priority order
-  products: {}
-  detail: {}
+      welcome:          # contained substate; first = the landing default
+        layout: layouts/main-welcome
+  focus:                # the reaction ladder, in priority order
+    layout: layouts/focus
+  products:
+    layout: layouts/products
+  detail:
+    layout: layouts/detail
 ```
 
 The ladder (`stateOrder`) is DERIVED from the tree: the top level minus the base, in
@@ -412,7 +432,8 @@ in the migration plan, not here):
    ordered list (today's `stateOrder` promoted from picker hint to contract); layout
    filenames stop being claims.
 3. **State-owns-layout resolution.** The active layout resolves from the state's
-   declaration (same-name default), never from name identity with a view.
+   declaration (a REQUIRED root-relative path since the 2026-08-29 ruling; the
+   same-name default is retired), never from name identity with a view.
 4. **`view` with legacy alias.** The slice key renames; `defaultState` stays readable
    during the sweep.
 5. **Arrival scan, single owner.** Rule 3's host scan replaces the three v1 emitters.

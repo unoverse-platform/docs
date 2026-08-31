@@ -3,185 +3,149 @@ sidebarTitle: "State"
 title: "State"
 ---
 
-Make a card expand to a full page, a wizard walk its steps, or a panel slide out beside the
-conversation, without wiring any of it. A component writes only its own state, and the app
-around it reacts to that by name.
+Make a card expand into a full page, a wizard walk its steps, or a panel slide out beside
+the conversation, without wiring any of it. Everything on screen reacts to one thing: the
+state an interface is in.
 
-If you know statecharts and the actor model you already know this. A component is a small state
-machine whose states own their layouts. A streamed component is a spawned actor that publishes
-its state, and the app subscribes.
-
-## Three places state lives
+## Where state lives
 
 | | Holds | Written by |
 |---|---|---|
 | **Conversation** | The turns, each turn's status, the voice transcript | The stream. Never you |
-| **Component** | One slice per component: its data, its `view`, its private keys | The stream, and the component's own `setValue` |
-| **App** | The app's own chrome: its draft, its panels | The workflow, and `setAppValue`. Never a component |
+| **Interface** | One slice each: its data, its `state`, its private keys | The stream, and its own `setValue` |
+| **App** | The app's own chrome: its draft, its panels | The workflow, and `setAppValue`. Never an interface |
 
-All three are render state, rebuilt from the stream on reload. The Agent's memory is a separate
-layer on the server.
+All three are render state, rebuilt from the stream on reload. The Agent's memory is a
+separate layer on the server.
 
-A component's public state lives under the key **`view`**, and it is the only thing about a
-component the outside world sees.
+An interface's public state lives under the key `state`, and it is the only thing about
+that interface the outside world sees. (`view` and `defaultState` are legacy spellings the
+platform still reads.)
 
-## The six rules
+## The one question
 
-### 1. Each state owns its layout
-
-The component declares its states, and every state names the drawing that shows it. Top-level
-states are public; anything nested is private. [Components](/design/components) covers the tree
-and the rearrange rule that sorts them.
-
-### 2. Nobody sends a state. The host places the actor
-
-A streamed component arrives as data. Where it lands is the host's decision, in two steps.
-
-The component's **first declared state** stands whenever the host has a state of that name. A
-card declaring `products` first, arriving into an app with a `products` state, starts there.
-
-Only when the host has no such state does the **scan** run. The app walks its own states in
-declared order and takes the first name the component's public menu also has. With no overlap
-at all, the component wakes in its own first state, inline.
-
-After that, everything is forbidden. **The app never writes a component's state.** Not to
-promote it, not to retract it, not to close it.
-
-### 3. The component drives, the app reacts by name
-
-Once it has landed, `view` changes exactly two ways, and both are the same write into the
-component's own slice. Someone interacts, or the component's own chrome does it: its expanded
-state carries a ✕ that sets `view` back.
-
-Whenever `view` changes, every hosting app asks one question.
+An interface writes its own `state`. Everything holding it then asks one question:
 
 > **Do I have a state with that name?**
 
-Match, and the app enters its own state of that name, and that state's layout draws. No match,
-and rule 6 applies.
+A template asks it and draws that state's shape. An app asks it and draws that state's
+layout. A match activates, and no match means the interface renders inline in the
+conversation.
 
-Name matching is the default and needs no ceremony. An explicit `reactsTo` on an app state is
-the rare escape hatch for a vocabulary mismatch.
+That is the whole reaction contract, and it runs at every scale. A card writing
+`state: page` opens the `page` state of whatever holds it, and nothing was wired to make
+that happen.
 
-### 4. Declared order is the priority ladder
+**Nothing writes another thing's state.** An interface writes its own and nothing else's,
+and the app never writes a component's: not to promote it, not to retract it, not to close
+it. A card's own ✕ writes its state back, which is why there is no close logic anywhere.
 
-An app declares its own tree, and one declaration answers everything:
+**One instance, one place.** While an interface's state matches, it lifts out of the flow
+into that place. It is never drawn twice, and there is no trick for hiding a second copy.
+Losing the match releases it back inline.
+
+## Arrival and lifetime
+
+An interface arrives as data, and where it lands is the host's decision.
+
+Its first declared state stands whenever the host has a state of that name. A card
+declaring `grid` first, arriving into an app with a `grid` state, starts there. Only when
+the host has no such state does the scan run: the host walks its own states in declared
+order and takes the first name the interface also declares. With no overlap at all, the
+interface wakes in its own first state, inline.
+
+**A new turn resets the screen.** Every instance returns to its first state, places empty,
+and the app derives its base state again. An interface whose first state suits the flow
+stays in that turn's history. One with no inline face retires: visible while placed,
+invisible afterwards.
+
+The opt-out is `lifetime: conversation` in the manifest, for a durable surface such as a
+cart or a composed page. The platform keys it by the conversation rather than the turn, so
+a repeat arrival merges into the same slice instead of replacing it. It survives the reset
+and cancellation, and stays until it is replaced, closes itself, or the app swaps. An app
+swap is the hard boundary, and a new shell retires every surface, durable ones included.
+
+## Priority
+
+An app is in exactly one state at a time, and its tree declares the order:
 
 ```yaml
 states:
-  main:                 # the base arrangement, always first
+  main:                    # the base arrangement, always first
+    layout: layouts/main
     states:
-      welcome: {}       # contained: exists only inside main
-  focus: {}             # the ladder, in priority order
-  products: {}
-  detail: {}
+      welcome:             # contained: exists only inside main
+        layout: layouts/main-welcome
+  focus:                   # the ladder, in priority order
+    layout: layouts/focus
+  grid:
+    layout: layouts/grid
+  page:
+    layout: layouts/page
 ```
 
-An app is in exactly one state at a time. When hosted components sit in different views, it
-walks its top-level list top-down and enters the first of its states that **any** hosted
-component matches. One card in `focus` and seven in `products` means the app enters `focus`.
-Ties go to the most recent write.
+The app walks its top-level list top-down and enters the first of its states that any
+hosted interface matches. One card in `focus` and seven in `grid` means the app enters
+`focus`. Ties go to the most recent write. No word is special, and `focus` outranks `grid`
+by list position alone.
 
-No word is special. `focus` outranks `products` because of list position, and nothing else.
+The active state is **derived, never stored**. It is a function of what the app currently
+holds, so nothing writes a focus flag anywhere.
 
-The app's active state is **derived, never stored**. It is a pure function of the components it
-hosts, and nothing writes a focus flag anywhere.
+**A delivery clears the claims below it. Your own navigation does not.** When an interface
+arrives into a higher-ranked state, interfaces sitting in lower ones release and retract to
+inline, so releasing the higher state lands on the base rather than a stale lower one.
+Closing a finder returns you to the conversation instead of resurrecting the rail that was
+open beforehand. Tapping a rail card into its page enters `page` without touching the
+rail's claims, so closing that page returns you to the rail you opened it from.
 
-### 5. A delivery clears the claims below it. Your hand does not
+Both are the same walk, with one question added: did a delivery put the winner there, or
+did you?
 
-When a component **arrives** into a higher-ranked state, every component sitting in a lower one
-releases its claim and retracts to inline. Releasing the higher state then lands on the base,
-never on a stale lower one. Closing a finder returns you to the conversation, and does not
-resurrect the rail that was open beforehand.
+## Writing state
 
-**Your own navigation clears nothing.** Tapping a rail card into its detail page enters
-`detail` without touching the rail's claims. So closing that page returns you to the rail you
-opened it from.
+Two writes exist, and everything else is a native MCP call.
 
-Both are the same walk with one question added: did a delivery put the winner there, or did
-you? There is no close logic anywhere.
-
-### 6. An unmatched view falls inline. Always
-
-No state, a view the app has no state for, or an app with no reaction states at all, and the
-component renders inline in the conversation.
-
-**One instance, one place.** While its view matches an app state, the instance lifts out of the
-flow into that state's slot. It is never painted twice, and there is no trick for hiding a
-second copy. Losing the match releases it back.
-
-## Two lifetimes
-
-Conversation state is durable and append-only. Chat state, meaning each instance's active view
-and the app's chrome, is the present interaction.
-
-**A new turn resets the chat layer.** Every instance returns to its first state, slots
-empty, and the app derives its base state. A component whose first state suits the flow returns
-to it in that turn's history. A surface-only component simply retires: visible while placed,
-invisible afterwards.
-
-The opt-out is `lifetime: conversation` in the manifest, for a durable surface such as a cart or
-a composed page. The platform keys it by the conversation rather than the turn, so a repeat
-arrival merges into the same slice instead of replacing it. It survives the new-turn reset and
-cancellation, and stays until it is replaced, closes itself, or the app swaps.
-
-An app swap is the hard boundary. A new shell retires every surface, durable included.
-
-## How a layout reacts
-
-Inside an app state's layout, the slot selects by view. Never by component type, never by id.
-
-```yaml
-type: ComponentSlot
-select: { from: all, where: { field: view, eq: focus }, limit: 1 }
-```
-
-Which component is intrinsic: the one whose view matches. Conflicts go to the most recent.
-
-**Many instances are fine.** Three products means three cards, and the rule holds per instance.
-The app decides how a slot lays its occupants out: a flow list, one focus, or a rail.
-
-A component's private keys never cross, and selectors read `view` only.
-
-For app chrome rather than slots, the same fact arrives as **`surfacedView`**: the name of the
-active reaction state, or empty when everything is inline. So a header button reacts by name.
-
-## The two writes
-
-**`setValue`** writes the component's own slice: its answers, its `step`, its `view`. That is
-the only thing a component ever writes.
-
-**`setAppValue`** writes app state: a disclosure panel, the composer draft. A component may
-write it too, because chrome drawn through `Ref` has no slice of its own. One direction still
-holds, in that the button writes a key and whoever cares reacts.
+**`setValue`** writes the interface's own slice: its answers, its `step`, its `state`.
 
 ```yaml
 action:
   type: setValue
   values:
-    - { key: subject, value: "{{value}}" }
-    - { key: step, value: route }
+    - key: subject
+      value: "{{value}}"
+    - key: step
+      value: route
 ```
 
-Anything that is not one of these two is a native MCP call. Sending a message is `tools/call`,
-and answering a waiting wizard is an elicitation. You never build transport.
+**`setAppValue`** writes the app's own chrome, such as a disclosure panel or a composer
+draft. A component may write it too, because chrome drawn through `Ref` has no slice of its
+own.
 
-## The four moves
+Sending a message is `tools/call`, and answering a waiting wizard is an elicitation. You
+never build transport.
 
-All reactivity is `eq` / `ne` / `in` / truthy, applied four ways.
+A place selects what it holds by state, never by component type and never by id:
 
-| Move | Use when |
-|---|---|
-| `visibleWhen` | A small thing appears or disappears |
-| `Switch` | A whole view swaps: public states, wizard steps |
-| `Each` | Repeat over a literal list or a bound array |
-| `style.when` | The same element restyles by state |
+```yaml
+type: ComponentSlot
+select:
+  from: all
+  where:
+    field: state
+    eq: focus
+  limit: 1
+```
 
-Mutually exclusive views belong in **one** `Switch`. Name one field per axis: `view`, `step`,
-`callState`. Never boolean soup. This is the discriminated-union doctrine, which exists to make
-impossible states impossible.
+Which interface lands there follows from the match, and the most recent write wins a tie.
+Many instances are fine, and the rule holds per instance: three products means three cards,
+and the app decides whether that place is a flow list, one focus or a rail. Private keys
+never cross, and a selector reads `state` only.
 
-## State you cannot write
+App chrome reads the same fact as `surfacedView`, the name of the active reaction state, or
+empty when everything is inline. A header button reacts by name without needing a slot.
+
+### State you cannot write
 
 Three things are managed for you. Project them, and never simulate them.
 
@@ -193,12 +157,47 @@ Three things are managed for you. Project them, and never simulate them.
 
 An app binds the voice service by declaring `service: voice` in its manifest.
 
+## Modelling a state tree
+
+Three habits keep a tree honest.
+
+**A state's layout is its shell.** The shell stays on while that state is active, and only
+its nested substates are choices inside it. You never write a root for a tree, because the
+compiler builds the `Switch` on `state` from the declaration, and a case never re-guards
+the discriminant the tree already selected.
+
+**Most "states" are data.** Seven wizard questions sharing one arrangement are one state
+whose data changes, never seven files. The `step` value selects what the layout binds, and
+only a genuinely different arrangement earns a file. Input is neither a state nor a step,
+because a composer or edit form is the app's one input tool.
+
+**The writer of a value owns where it lives.** Before nesting anything, ask what writes the
+discriminant:
+
+| Written by | It belongs to |
+|---|---|
+| The interface's own buttons | Private substates on its own axis, named by your design |
+| A service projecting a value, such as `callState` | Substates named for those values |
+| Conversation facts the app derives, such as "is it empty" | The app, as a condition-guarded mood. Interfaces react |
+
+Borrowing another field's values leaks machinery into your design, so never model a derived
+mood as component substates.
+
+<div className="ref-source">
+The model is not a house invention. One discriminant per axis is the discriminated-union
+doctrine, which exists to make impossible states impossible. Nested states with a first
+declared entry are <a href="https://statecharts.dev/" target="_blank" rel="noopener">statecharts</a>.
+A streamed interface is a spawned <a href="https://stately.ai/docs/actors" target="_blank" rel="noopener">actor</a>
+that owns its state and publishes it, and the app subscribes. Deriving rather than storing
+is React's own <a href="https://react.dev/learn/choosing-the-state-structure" target="_blank" rel="noopener">Choosing the State Structure</a>.
+</div>
+
 ## Next steps
 
-<Card title="Apps" icon="layout-template" href="/design/apps" horizontal>
-The shell your components render inside.
+<Card title="Templates" icon="layout-grid" href="/design/templates" horizontal>
+The arrangements that hold your interfaces and react to their states.
 </Card>
 
-<Card title="Primitives" icon="box" href="/reference/primitives" horizontal>
-Every element, and what each one reads.
+<Card title="Apps" icon="layout-template" href="/design/apps" horizontal>
+The shell your templates and components render inside.
 </Card>

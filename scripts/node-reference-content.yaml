@@ -53,6 +53,7 @@ api:
   toolExchange: "Hands tools to a model and resolves the calls that come back. Declaring it makes the node a callback node."
   narrate: "A second, cheaper model writing a status line while the main call runs. A `from: narrator` row in `events` says where the line lands."
   publish: "A write straight into the caller's screen state, pushed after the node settles. A side channel to the person watching, never an output."
+  renderComponents: "Rows to draw as content cards on the caller's live screen, such as `return response.results`. A row naming a component renders it as the node settles, so a card appears without the model choosing to show one. Evaluated after the events table, over the full settled reply, because a card needs the whole row that an events projection strips. Fire and forget: with no live session it does nothing."
   audio: "Binds a voice node to the platform's audio lane, which is a separate socket. Everything that is not audio belongs in `events`."
 
 config:
@@ -203,7 +204,7 @@ examples:
     displayName: Airtable
     description: Read and write records in Airtable bases.
     version: 1.0.0
-    category: Storage & Data
+    category: storage
     requires:
       credential: [bearer]
       transport: [json]
