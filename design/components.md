@@ -265,6 +265,13 @@ The platform compiles every brief into the component's tool schema, so there is 
 to maintain anywhere. Change a description or a count, and behaviour changes on the next
 render.
 
+## How an Agent finds it
+
+Your `manifest.yaml` carries the four fields that decide whether this is ever chosen:
+`title`, `description`, `whenToUse` and `category`. The rules are identical for every kind,
+they are enforced by the deploy lint, and
+[Node discoverability](/nodes/node-discoverability) is the contract.
+
 ## Next steps
 
 <Card title="State" icon="workflow" href="/design/state" horizontal>

@@ -3,13 +3,32 @@ sidebarTitle: "Node Discoverability"
 title: "Node Discoverability"
 ---
 
-A node that works perfectly and never gets picked is dead code.
+Write the four fields that decide whether your work is ever chosen. This page is the
+contract, and every other guide links here rather than restating it.
 
-When the AI workflow builder assembles a workflow, it does not see every node you have. For
-each step it asks for the nodes that suit the job, gets back a handful, and picks from those.
-Your node is either in that handful or invisible.
+**Nothing selects your artifact by name.** When an Agent needs something, it does not see
+your catalogue: it describes the job, and the platform returns a handful of candidates
+ranked by how close their meta reads to that description. You are in that handful or you
+are invisible, and the failure is silent, because the thing works perfectly and is simply
+never reached for.
 
-Four fields decide it, and they all live in `node.yaml`.
+The same contract covers **nodes, apps, components, templates and agent skills**. A node
+carries the fields in `node.yaml`; everything else carries them in its `manifest.yaml`.
+
+| Field | Its one job | Enforced |
+|---|---|---|
+| `title` | The thing itself. No project prefix, no mechanism | A warning if missing, because the name or the folder slug leads the ranking text instead |
+| `description` | What it **is**: the listing subtitle, one line, 20 to 120 characters. No "use when…" inside it | An error at both bounds |
+| `whenToUse` | The **selection text**, which replaces `description` in the ranking when present | An error if under 20 characters, selector-shaped, or mechanism-led |
+| `category` | The domain of the job, never the implementation | A warning |
+
+The ranked text is assembled as `<title>. <whenToUse> <description>`, so `title` leads it
+and a missing one puts a kebab slug in front of the ranker. Apps and nodes also carry their
+category into that text; a component's and a template's category is shelf organisation
+rather than ranking signal.
+
+`whenToUse` is the field that matters most, because it replaces `description` in the
+ranking when present. It is not a footnote. It is the text being matched.
 
 ```yaml node.yaml
 name: Smart Document
@@ -20,9 +39,6 @@ whenToUse: >-
   article or brief. Writes and revises section by section, so a one-shot generation
   cannot be revised and blows the context window on every change.
 ```
-
-`whenToUse` is the one that matters. When it is present it **replaces** `description` for
-matching, so it is not a footnote. It is the text being ranked.
 
 ## Write for the task, not for a reader
 

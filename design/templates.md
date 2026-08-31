@@ -195,7 +195,7 @@ parts need none, because they render their own defaults.
 
 Every preview is ignored at runtime. Real deliveries replace all of it.
 
-## Fetching its own interfaces
+### Fetching its own interfaces
 
 <Note>
 The query lane is designed and not yet built. The shape below is the model, and the
@@ -229,6 +229,13 @@ The placement only places, and the director's rules stay in the template itself.
 
 The delivery owns the parts. Each turn's delivery replaces the last, a delivery that
 confirms nothing clears them, and an empty template collapses, frame included.
+
+## How an Agent finds it
+
+Your `manifest.yaml` carries the four fields that decide whether this is ever chosen:
+`title`, `description`, `whenToUse` and `category`. The rules are identical for every kind,
+they are enforced by the deploy lint, and
+[Node discoverability](/nodes/node-discoverability) is the contract.
 
 ## Next steps
 

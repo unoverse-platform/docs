@@ -222,15 +222,19 @@ never wired in a definition.
 
 ## How an Agent finds your app
 
-`whenToUse` is the text an Agent's search is ranked against, so it decides whether the app
-is ever chosen. Getting it wrong fails silently: the app works, and is simply never picked.
+Nothing selects your app by name. An Agent describes the job, and the platform returns a
+handful of candidates ranked on their meta, so `whenToUse` decides whether your app is ever
+chosen. Getting it wrong fails silently: the app works, and is simply never picked.
 
-| Field | Its one job |
-|---|---|
-| `title` | The thing itself. No project prefix, no mechanism |
-| `description` | What it is, one line under 120 characters |
-| `whenToUse` | The words a user would say, outcome first |
-| `category` | The job's domain, never the implementation |
+| Field | Its one job | Enforced |
+|---|---|---|
+| `title` | The thing itself. No project prefix, no mechanism | Warning if missing, because it leads the ranked text |
+| `description` | What it is: the listing subtitle, one line, 20 to 120 characters | Error at both bounds |
+| `whenToUse` | The words a user would say, outcome first | Error if too short, selector-shaped or mechanism-led |
+| `category` | The job's domain, never the implementation | Warning |
+
+The ranked text is `<title>. <whenToUse> <description>`, so a missing title puts the folder
+slug in front of the ranker.
 
 The trap for a general-purpose app is listing its siblings' jobs, because that vocabulary
 then outranks the focused apps for their own queries. A fallback owns general help and

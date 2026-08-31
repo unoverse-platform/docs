@@ -91,10 +91,6 @@ APPS: the Studio walk. Each key is a state name. An ARRAY seeds that state with 
 COMPONENTS: opt out of supersession (rule 5). An instance marked `conversation` is not replaced when a newer instance arrives in the same state — it stays for the whole conversation.
 </ResponseField>
 
-<ResponseField name="latch" type="object">
-COMPONENTS: declaring this makes the component LATCHABLE — the conversation can be addressed AT this instance, so what the guest says next travels with its key (`chatId:nodeId`) and its current state, and the answer merges back into it rather than placing a new component. The composer shows a pill (icon + title + ✕); the ✕ is the only exit. There is at most ONE latch at a time and its holder is DERIVED, never stored: the highest-ranked latchable instance live in the store, by the app's declared state order (STATE MODEL v2 rule 5). No block means never latchable. Spec: docs/MCP_COMPLETE_GUIDE.md §The Component Latch.
-</ResponseField>
-
 <ResponseField name="lifecycle" type="object[]">
 COMPONENTS: hooks that fire on a moment, not a URL. `onEnterView` runs when the instance enters one of the named states.
 </ResponseField>
