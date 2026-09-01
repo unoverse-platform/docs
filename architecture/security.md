@@ -168,15 +168,12 @@ is Splunk, ELK or Datadog.
 
 ## Still open
 
-Three items are honest gaps rather than controls. All three are known and tracked.
+Two items are honest gaps rather than controls. Both are known and tracked.
 
 **There is no rate limit and no spend cap.** Any signed-in caller can run workflows, and
 workflows spend money with your AI providers. Nothing in the platform slows a caller down or
 stops them. Set spend limits at the provider until this lands, because a provider limit holds
 even if the platform does not.
-
-**Decrypted credentials are cached in Redis for twenty minutes.** A Redis backup taken in
-that window contains plaintext keys. Treat those backups as secrets.
 
 **One connection carries its token in the query string.** That is why load balancer access
 logs are switched off in the entry point requirements. Moving the token to a header lifts both
