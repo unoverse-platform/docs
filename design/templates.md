@@ -224,6 +224,10 @@ appears when an Agent happens to mention its subject.
     pick: 2                        # how many the director keeps
 ```
 
+Write the component's description as a comma list of things ("theme parks, rides,
+karting"), never prose: each term is searched as its own short angle in one batched
+call, and short terms match content that long sentences miss.
+
 **You never write the question.** The director derives it from the first of four voices
 that speaks:
 
