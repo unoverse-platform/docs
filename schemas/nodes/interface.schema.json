@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://unoverse/nodes/interface.schema.json",
+  "title": "Unoverse node interface",
+  "description": "interface.yaml — the node's WIRING SURFACE, and nothing else. Everything another node, an agent, or a developer needs in order to connect to this one: what goes in, what comes out, what services it offers or consumes, and what credentials it needs.\n\nIt has its own file because this is the question asked most often about a node, and it should never require reading past a node's branding to answer. See docs/architecture/DECLARATIVE_NODES.md §5.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "inputs": {
+      "type": "array",
+      "description": "Ports that accept data from upstream nodes. Absent means the node is a trigger or takes no wired input. A streaming or looping node also declares a CONTINUE signal port here, and that port is what makes it a CallbackNode.",
+      "items": {
+        "$ref": "_defs.schema.json#/definitions/port"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "description": "Ports this node emits on. A streaming node emits on several: incremental output during the run, and its settled result at the end (see api.yaml `response.events` and `response.finalize`).\n\nAN ANNOTATION NODE MAY DECLARE NONE. `Note` is a markdown sticky on the canvas: no inputs, no outputs, no api. Having no INPUTS is what keeps it out of the data flow (the graph can never reach it), which is why it needs no outputs either — a dot that could never carry anything. Lint still refuses a node that has inputs but no outputs, because there something reaches it and the data then stops dead.",
+      "items": {
+        "$ref": "_defs.schema.json#/definitions/port"
+      }
+    },
+    "credentials": {
+      "type": "array",
+      "description": "Credential TYPES this node needs. Values never appear here. The type is declared once per package in credentials/<name>.yaml, and the executor resolves it at run time.",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Must match a credential declared in this package's credentials/ folder. Lint enforces it."
+          },
+          "type": {
+            "type": "string",
+            "description": "Credential type id, when it differs from `name`."
+          },
+          "required": {
+            "type": "boolean",
+            "default": true
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "serviceConnectors": {
+      "type": "array",
+      "description": "Service wiring between nodes in a workflow, drawn as the node's top and bottom handles. `isService: true` means this node PROVIDES a capability to others; false means it CONSUMES one granted by an upstream provider.\n\nA provider node has TWO INDEPENDENT CHANNELS that do not cross: service calls answer an agent and do NOT fire the node's outputs, while a graph trigger fires the outputs and does not answer an agent (mcp-services.md).\n\nUnrelated to api.yaml, which describes this node's own upstream HTTP call.",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "serviceType",
+          "isService"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "serviceType": {
+            "enum": [
+              "mcp",
+              "embedding"
+            ],
+            "description": "IMPLEMENTED service types only."
+          },
+          "isService": {
+            "type": "boolean"
+          },
+          "methods": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Consumers only: the provider methods this node calls."
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Providers only: usage protocol handed to the calling agent, for tools whose correct use is not obvious from the schema alone (11-agent-skills.md)."
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

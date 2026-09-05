@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://unoverse/nodes/_defs.schema.json",
+  "title": "Shared node definitions",
+  "description": "Fragments $ref'd by the sibling node schemas. Not authored directly. See docs/architecture/DECLARATIVE_NODES.md.",
+  "definitions": {
+    "nodeType": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9]*$",
+      "description": "The node's stable identity, PascalCase. This is what a saved workflow stores and what the engine resolves. Renaming it orphans every graph that uses it. NOT the same as the `type` field in package.json's gravity.nodes[], which meant PromiseNode or CallbackNode."
+    },
+    "portType": {
+      "enum": [
+        "string",
+        "number",
+        "boolean",
+        "object",
+        "array",
+        "signal"
+      ],
+      "description": "The shape carried on a wire. Mirrors NodeInputType in @unoverse-platform/plugin-base."
+    },
+    "signalType": {
+      "enum": [
+        "EXECUTE",
+        "CONTINUE",
+        "SPAWN",
+        "RESET"
+      ],
+      "description": "Which signal fires this connector. EXECUTE is the default trigger; CONTINUE drives the next iteration of a streaming or looping node; SPAWN initialises an actor; RESET clears it. A node becomes ready when ANY ONE connector has all its required sources populated (signal-routing.md)."
+    },
+    "port": {
+      "type": "object",
+      "required": [
+        "name",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9_]*$",
+          "description": "camelCase by convention. Upstream nodes address it as signal.<sourceId>.<outputHandle>.\n\nsnake_case is ALLOWED because a migrated node must keep the connector names its code version had: a saved workflow references them by name, so renaming `linkedin_url` to `linkedinUrl` would silently stop resolving and the field would read as empty with no error anywhere. Fidelity to the node being replaced beats house style. Prefer camelCase for anything new."
+        },
+        "type": {
+          "$ref": "#/definitions/portType"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Inputs only. A connector is satisfied when all its REQUIRED sources are populated."
+        },
+        "signal": {
+          "$ref": "#/definitions/signalType",
+          "description": "Inputs only. Omit for the EXECUTE default."
+        },
+        "description": {
+          "type": "string",
+          "description": "What travels on this port. Read by developers wiring the graph."
+        }
+      },
+      "additionalProperties": false
+    },
+    "nodeCategory": {
+      "enum": [
+        "AI",
+        "Voice",
+        "Go To Market",
+        "Search",
+        "Web Scraping",
+        "Media & Design",
+        "Documents",
+        "Knowledge & Vectors",
+        "Storage & Data",
+        "Communication",
+        "Flow",
+        "Output"
+      ],
+      "description": "Descriptive taxonomy matching the node's JOB. This is the NODE vocabulary and it is deliberately different from the PACKAGE vocabulary in package.schema.json (ai, storage, ingest, ...). See docs-starter/nodes/CLAUDE.md."
+    },
+    "whenToUse": {
+      "type": "string",
+      "minLength": 40,
+      "description": "AI selection guidance, embedded and semantically ranked by getNodeCatalog, so it decides whether this node SURFACES AT ALL to the workflow-building agent. Rules (node-discoverability.md): 1-2 sentences; OUTCOME first, mechanism last; disqualify yourself by PROPERTY and never name a rival node; put wiring facts last. A node with weak meta is invisible no matter how well it works."
+    },
+    "expression": {
+      "type": "string",
+      "pattern": "^return ",
+      "description": "A sandboxed `return ...` data-shaping expression, evaluated by the platform's existing SafeExpression evaluator (engine/src/template/SafeExpression.ts). Same syntax developers already use in object template config fields, so this format introduces NO second expression language.\n\nSecurity is by ABSENCE: an acorn AST allowlist that never implements process, require, fetch, eval, Function, new, assignment, or constructor/__proto__, so there is nothing to escape to. Allowed: member access, indexing, object and array literals, spread, template strings, operators, ternaries, and safe array/string/JSON/Math methods including arrow callbacks. Anything else throws and is logged."
+    },
+    "templateOrExpression": {
+      "type": "string",
+      "description": "EITHER a Handlebars template or a `return ...` expression, decided by the string itself: anything starting with `return ` is evaluated by SafeExpression, everything else is rendered as a template.\n\nONE RULE FOR EVERY STRING IN A CALL. url, headers, query and the auth fields all take this, exactly as the body already did. The gap used to be arbitrary and it cost a real node: a URL is often assembled from an earlier call's reply, and a vendor's shape is not always uniform (HubSpot's v3 associations return the related id as `toObjectId` on some object pairs and `id` on others). Handlebars has no `??`, so a manifest could not express the fallback that the retired TypeScript wrote as `toObjectId ?? id`, and the only escape was choosing an API version whose shape happened to be predictable. A node should not contort itself around a limitation of the executor.\n\nPrefer the template. Reach for the expression when a template genuinely cannot say it, because a template is what a reader can scan.\n\nNOTE for `url`: the linter checks allowedHosts hosts STATICALLY by blanking `{{ }}` and parsing what is left, and it cannot do that with an expression, so an expression URL is reported as not statically verifiable. It is still enforced at run time: `sendRequest` calls `assertAllowedHost` on the RESOLVED url, and every call in the runtime goes through it.",
+      "examples": [
+        "https://api.example.com/v1/things/{{ calls.search.results.0.id }}",
+        "return 'https://api.example.com/v1/things/' + (calls.search.results[0].toObjectId || calls.search.results[0].id)"
+      ]
+    },
+    "template": {
+      "type": "string",
+      "description": "A Handlebars template resolved against the node's input context before the request is sent.\n\nFive roots:\n  signal.<sourceId>.<outputHandle>.<field>   upstream node output, e.g. {{signal.inputtrigger1.output.message}}\n  config.<field>                              this node's own settings\n  credentials.<name>.<field>                  this node's resolved credential\n  services.<connector>                        RUNTIME service wiring, e.g. {{#unless services.mcpService.tools}}\n  prompt.<blockName>                          a PROMPT BLOCK from the library (alias: blocks.<name>)\n\nThe services root exists because some request shaping depends on what is WIRED rather than configured, a fact only the executor knows at run time.\n\nThe prompt root is why a manifest must NEVER hardcode instruction text. Blocks live in prompts/blocks/**/*.md, are authored and toggled in Studio, and are camelCased from the filename (markdown-guidelines.md becomes {{prompt.markdownGuidelines}}). A copy of a block's words baked into a node is a fork that silently stops tracking the block. Text belongs in the library; the node references it. This is the prompt-side twin of the SDK owning no styles.\n\nEvery root works in ANY template field, including a user's own systemPrompt: that is what lets an author compose blocks and upstream values into a prompt without the node knowing anything about it.\n\nThere is NO {{input.*}} root: a wrong path resolves to EMPTY silently. Array elements and object keys are dot segments, never brackets: records.0.Name, not records[0].Name."
+    }
+  }
+}

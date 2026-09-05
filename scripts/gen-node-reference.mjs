@@ -3,7 +3,7 @@
  * gen-node-reference — the node authoring surface, from the eight node schemas.
  *
  * Nodes never had the hole the design side did: `packages/base/src/lint/nodes/` already
- * validates every node file against `apps/unoverse/nodes/_schema/*.json`, and those schemas
+ * validates every node file against `packages/docs/schemas/nodes/*.json`, and those schemas
  * already say what each file is. So there is no contract to build here, only a reference to
  * generate, and 41 of the 56 properties already carry their own description.
  *
@@ -25,7 +25,7 @@ import { parse } from "yaml";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DOCS = join(HERE, "..");
 const REPO = join(DOCS, "../..");
-const SCHEMAS = join(REPO, "apps/unoverse/nodes/_schema");
+const SCHEMAS = join(DOCS, "schemas/nodes");
 const PUBLISH = process.argv.includes("--publish");
 const OUT = PUBLISH ? join(DOCS, "reference") : join(tmpdir(), "unoverse-node-reference-preview");
 mkdirSync(OUT, { recursive: true });
@@ -90,7 +90,7 @@ title: "${page.title}"
 ${esc(content.pages?.[page.sub ?? page.schema] ?? "")}${page.note ? `\n\n${esc(page.note)}` : ""}
 
 <div className="ref-source">
-Generated from <code>nodes/_schema/${page.schema}.schema.json</code>, the same file the node
+Generated from <code>schemas/nodes/${page.schema}.schema.json</code>, the same file the node
 linter validates against.
 </div>
 

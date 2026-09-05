@@ -6,7 +6,7 @@ title: "package.yaml"
 The envelope around a folder of nodes, and what the marketplace lists.
 
 <div className="ref-source">
-Generated from <code>nodes/_schema/package.schema.json</code>, the same file the node
+Generated from <code>schemas/nodes/package.schema.json</code>, the same file the node
 linter validates against.
 </div>
 

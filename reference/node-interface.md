@@ -6,7 +6,7 @@ title: "interface.yaml"
 The node's wiring surface. Everything another node or an Agent can see.
 
 <div className="ref-source">
-Generated from <code>nodes/_schema/interface.schema.json</code>, the same file the node
+Generated from <code>schemas/nodes/interface.schema.json</code>, the same file the node
 linter validates against.
 </div>
 

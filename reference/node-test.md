@@ -6,7 +6,7 @@ title: "test.yaml"
 The fixture behind Load sample on the studio Nodes screen.
 
 <div className="ref-source">
-Generated from <code>nodes/_schema/test.schema.json</code>, the same file the node
+Generated from <code>schemas/nodes/test.schema.json</code>, the same file the node
 linter validates against.
 </div>
 

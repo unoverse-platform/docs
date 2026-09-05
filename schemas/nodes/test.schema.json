@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://unoverse/nodes/test.schema.json",
+  "title": "Unoverse node test data",
+  "description": "test.yaml \u2014 the fixture behind Studio's \"Load sample, Run\" button and behind `unoverse node test`. Every node must have one: a node nobody can run is a node nobody can trust, and lint enforces it.\n\nTemplate fields are supplied ALREADY RESOLVED, because the bench has no upstream node to resolve them from. See docs/architecture/DECLARATIVE_NODES.md \u00a76.",
+  "type": "object",
+  "required": [
+    "testData"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "testData": {
+      "type": "object",
+      "required": [
+        "config"
+      ],
+      "properties": {
+        "config": {
+          "type": "object",
+          "description": "A complete, valid config. Lint validates it against this node's own configSchema, so a config that drifts from the schema fails the build."
+        },
+        "inputs": {
+          "type": "object",
+          "description": "Sample values per input port, keyed by port name. Lint checks each key is declared in node.yaml inputs."
+        },
+        "user": {
+          "type": "object",
+          "description": "The SIGNED-IN person to run as, standing in for the session the bench does not have. Required by any node whose join key is the caller's identity: a CRM, support desk or account lookup resolves nothing without one. Identity only, mirroring the `user` scope a manifest sees at run time; there is no token here because a manifest never gets one.",
+          "properties": {
+            "email": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "state": {
+      "type": "object",
+      "description": "PLATFORM STORAGE this fixture starts with, keyed by LOGICAL key. The bench has no Redis, so it runs the real state and loop code against an in-memory client seeded from here; a value is either an object (stored whole) or an array (stored as a list, for drain).\n\nIt exists because some nodes only make sense with a warm store. `LoopEnd` closes a pass of a loop that `LoopStart` opened, so with nothing seeded its very first act is the \"loop state not found\" error it is supposed to raise for a mistyped id \u2014 the bench would report a real bug as the node's normal behaviour. Same for any node whose first call is a cache read.\n\nThe run's ids are FIXED on the bench (see test-node.mjs) so a key naming them is predictable.",
+      "additionalProperties": true
+    },
+    "expect": {
+          "type": "object",
+          "description": "Assertions over the result. On the workflow channel the scope is `output` (the emitted connectors); on the service channel it is `output` too, bound to the value the method RETURNED. Absent means the run only has to succeed.",
+          "additionalProperties": {
+            "$ref": "_defs.schema.json#/definitions/expression"
+          }
+        },
+        "call": {
+          "type": "object",
+          "required": [
+            "method"
+          ],
+          "description": "For a node with `provides`: which SERVICE method to exercise and with what arguments. A pure service node has no inputs to feed and no outputs to watch, so `inputs` cannot stand in \u2014 the only way to run it is to call it the way a consumer would.",
+          "properties": {
+            "method": {
+              "type": "string",
+              "description": "Must be a key of api.yaml `provides`."
+            },
+            "params": {
+              "type": "object",
+              "description": "Arguments the caller passes."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -6,7 +6,7 @@ title: "api/audio.yaml"
 How a voice node binds to the platform's audio lane.
 
 <div className="ref-source">
-Generated from <code>nodes/_schema/audio.schema.json</code>, the same file the node
+Generated from <code>schemas/nodes/audio.schema.json</code>, the same file the node
 linter validates against.
 </div>
 

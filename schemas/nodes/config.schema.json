@@ -1,0 +1,174 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://unoverse/nodes/config.schema.json",
+  "title": "Unoverse node config",
+  "description": "config.yaml \u2014 the node's settings form. `configSchema` is itself a JSON Schema: this file describes the SHAPE OF THAT SCHEMA, not the shape of a config. Canvas renders the form from it and the executor resolves {{ config.* }} against the saved values.\n\nThis is the file with the most churn: every new option lands here and nowhere else. Full reference for the options: docs-starter/nodes/config-schema.md.",
+  "type": "object",
+  "required": [
+    "configSchema"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "configSchema": {
+      "type": "object",
+      "required": [
+        "type",
+        "properties"
+      ],
+      "description": "A JSON Schema object, plus the ui: annotations below. Kept deliberately loose: any valid JSON Schema keyword is allowed through, so a new validation keyword never needs a change here.",
+      "properties": {
+        "type": {
+          "const": "object"
+        },
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Lint checks every name here exists in properties."
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/field"
+          }
+        },
+        "dependencies": {
+          "type": "object",
+          "description": "JSON Schema conditional BRANCHES, as used by the generic Component node: a top-level select whose value selects a whole branch of extra properties via dependencies.<field>.oneOf. Different mechanism from a field's \"ui:dependencies\", which only shows or hides one already-declared field."
+        }
+      }
+    },
+    "ui:order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Field order in the config panel. Lint checks every name exists in configSchema.properties, and warns on any property missing from this list."
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "field": {
+      "type": "object",
+      "description": "One config field. Standard JSON Schema keywords apply; the ui: keys below are ours.",
+      "properties": {
+        "type": {
+          "description": "The field's type. A LIST of types when the field genuinely holds more than one. A template-fed field can arrive as one typed value or as a collection from an upstream node, and declaring only the single case would make the other one lint as invalid config.",
+          "anyOf": [
+            {
+              "enum": [
+                "string",
+                "number",
+                "boolean",
+                "object",
+                "array"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "enum": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "object",
+                  "array"
+                ]
+              }
+            }
+          ]
+        },
+        "title": {
+          "type": "string",
+          "description": "The label. Without one the raw property name is shown, which reads as unfinished."
+        },
+        "description": {
+          "type": "string",
+          "description": "Help text under the field. Say what the setting DOES, not what it is called."
+        },
+        "default": {},
+        "enum": {
+          "type": "array",
+          "description": "Allowed values, rendered as a dropdown. $ref a shared/*.yaml fragment when several nodes share a list, e.g. the model enum."
+        },
+        "enumNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Human labels, positionally parallel to enum. Lint checks the lengths match."
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "step": {
+          "type": "number",
+          "description": "Number fields: slider or stepper increment, e.g. 0.1 for temperature."
+        },
+        "resolve": {
+          "enum": [
+            "modelTier"
+          ],
+          "description": "An executor RESOLVER applied to this field's saved value just before the request is built. IMPLEMENTED resolvers only.\n\n`modelTier` is the migration of shared/models.ts resolveModel(): a saved workflow stores a concrete model id, and if that id is later retired the resolver falls back to the current best model in the same tier, warning the operator. Without it, replacing a model generation breaks every saved workflow that named an old id.\n\nThis is the \u00a72 line in miniature: the model LIST is description and lives in shared/models.yaml, while the fallback is computation and lives in the executor.",
+          "$comment": "Adding a value here without implementing it produces a node that lints clean and fails at run time."
+        },
+        "ui:field": {
+          "enum": [
+            "template",
+            "code",
+            "textarea",
+            "password"
+          ],
+          "description": "Renders a richer control. `template` is what makes a field WIRABLE from an upstream node, and the syntax it accepts is decided by the field's `type`, universally, never per node:\n\n  type: string  -> Handlebars, e.g. {{signal.inputtrigger1.output.message}}\n  type: object or array -> a sandboxed `return ...` expression, e.g. return signal.s3files1.files\n\nA bare nested object like { topic: \"{{...}}\" } is invalid and never resolves."
+        },
+        "ui:widget": {
+          "enum": [
+            "toggle",
+            "select",
+            "textarea",
+            "slider",
+            "checkboxes",
+            "domainSelector"
+          ],
+          "description": "IMPLEMENTED widgets only, verified against the renderer in apps/canvas/src/components/workflow/ConfigurationForm/FieldRenderer.jsx:\n\n  toggle          a boolean switch\n  select          an enum picker\n  textarea        a multi-line box (FieldRenderer.jsx:248). Pair with ui:options.rows\n  slider          a number, dragged rather than typed (:162)\n  checkboxes      an array of enum values, all visible at once (:208)\n  domainSelector  an array of hostnames (:195)\n\nNOT `color`. The retired Note node declared `ui:widget: color` and the renderer has never implemented it, so it fell through to a plain text input \u2014 a setting that looked bespoke and was not. Adding a value here without a branch in FieldRenderer reproduces exactly that: it lints clean and silently renders as something else."
+        },
+        "ui:dependencies": {
+          "type": "object",
+          "description": "Show this field only when other fields hold given values. A SCALAR value is strict equality (config[field] === value); an ARRAY value is membership (value.includes(config[field])), for \"show when the parent is any one of these\". Multiple keys are ANDed.\n\nLint checks every key names a real sibling property.",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "ui:hidden": {
+          "type": "boolean",
+          "description": "Kept in the schema, hidden from the panel."
+        }
+      }
+    }
+  }
+}

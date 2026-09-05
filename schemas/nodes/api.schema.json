@@ -1,0 +1,971 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://unoverse/nodes/api.schema.json",
+  "title": "Unoverse node API call",
+  "description": "api.yaml — the upstream call this node makes, and how its response maps onto the node's outputs. This is the file that replaces an executor. NAMED api, not service: `service` already means serviceConnectors / isService / MCP providers / /service-call in this platform. See docs/architecture/DECLARATIVE_NODES.md §8.\n\nEVERY enum below is the EXECUTOR'S CAPABILITY LIST. A manifest may only name a capability that is already implemented in code. Adding a value here without implementing it produces a node that lints clean and fails at run time, and allowing a manifest to name arbitrary code would end the safety property this whole format exists for (§2).\n\nA node is reached two ways, and they never cross. The GRAPH RUNS it: `run` is the ordered list of calls it makes, and `events` says what lands on its output connectors. Or a SERVICE CALLS it ad-hoc, exposed as MCP: `service` holds those methods, each with its own list of calls, each handing one value straight back to the caller rather than touching a connector. A pure service node has only `service`.\n\nCalls are ALWAYS a `run` list, even when there is one of them. There is no `request` key.",
+  "type": "object",
+  "required": [],
+  "definitions": {
+    "call": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9]*$",
+          "description": "REQUIRED on a call. How later calls, `events` rows and `returns` reach this call's reply, as calls.<name>. Name it for what it FETCHES (search, association, company), not for its position. The narrator's own call has no name because nothing reads it back."
+        },
+        "when": {
+          "$ref": "_defs.schema.json#/definitions/expression",
+          "description": "Skip this call unless the expression is true, with every earlier reply in scope as calls.<name>. A skipped call leaves NO key behind, so a later call asks `!!calls.x` rather than checking a sentinel. Meaningless on the first call, which has nothing to test, and lint says so."
+        },
+        "method": {
+          "enum": [
+            "GET",
+            "HEAD",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE"
+          ],
+          "description": "HEAD is here for the metadata case: it asks for everything a GET would return EXCEPT the body, which is how a node learns an object's size and type without moving the object. Pair it with transport: headers."
+        },
+        "url": {
+          "$ref": "_defs.schema.json#/definitions/templateOrExpression",
+          "description": "Absolute URL. May template in config and credential values, e.g. a per-tenant subdomain."
+        },
+        "credential": {
+          "type": "object",
+          "required": [
+            "scheme"
+          ],
+          "description": "How this node proves itself TO THE VENDOR — outbound, about the node. Not to be confused with node.yaml's `auth`, which is inbound and about the CALLER (who may run this node at all). The two were both spelled `auth` until 2026-07-28 and the collision was a reliable source of confusion, so the outbound one took the name of what it actually holds: a scheme and a credential value. The scheme is executor code; everything else here is data.",
+          "properties": {
+            "scheme": {
+              "enum": [
+                "none",
+                "bearer",
+                "basic",
+                "apiKeyHeader",
+                "apiKeyQuery",
+                "oauth2ClientCredentials",
+                "awsSigV4"
+              ],
+              "description": "IMPLEMENTED schemes only. Values are added here only WITH their implementation, never ahead of it.\n\noauth2ClientCredentials exchanges a client id and secret for a short-lived token, form-encoded, caches it per connected app until it expires, and refreshes once on a 401. What the exchange returned is in scope as `token`, so a url can reach `{{ token.instanceUrl }}` where the vendor tells you where to talk as well as how.\n\nawsSigV4 signs the request with AWS Signature Version 4, which is what turns every AWS service into a manifest: the signature is computation over the request (it hashes the exact bytes being sent), so it belongs to the executor, while the endpoint, operation and body are description and stay here. Name `service` and, if it is not on the credential, `region`; the keys come from `awsCredential` and are never written in a manifest. Unlike every other scheme this resolves LAST, after the url and body are final, because a signature covers them."
+            },
+            "token": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression"
+            },
+            "username": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression"
+            },
+            "password": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression"
+            },
+            "header": {
+              "type": "string",
+              "description": "Header name for apiKeyHeader, e.g. X-Api-Key."
+            },
+            "param": {
+              "type": "string",
+              "description": "Query parameter name for apiKeyQuery."
+            },
+            "value": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression"
+            },
+            "region": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression",
+              "description": "awsSigV4: the region the signature is scoped to. Defaults to the credential's region, so name it only to override."
+            },
+            "service": {
+              "type": "string",
+              "description": "awsSigV4: the AWS service name the signature is scoped to, e.g. dynamodb, s3, bedrock, textract. Required, and not guessable from the URL."
+            },
+            "tokenUrl": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression",
+              "description": "oauth2ClientCredentials: where the token is minted, e.g. https://your-org.my.salesforce.com/services/oauth2/token."
+            },
+            "clientId": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression",
+              "description": "oauth2ClientCredentials: the connected app's id. Not secret."
+            },
+            "clientSecret": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression",
+              "description": "oauth2ClientCredentials: the connected app's secret."
+            },
+            "scope": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression",
+              "description": "oauth2ClientCredentials: optional scope string, when the vendor wants one."
+            }
+          },
+          "additionalProperties": false
+        },
+        "headers": {
+          "type": "object",
+          "description": "Static or templated headers. Auth headers come from `auth`, not here.",
+          "additionalProperties": {
+            "$ref": "_defs.schema.json#/definitions/templateOrExpression"
+          }
+        },
+        "query": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "_defs.schema.json#/definitions/templateOrExpression"
+          }
+        },
+        "body": {
+          "description": "Request body, in one of two forms.\n\nAn OBJECT is the normal case: values are {{ }} templates, and a key whose resolved value is empty is omitted rather than sent as null. Readable, and enough for most APIs.\n\nA `return ...` EXPRESSION is for bodies whose SHAPE is conditional, which templates cannot express: an array whose members depend on config (a system message only when one is set, history spread in), or a key whose NAME depends on a value (max_completion_tokens on one model family, max_tokens on another). Evaluated by the same sandboxed SafeExpression as response mapping, against { config, credentials, signal, services }.\n\nPrefer the object. Reach for the expression when the alternative is a node that cannot be expressed at all, not to be clever: the object form is what a reader can scan.",
+          "oneOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string",
+              "pattern": "^return "
+            }
+          ]
+        },
+        "timeoutMs": {
+          "type": "number",
+          "minimum": 1
+        },
+        "okOn": {
+          "type": "array",
+          "description": "HTTP statuses that are an ANSWER rather than a failure (e.g. [404] on a lookup), passed to the projection instead of thrown.",
+          "items": {
+            "type": "number"
+          }
+        },
+        "retry": {
+          "type": "object",
+          "description": "Executor capability. Omit to take the platform default.",
+          "properties": {
+            "attempts": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 10
+            },
+            "backoff": {
+              "enum": [
+                "none",
+                "fixed",
+                "exponential"
+              ]
+            },
+            "on": {
+              "type": "array",
+              "description": "HTTP status codes worth retrying, e.g. [429, 502, 503].",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "transport": {
+          "enum": [
+            "json",
+            "text",
+            "sse",
+            "xml",
+            "headers",
+            "binary",
+            "ws"
+          ],
+          "description": "IMPLEMENTED transports only. json/text/xml settle once; sse emits repeatedly and requires `events`.\n\n`xml` is for the vendors that never moved, S3's list endpoints above all. It parses to the same plain object shape a JSON reply gives, so an events table reads it identically and nothing downstream knows the difference.\n\nOne XML hazard the parser is configured for: XML cannot tell one element from a list of one, so a bucket with a SINGLE object would parse `Contents` as an object while two parse as an array. Repeatable element names are declared in the executor so they are always arrays — otherwise a manifest works until a bucket happens to hold one file.\n\n`headers`: the reply IS its headers, for a HEAD request, which has no body by definition. Size, content type and modified date all arrive as headers and nothing else does. Keys are lower-cased, because HTTP header names are case-insensitive and an expression should not depend on the vendor's capitalisation.\n\n`binary`: the reply is BYTES, handed over as { base64, contentType, bytes }. base64 rather than a Buffer or a stream, because what leaves a node travels on the event bus and through JSON, where a Buffer does not survive and a stream cannot be given to two consumers. `contentType` travels with it because bytes without their type are unusable.\n\n`ws`: a DUPLEX session rather than a request. Every other transport is one request and a reply the executor reads; a voice model is a conversation that both sides write to, held open for the length of a call. The node's `events` table reads inbound events exactly as it does for `sse` — `match` on the event type — and `open`/`send`/`close` are what make it two-way.\n\nWHY THIS EXISTS AT ALL, and the boundary it must not cross. There are TWO sockets in a voice call and only one of them is this. This is the VENDOR socket, executor to OpenAI or xAI. The other is the platform's audio lane to the browser, and it exists for exactly one reason: MCP cannot carry binary audio. Everything that is NOT audio — transcripts, tool results, speech state — already reaches the client over MCP streaming by landing on an output connector, so it belongs in `events` and never in `api/audio.yaml`."
+        },
+        "encoding": {
+          "enum": [
+            "dynamodbJson",
+            "binary",
+            "multipart",
+            "ndjson"
+          ],
+          "description": "IMPLEMENTED encodings only. A SECOND AXIS to `transport`: transport says how a reply is FRAMED (one body, or a stream of events), encoding says how the values INSIDE it are spelled. Most vendors need only a transport, because their values are ordinary JSON.\n\n`dynamodbJson`: DynamoDB does not carry `{ name: \"Ada\" }`, it carries `{ name: { S: \"Ada\" } }` — every value tagged with its type, nested arbitrarily. The manifest writes plain JSON and the executor translates both ways, so a node never spells out type tags.\n\nWhy this cannot be an expression: the translation is RECURSIVE, and the sandbox has no way to define a function that calls itself. It uses `@aws-sdk/util-dynamodb`, AWS's own translator, on the same judgement as the SigV4 signer — a published implementation beats a hand-rolled one, because the edge cases (binary, sets, empty strings, numeric precision) are where they quietly differ.\n\nOnly the keys that HOLD ITEM DATA are translated (Item, Key, ExpressionAttributeValues, ExclusiveStartKey going out; Item, Items, Attributes, LastEvaluatedKey, Responses coming back). Translating the whole body would turn `TableName: \"Users\"` into a type tag and 400 every call.\n\n`binary`: the request body is RAW BYTES rather than JSON. The manifest supplies base64 (a `transport: binary` reply, or its `base64` field) and the executor decodes it just before sending. Storing a file means PUTting the file, not a JSON document describing it, and without this the upload would be the quoted base64 text.\n\nmultipart builds a multipart/form-data body from the same plain object every other encoding starts from, choosing each part by SHAPE rather than a flag: a scalar becomes a text field, and { base64, mimeType?, filename? } becomes a FILE part. Needed for any endpoint that only accepts an upload — ElevenLabs speech-to-text takes its audio this way. The boundary is fetch's to generate, so the executor removes any declared Content-Type: a multipart/form-data header without a boundary parameter is a body the vendor cannot split."
+        },
+        "terminator": {
+          "type": "string",
+          "description": "Streaming sentinel that ends the stream, e.g. OpenAI's [DONE]. Absent means the stream ends when the connection closes."
+        },
+        "error": {
+          "type": "object",
+          "description": "How to recognise and surface an upstream error, so a 200-with-an-error-body does not read as success.",
+          "properties": {
+            "when": {
+              "$ref": "_defs.schema.json#/definitions/expression"
+            },
+            "message": {
+              "$ref": "_defs.schema.json#/definitions/expression"
+            }
+          },
+          "additionalProperties": false
+        },
+        "state": {
+          "enum": [
+            "read",
+            "merge",
+            "drain",
+            "save"
+          ],
+          "description": "PLATFORM STATE instead of a request. The entry stays in the same ordered list, with the same `name` and `when`, because reading a cache, calling a vendor only when it was cold, and writing the answer back is ONE sequence: splitting it into another section would put the order in the reader's head instead of on the page.\n\nread   the value at `key`, or {} when nothing is stored\nmerge  shallow-merge `value` into it, stamped with updatedAt. Read-modify-write, because more than one writer shares a key and replacing it wholesale would drop their fields\ndrain  pop up to `max` items off a list, oldest first. Taken items are GONE, so dedup is inherent\nsave   put `value` into THIS RUN's saved-context, reachable from a later node's templates as saved.<nodeId>\n\n`save` NAMES NO `key`, and lint refuses one. Its key belongs to the ENGINE - the resolver reads `saved:<executionId>` when it builds a template scope, and the run deletes it at the end - so a manifest addressing that key by hand would be guessing at another component's private layout, and would apply the deployment namespace to the one key that must not have it. `save` also sets the output envelope's `__saveToContext` flag for you, because writing the value without the flag makes it reachable from the NEXT node but not the current one, and that half-working state is invisible.\n\nIMPLEMENTED operations only, like every other enum here.\n\nThe deployment namespace is applied by the EXECUTOR, never written in the manifest. A manifest that had to remember the prefix would eventually forget, both sides would write to different keys, and nothing would error.\n\nWith no store configured a read is {} and a drain is [], rather than a failure: a universe without Redis should degrade to \"the cache was cold\", not lose a workflow over a cache."
+        },
+        "loop": {
+          "enum": [
+            "open",
+            "read",
+            "advance"
+          ],
+          "description": "ITERATION BOOKKEEPING instead of a request, for the LoopStart / LoopEnd pair. Named `key`'s loop: the id of the LoopStart node the loop belongs to, so LoopStart passes `{{ scope.nodeId }}` and LoopEnd passes the paired id from its own config. The run is supplied by the EXECUTOR, so a loop can never address another execution's state.\n\nopen     take `value` as the array, record it, hand back the first item as { item, index, total }\nread     hand back the item at the CURRENT index without moving it, same shape\nadvance  collect `value` for this pass, move the index, and hand back { continuing, index, total, collected }\n\nONE CAPABILITY, not several state operations, and that is the point: the retired executors used hset, hget, hincrby, rpush, lrange, exists, del and expire between them, and declaring those individually would amount to \"a manifest may run arbitrary Redis\" - the exact authority this format exists to withhold.\n\n`read` and `advance` are separate so ITEM EMISSION HAS ONE HOME: LoopEnd moves the index and LoopStart reads it. If advancing also returned the next item the same fact would be computed twice and could disagree by one.\n\nNO DEGRADED MODE, unlike a state read. A cache that reads cold is a cache doing its job badly; a loop with nowhere to keep its index cannot iterate at all, so this fails loudly rather than running the body once and calling it done.\n\nIMPLEMENTED operations only, like every other enum here."
+        },
+        "key": {
+          "$ref": "_defs.schema.json#/definitions/templateOrExpression",
+          "description": "The LOGICAL key, without any deployment prefix. Usually templated from `scope`, e.g. \"crm:{{ scope.userId }}:{{ scope.workflowId }}\".\n\nREQUIRED by read, merge and drain, and REFUSED by save, whose key belongs to the run rather than to the manifest and is built by the executor. The schema cannot express that split per operation, so lint does; the anyOf only asks for `state`."
+        },
+        "value": {
+          "$ref": "_defs.schema.json#/definitions/expression",
+          "description": "merge only: the patch to fold in. An expression, because what you store is nearly always shaped from an earlier call."
+        },
+        "max": {
+          "type": "number",
+          "minimum": 1,
+          "description": "drain only: how many items to take at most. Bounded so one run cannot pull an unbounded queue. Defaults to 25."
+        },
+        "paginate": {
+          "type": "object",
+          "required": [
+            "strategy",
+            "into",
+            "items"
+          ],
+          "description": "MANY REQUESTS, ONE CALL. Walk the vendor's pages and accumulate. The reply this call's `name` holds becomes { items, pages, truncated } rather than the last page's body, because the accumulation IS the answer and handing back the final page would quietly lose the rest.\n\nA manifest cannot express a second page without this: `run` is an ordered list of DIFFERENT calls, not a loop.\n\n`truncated` is true when a bound stopped the walk while the vendor still had more, so a consumer can tell \"that is everything\" from \"that is the first 100\".\n\nThere is also a platform ceiling of 100 requests per call, independent of `max`: a vendor that keeps returning the same cursor would otherwise loop forever.",
+          "properties": {
+            "strategy": {
+              "enum": [
+                "cursor",
+                "page",
+                "offset"
+              ],
+              "description": "IMPLEMENTED strategies only.\n\n`cursor`: a token from the reply goes back for the next request, and a FALSY token means that was the last page. This is what most modern APIs do.\n\n`page`: an integer counting PAGES from 1, sent on the FIRST request too, because there is no token to wait for.\n\n`offset`: an integer counting ITEMS already seen, from 0. Looks like `page` and is not: the number means a row count, so it steps by `size` rather than by 1. Stepping an offset by 1 re-reads the same window shifted one row and the walk returns mostly duplicates, which reads as a large result rather than a bug.\n\nBoth counting strategies end on a SHORT PAGE rather than a missing token, so `size` is required for them: without it a short page cannot be recognised and the walk runs to the platform ceiling.\n\nOthers (RFC 5988 Link header) are added WITH their implementation, driven by a real node, never ahead of one."
+            },
+            "cursor": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "`cursor` only. Where the next-page token lives in the reply, e.g. \"return response.offset\". A FALSY result means that was the last page."
+            },
+            "into": {
+              "type": "string",
+              "description": "The query parameter the token goes back as, e.g. offset. The first request carries none."
+            },
+            "items": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "The array to accumulate from each page, e.g. \"return response.records\"."
+            },
+            "max": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "Stop once this many items are collected. Usually reads a config field, since how much to fetch is a per-node choice. Unbounded without it, up to the platform ceiling."
+            },
+            "in": {
+              "enum": [
+                "query",
+                "body"
+              ],
+              "default": "query",
+              "description": "WHERE the token goes. `query` by default; `body` for a JSON search endpoint that takes its page number in the body, where there is nowhere else to put it."
+            },
+            "size": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 1
+                },
+                {
+                  "$ref": "_defs.schema.json#/definitions/expression"
+                }
+              ],
+              "description": "`page` and `offset` only, and required for both: what a FULL page looks like. An expression when the size comes from config, which it usually does, since asking for 5 results and asking for 100 are the same call with a different page size.\n\nFor `offset` it is also the STEP: the next request asks to skip this many more rows."
+            }
+          },
+          "additionalProperties": false
+        },
+        "poll": {
+          "type": "object",
+          "required": [
+            "until",
+            "url"
+          ],
+          "description": "ONE CALL, A JOB. Start work, then ask until it is done. The third loop after `paginate` and `chunk`, and the same trade: the vendor's mechanism is description, the waiting is computation.\n\nA manifest cannot express a job without this. `run` is an ordered list of DIFFERENT calls, so it can say \"start, then check once\" and never \"check until\". Every crawler, render farm, transcription and batch import works this way.\n\nThe reply this call's `name` holds is the FINAL STATUS payload, not the start reply. The start reply is a receipt carrying a job id, and handing that back would give `events` a handle where it expected the answer.\n\n`until` is asked of the START reply too, before any polling. A vendor whose unified endpoint may finish INLINE (Hyperbrowser's /web/fetch does) returns the completed result on the POST with no job id, and a manifest that assumed a handle would fail on exactly the fast path.\n\nThere is a platform ceiling of 300 polls and a 60s cap on the interval, independent of what is written here: `maxAttempts` is the author's bound, and the author's can be wrong.",
+          "properties": {
+            "until": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "Done when this is true, e.g. \"return response.status === 'completed'\". Tested against the start reply first, then against every poll."
+            },
+            "failed": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "Failed when this is true, e.g. \"return response.status === 'failed'\". Without it a job that fails terminally is polled until the attempt bound runs out and reported as a timeout, which sends whoever reads it looking for a slow job rather than a broken one."
+            },
+            "message": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "Reads the reason out of a failed reply, e.g. \"return response.error\"."
+            },
+            "url": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression",
+              "description": "Where to ask, built from the START reply, which is the only place the job id exists. Resolved ONCE: re-resolving per attempt against the latest status would work for vendors that echo the id back and break for those that do not.\n\nPolled as a GET at this complete URL. Auth, headers, retry, transport and error carry over from the call, because a status check is the same conversation with the same vendor; the start request's method, body and query do not, because they described starting work."
+            },
+            "method": {
+              "enum": [
+                "GET",
+                "POST"
+              ],
+              "description": "How to ASK for status. GET by default, because most vendors put the job id in the path.\n\nPOST is here for AWS: Textract's GetDocumentAnalysis is a POST carrying { JobId }, signed like any other request, and every AWS batch job is shaped that way. Pair it with `poll.body`.\n\nOnly the status check is affected. Starting the job already uses the call's own `method`, so a POST start with a GET poll needs nothing declared here."
+            },
+            "body": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "The status request's body, as an expression over the START reply — e.g. \"return { JobId: response.JobId }\". Resolved ONCE against that reply, like `url`, because the job id exists only there: resolving per attempt against the latest status works for vendors that echo the id back and silently breaks for those that do not.\n\nMeaningless without `method: POST`, and lint says so."
+            },
+            "intervalMs": {
+              "description": "Wait between polls, default 2000. Capped at 60s by the platform. An EXPRESSION when the wait is a dial a person sets rather than a property of the vendor.",
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 1
+                },
+                {
+                  "$ref": "_defs.schema.json#/definitions/expression"
+                }
+              ]
+            },
+            "maxAttempts": {
+              "description": "Give up after this many polls, default 90. Capped at 300 by the platform. An EXPRESSION when a node exposes the wait as a config field, e.g. \"return config.maxWaitTime / 5\" for a timeout in seconds against a 5s interval.",
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 1
+                },
+                {
+                  "$ref": "_defs.schema.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "chunk": {
+          "type": "object",
+          "required": [
+            "items",
+            "size"
+          ],
+          "description": "MANY REQUESTS OVER ONE COLLECTION. The mirror of `paginate`: that loops because the vendor decides how much comes back, this loops because the vendor decides how much may go in at once. Airtable takes 10 records per write, HubSpot 100, Salesforce 200.\n\nEach batch is in scope for the body as `batch`, so the manifest describes ONE request for a slice and the executor repeats it.\n\nWITH `size: 1` THIS IS A FAN-OUT: one request per item, which is how a node reaches an endpoint that takes a single url when the author has a list of them. It composes with `poll`, because the two loops are orthogonal — this one walks the collection, that one waits on a request — and a vendor whose endpoint is both single-item and asynchronous needs both.\n\nThe reply is { sent, batches, results, errors }. PARTIAL SUCCESS is the normal outcome and must be visible: one rejected batch out of ten is neither a failed call nor a successful one, and the batches before it have already landed and cannot be taken back. A failing batch is recorded and the walk continues.\n\n`results` is POSITIONAL, one entry per batch with `null` where the batch failed, so results[i] is always the reply to batch i. Compacting it would shift later replies onto the wrong items when fanning out, which looks like an answer rather than an error.\n\nThere is a platform ceiling of 200 per batch regardless of `size`.",
+          "properties": {
+            "items": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "The collection to write, e.g. \"return signal.input.records\"."
+            },
+            "size": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 200,
+              "description": "Records per request. The VENDOR's limit, not a preference: Airtable rejects an eleventh."
+            }
+          },
+          "additionalProperties": false
+        },
+        "docstore": {
+          "type": "string",
+          "enum": [
+            "render",
+            "outline",
+            "readSection",
+            "updateSection",
+            "appendToSection",
+            "replaceInSection",
+            "insertSection",
+            "deleteSection",
+            "moveSection",
+            "resetDoc"
+          ],
+          "description": "A DOCSTORE operation — the platform's sectioned, hash-checked markdown document in Redis, for an agent that authors a long deliverable section by section instead of rewriting a blob. Makes NO request; it earns its place in the call list the same way `state` and `loop` do: the manifest NAMES an operation the executor performs.\n\nThe op's arguments default to the CALLER'S `params` (nine of the ten ops exist as service methods whose arguments arrive exactly there); an explicit `params` expression on the call overrides. The doc's KEY is derived by the executor from the run's own ids (user + workflow + conversation + node instance) — never named by the manifest, which could otherwise read another conversation's document. `initialMarkdown` and `sectionizeAt` are read from the node's config.\n\n`render` is the workflow channel's op: initialise-if-cold, then the whole doc as markdown for a downstream renderer. The rest are the agent-facing tool surface; a MUTATING op arriving over the service channel re-fires the workflow channel so the renderer stays in sync (the hybrid contract). Errors come back structured ({ ok:false, error, hint }), never thrown — the caller is usually a model, and a hint is a recoverable instruction where an exception ends the turn."
+        },
+        "params": {
+          "$ref": "_defs.schema.json#/definitions/expression",
+          "description": "docstore only: override the arguments passed to the op. Absent, the caller's `params` pass through — which is what a service method wants."
+        },
+        "presign": {
+          "type": "object",
+          "required": [
+            "for",
+            "url"
+          ],
+          "description": "MINT SIGNED URLS. Makes NO request: it computes strings from the credentials and the clock, and earns its place in the ordered `run` list for the same reason `state` does — listing a bucket and then minting a link for each object found is ONE sequence, and splitting it would put the order in the reader's head.\n\nA presigned URL moves the signature out of the Authorization header and into the query string, with an expiry, so the URL alone is enough to fetch the object. That is what makes it shareable, and why the expiry matters: anyone holding the link has the access until it lapses.\n\nThe reply is ALWAYS AN ARRAY of urls, positionally aligned with `for`, even when there is one. A bucket listing needs a link per object and a single file needs one; making those different shapes would mean the events table had to care how many there were.",
+          "properties": {
+            "for": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "The items to mint a url for, e.g. \"return (calls.list.ListBucketResult.Contents || []).map(o => o.Key)\". An empty list mints nothing."
+            },
+            "url": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression",
+              "description": "How ONE url is built, with `item` in scope. Checked against allowedHosts like any other url, because a presigned link is authority leaving the platform."
+            },
+            "expiresIn": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 1
+                },
+                {
+                  "$ref": "_defs.schema.json#/definitions/expression"
+                }
+              ],
+              "description": "Seconds the url stays valid, default 3600. An expression when a node exposes it as a setting. Keep it as short as the job allows: the link IS the credential."
+            },
+            "service": {
+              "type": "string",
+              "default": "s3",
+              "description": "The AWS service the url is scoped to."
+            },
+            "region": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression",
+              "description": "Defaults to the credential's region."
+            }
+          },
+          "additionalProperties": false
+        },
+        "open": {
+          "type": "array",
+          "description": "DUPLEX ONLY. Messages sent once, IN ORDER, as soon as the socket opens. The handshake.\n\nA LIST rather than one object because vendors disagree about how much of one there is. OpenAI and xAI open with a single `session.update` carrying the whole configuration. Nova Sonic opens with an ordered sequence — sessionStart, promptStart, contentStart, the system prompt as textInput, contentEnd — where each event is only valid after the one before it. A single-object `open` would have fitted two vendors and forced the third back into code, so it is a list from the start and a one-message handshake is simply a list of one.\n\nEach entry resolves against the same scope a body does, so the handshake is built from config.",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "$ref": "_defs.schema.json#/definitions/expression"
+              }
+            ],
+            "description": "One message, in the same two forms a `body` takes: an OBJECT whose leaves are {{ }} templates and `return` expressions, or a single expression when the message's SHAPE is conditional."
+          }
+        },
+        "close": {
+          "type": "array",
+          "description": "DUPLEX ONLY. Messages sent once, IN ORDER, before the socket is closed. The mirror of `open`, and needed for the same reason: Nova requires contentEnd, promptEnd and sessionEnd in that order to end a session cleanly, and a socket dropped without them leaves the vendor holding a session open and billing for it. Vendors that need no teardown simply omit this.",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "$ref": "_defs.schema.json#/definitions/expression"
+              }
+            ],
+            "description": "One message, in the same two forms a `body` takes: an OBJECT whose leaves are {{ }} templates and `return` expressions, or a single expression when the message's SHAPE is conditional."
+          }
+        },
+        "send": {
+          "type": "array",
+          "description": "DUPLEX ONLY. Messages sent IN REACTION to an inbound event, rather than at open or close.\n\nThis is what makes a socket a conversation rather than a subscription. It is deliberately general instead of a tool-loop-shaped key: `toolExchange` counts TURNS, where one turn is one model call, and that idea does not exist on a socket that stays open for a whole conversation. A reactive send covers the same ground without importing the wrong model of time — a tool result going back, a response asked for after an item is committed, a keepalive.\n\nThe triggering event is in scope as `response`, exactly as in an `events` row.",
+          "items": {
+            "type": "object",
+            "required": [
+              "on",
+              "message"
+            ],
+            "properties": {
+              "on": {
+                "type": "string",
+                "description": "The inbound event type this fires on, matched like an events row's `match`."
+              },
+              "when": {
+                "$ref": "_defs.schema.json#/definitions/expression",
+                "description": "Narrow it further, with the triggering event in scope as `response`. A send whose event arrived but whose condition is false does nothing."
+              },
+              "message": {
+                "anyOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "$ref": "_defs.schema.json#/definitions/expression"
+                  }
+                ],
+                "description": "One message, in the same two forms a `body` takes: an OBJECT whose leaves are {{ }} templates and `return` expressions, or a single expression when the message's SHAPE is conditional."
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false,
+      "description": "ONE CALL, end to end: how it is made and how its reply is framed. Everything about a call stays together, because whether a reply arrives as one JSON body or as an SSE stream is decided by the request you make. What LEAVES the node is `events`, which is a separate concern.",
+      "anyOf": [
+        {
+          "required": [
+            "method",
+            "url",
+            "transport"
+          ]
+        },
+        {
+          "required": [
+            "state"
+          ]
+        },
+        {
+          "required": [
+            "loop",
+            "key"
+          ]
+        },
+        {
+          "required": [
+            "presign"
+          ]
+        },
+        {
+          "required": [
+            "docstore"
+          ]
+        },
+        {
+          "required": [
+            "transport",
+            "url"
+          ],
+          "properties": {
+            "transport": {
+              "const": "ws"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "run": {
+      "type": "array",
+      "minItems": 1,
+      "description": "THE CALLS THIS NODE MAKES, in order, ALWAYS a list even when there is only one.\n\nThere is no `request` key. One shape for one job, so every node in every package answers \"what does this call, and in what order?\" the same way, and a node that grows a second call does not change form. This is the same trade the `api` folder makes: uniformity is worth more than brevity, because two nodes in one package reading differently costs more than a one-item list ever does.\n\nEach step sees what the earlier ones returned, as calls.<name>. That is what lets one fact take more than one request: resolving a CRM contact is a search by email, then a follow of the contact's company association ONLY when the contact's own company field came back blank. No body template expresses \"and then\".\n\nFLAT, not nested, for the same reason the events table is flat: you read the whole thing top to bottom, there is no merge order to reason about, and a step cannot be declared twice.\n\nEVERY CALL BUT THE LAST MUST SETTLE (transport json or text). The last may stream, which is how a streaming node is a one-item chain and how a chain can end in a stream. A middle call that streams has no defined meaning, and the executor refuses it rather than inventing one.\n\nOn the SERVICE channel (`service`) every step must settle, since a method hands back one value.",
+      "items": {
+        "$ref": "#/definitions/call"
+      }
+    },
+    "events": {
+      "type": "array",
+      "description": "EVERYTHING THAT LEAVES THIS NODE, one row per output connector, in the SAME ORDER the connectors are declared in interface.yaml. Lint enforces both coverage and order, so reading this table tells you the node's whole outward behaviour without opening another file. It replaced four scattered mechanisms (response.events, response.finalize, response.map, narrate.output).",
+      "items": {
+        "type": "object",
+        "properties": {
+          "emit": {
+            "type": "string",
+            "description": "Output connector this row writes to. Must be declared in interface.yaml outputs."
+          },
+          "from": {
+            "enum": [
+              "response",
+              "narrator",
+              "tool",
+              "complete"
+            ],
+            "default": "response",
+            "description": "WHERE the row fires from. response: the LAST call's reply, as each streamed event matching `match`, or once over the whole body when it settles. Earlier calls are in scope as calls.<name> rather than firing rows of their own, since what leaves the node is one answer and not a running commentary on how it was assembled. narrator: each line the narrator writes. tool: after each tool call RETURNS, with its result (the result is produced by the tool loop and never appears in the HTTP stream). complete: once at the end, over everything emitted."
+          },
+          "match": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1
+              }
+            ],
+            "description": "Streaming only: the event type this row fires on, e.g. response.output_text.delta. It is a literal event NAME, not a path. Omit for a settling transport, which has one body and no event types. May be a LIST of event names when one connector accumulates from several wire events (the value expression reads response.type to tell them apart)."
+          },
+          "when": {
+            "$ref": "_defs.schema.json#/definitions/expression",
+            "description": "Extra predicate, for when one event type carries several meanings."
+          },
+          "value": {
+            "$ref": "_defs.schema.json#/definitions/expression",
+            "description": "What to emit. In scope: `response` (from: response), `narrator.line` (from: narrator), `call.name`/`call.args`/`call.output` (from: tool), `events` (from: complete)."
+          },
+          "accumulate": {
+            "type": "boolean",
+            "default": false,
+            "description": "Emit the running total rather than the fragment. A delta-per-event stream is almost never what a consumer wants; it wants the text so far."
+          },
+          "resetOn": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ],
+            "description": "Event type(s) that END A TURN, after which `accumulate` starts over. Whatever a throttle holds is flushed first, so the turn's last words are never lost.\n\nDUPLEX NODES NEED THIS: `accumulate` runs for the length of a RUN, which is one answer over HTTP and a whole CONVERSATION over a socket — so without a reset every turn carries every turn before it. Only the manifest knows which of a vendor's events ends a turn."
+          },
+          "throttleMs": {
+            "type": "number",
+            "description": "Emit at most this often. What a throttle holds back is never dropped: it is flushed when the run ends."
+          },
+          "throttleChars": {
+            "type": "number",
+            "description": "Emit only once this many characters have accumulated since the last emission. Also flushed at the end."
+          },
+          "send": {
+            "$ref": "_defs.schema.json#/definitions/template",
+            "description": "Send this row's value to a NAMED NODE instead of an output connector. Mutually exclusive with `emit`: a row either writes a dot on this node or hands a payload to another node.\n\nThe value is a TEMPLATE naming the target, and in practice it reads a config field the author already fills in: `{{ config.loopStartNodeId }}`. That is the point. LoopEnd already names its partner in config, so ALSO requiring an edge made the same fact true in two places, and the two can disagree — the canonical loop pattern shipped without the edge for months, which builds a loop that runs exactly one pass and looks like it worked.\n\nNo connector is declared for a send row and none is rendered, so there is nothing on the canvas to wire and nothing to leave dangling when the target changes.\n\nSCOPE: the delivery is confined to the sender's OWN run, and a target that is not a node in that workflow is refused. A target that resolves to empty raises rather than dropping the message, in the same spirit as `loop: advance` raising \"loop state not found\" rather than quietly reporting done.\n\nNOT loop-specific. `send` is the general primitive for one node addressing another; the loop is simply its first caller."
+          },
+          "handle": {
+            "type": "string",
+            "description": "Send rows only: the INPUT connector on the target node this arrives on. Defaults to `input`. The target must declare it, exactly as it would for a wired edge — a send changes who addresses whom, not what a node accepts."
+          }
+        },
+        "additionalProperties": false,
+        "anyOf": [
+          {
+            "required": [
+              "emit",
+              "value"
+            ]
+          },
+          {
+            "required": [
+              "send",
+              "value"
+            ]
+          }
+        ],
+        "not": {
+          "required": [
+            "emit",
+            "send"
+          ]
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "minProperties": 1,
+      "description": "Methods this node OFFERS to others over a service edge, keyed by method name.\n\nThis is the service channel. It is triggered by another node calling the method, never by the graph, and it returns a value to the caller rather than emitting on output connectors. A pure service node (isService: true, no inputs, no outputs) has only this.\n\nEvery method name here must appear in the `methods` list of a serviceConnector declared in interface.yaml with isService: true, and lint enforces that. Otherwise a method exists that nothing can discover, or is advertised and missing.",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "calls",
+          "returns"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "What this method does. Surfaced to a consumer discovering the service, and read by a MODEL deciding whether to call it, so say what comes back and what an empty result means."
+          },
+          "calls": {
+            "description": "The calls this method makes, in order. Always a list, even for one call. Every step must settle: a method hands back one value and has no connector to stream onto.\n\nEMPTY IS LEGAL, and means the method reaches nothing and returns a constant. `getSchema` is the case that matters: tool discovery hands an agent a fixed document, and forcing a pointless request just to satisfy a minimum would be a request that can fail.",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/call"
+            },
+            "minItems": 0
+          },
+          "renderComponents": {
+            "$ref": "_defs.schema.json#/definitions/expression",
+            "description": "Rows to render as content cards on the CALLER'S LIVE SCREEN, e.g. \"return response.results\". A row carrying a component app (metadata.app) draws its card the moment it surfaces: data-driven, never a model tool, so the model cannot forget to show it or describe one that is not there.\n\nEvaluated BEFORE `returns`, and that ordering is the point: `returns` projects a reply down to what a model should read, and a card needs the full row (component uri, images, authored copy) that the projection strips.\n\nFire-and-forget: a card is a side channel to a screen and must not hold up the answer. With no live session (builder, tests, headless) it no-ops on the missing session id, so a manifest declaring it stays pure wherever it is not wanted, with no flag to juggle."
+          },
+          "returns": {
+            "anyOf": [
+              {
+                "$ref": "_defs.schema.json#/definitions/expression"
+              },
+              {
+                "type": [
+                  "object",
+                  "array"
+                ]
+              }
+            ],
+            "description": "The value handed back to the CALLER. A service call returns one value; it does not emit on output connectors, which is why this is `returns` and not `map`. In scope: `response` (the LAST call's reply), `calls.<name>`, `params`, `config`, `user`.\n\nMAY ALSO BE A LITERAL. An object or array is returned exactly as written, with nothing evaluated — for a method that hands back a constant rather than shaping a reply. `getSchema` is the case: tool discovery is a fixed document, and expressing it as a `return { ... }` string meant a large object encoded inside YAML with every inner quote escaped, which no editor could check. Only a STRING is code."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "toolExchange": {
+      "type": "object",
+      "required": [
+        "tool",
+        "call",
+        "result"
+      ],
+      "description": "Hand tools to the model and resolve the calls that come back.\n\nTHE PROTOCOL IS DESCRIBED HERE, not in the executor. How a tool is offered, how a call arrives, how a result goes back, how turns chain: all of that is description of the vendor's API, so it belongs to the node. The runtime contributes only what data cannot express — counting turns, spotting a stuck loop, minting what discovery unlocks, and calling the tool.\n\nThat split is what makes an agent portable: a different vendor is a different api.yaml, not another adapter file in the platform.\n\nNO SDK. Plain HTTP throughout.\n\nDeclaring this makes the node a CallbackNode: resolving a call takes more than one request.",
+      "properties": {
+        "maxTurns": {
+          "description": "Turn budget. One turn is one model call; a tool call costs another, because the result has to go back for the model to use it. So 1 is a one-shot generator that cannot use tools at all, and anything above it is an agent.\n\nUsually a TEMPLATE reading a config field, because the budget is what separates an agent from a one-shot generator and that is a per-node choice, not a constant the manifest bakes in. A literal number is fine for a node whose budget is fixed.\n\nWithout it a confused model runs until the request times out.",
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 1
+            },
+            {
+              "$ref": "_defs.schema.json#/definitions/template"
+            }
+          ]
+        },
+        "stuckAfterRepeats": {
+          "description": "Abort after the SAME call with the SAME arguments this many times. maxTurns does not cover this: a model calling many DIFFERENT tools forever is not stuck by that rule.",
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 2
+            },
+            {
+              "$ref": "_defs.schema.json#/definitions/template"
+            }
+          ]
+        },
+        "tool": {
+          "$ref": "_defs.schema.json#/definitions/expression",
+          "description": "How ONE tool is offered to the model, over `tool` ({name, description, parameters}). The vendor's envelope: OpenAI wants { type: 'function', name, description, parameters }."
+        },
+        "toolsInto": {
+          "type": "string",
+          "default": "tools",
+          "description": "Request body key the tool array lands under."
+        },
+        "offer": {
+          "$ref": "_defs.schema.json#/definitions/expression",
+          "description": "DUPLEX ONLY. How the whole tool list is re-offered on a live socket once it has GROWN, over `tools` (the live list, in this protocol's own envelope). OpenAI realtime wants { type: 'session.update', session: { tools } }.\n\nThe tool list is DISCOVERED, not declared: a search returns rows pointing at apps, each of which becomes a tool, so the handshake's tools are only the seed. An HTTP turn re-sends the list in every request and needs nothing here; a socket sends it once and must announce growth on purpose.\n\nOmit for a vendor that genuinely cannot change tools mid-session."
+        },
+        "reinstruct": {
+          "$ref": "_defs.schema.json#/definitions/expression",
+          "description": "DUPLEX ONLY. How the system prompt is RE-SENT on a live socket when the skills in force change, over `skillsText` (the platform's rendering of what applies here) plus the usual scope. OpenAI realtime wants { type: 'session.update', session: { instructions } }.\n\nA region-attached skill is decided by WHERE the conversation is standing, so it can come into force or clear at any moment. An HTTP turn rebuilds its prompt every request and needs nothing here; a socket sent `instructions` once at the handshake and must announce the change on purpose, or the model keeps working to a prompt that no longer describes where it is.\n\nRepeat the configured prompt alongside `skillsText`: a merge REPLACES the field it names, so sending the skills alone would drop the node's role.\n\nOmit for a vendor whose instructions genuinely cannot change mid-session; the runtime logs that the model will not be told."
+        },
+        "choiceInto": {
+          "type": "string",
+          "description": "Request body key for tool choice, e.g. tool_choice. Omit if the vendor has none."
+        },
+        "choice": {
+          "type": "string",
+          "default": "auto",
+          "description": "Value for that key. Keep it auto: which tool to reach for is carried by the tool DESCRIPTIONS."
+        },
+        "call": {
+          "type": "object",
+          "required": [
+            "id",
+            "name",
+            "arguments"
+          ],
+          "description": "How a tool call ARRIVES in the stream. `match` is the event type; the rest read the call out of it.",
+          "properties": {
+            "match": {
+              "type": "string",
+              "description": "Event type carrying a call, e.g. response.output_item.done, or response.function_call_arguments.done on a realtime socket.\n\nIt is what makes a STREAM tractable: events keep arriving, and this says which of them is a tool call rather than a transcript or an audio chunk. A duplex (`transport: ws`) node uses exactly the same key — the only difference on a socket is that `maxTurns` and `stuckAfterRepeats` have nothing to count, because the conversation never ended. OPTIONAL: it selects by event TYPE, which only exists on a vendor whose SSE events carry one. A Chat Completions chunk has no `type` at all, so with no match declared every event is considered and `when` does the filtering."
+            },
+            "when": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "Extra test, when that event type carries more than calls."
+            },
+            "id": {
+              "$ref": "_defs.schema.json#/definitions/expression"
+            },
+            "name": {
+              "$ref": "_defs.schema.json#/definitions/expression"
+            },
+            "arguments": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "The raw arguments, usually a JSON string."
+            },
+            "each": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "FRAGMENTS. Declare this when one tool call arrives across MANY events rather than whole. It returns the partial calls in ONE event - e.g. \"return response.choices[0].delta.tool_calls || []\" - and then `index`, `id`, `name` and `arguments` are read PER PARTIAL with `part` in scope, any of them possibly absent.\n\n`arguments` is CONCATENATED across fragments, which is the entire point: Chat Completions sends '{\"qu' then 'ery\":\"x\"}', and reading either alone yields unparseable JSON. Merged by `index` and not by id, because the id arrives on the first fragment only.\n\nOmit it and nothing changes: one event, one whole call, the way the Responses API sends them."
+            },
+            "index": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "FRAGMENTS ONLY: which call a partial belongs to, e.g. \"return part.index || 0\". Parallel tool calls are why the vendor sends an index at all. Defaults to 0."
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "_defs.schema.json#/definitions/expression",
+          "description": "How ONE result goes BACK, over `call` ({id, name, output}). OpenAI wants { type: 'function_call_output', call_id, output }."
+        },
+        "resultsInto": {
+          "type": "string",
+          "default": "input",
+          "description": "Request body key the results array lands under on the next turn."
+        },
+        "continuity": {
+          "type": "object",
+          "required": [
+            "match",
+            "from",
+            "into"
+          ],
+          "description": "How one turn chains to the next without resending the transcript.",
+          "properties": {
+            "match": {
+              "type": "string",
+              "description": "Event type carrying the id, e.g. response.completed."
+            },
+            "from": {
+              "$ref": "_defs.schema.json#/definitions/expression"
+            },
+            "into": {
+              "type": "string",
+              "description": "Request body key it goes back as, e.g. previous_response_id."
+            },
+            "remember": {
+              "type": "object",
+              "required": [
+                "key"
+              ],
+              "description": "PERSIST THE CHAIN ID SO A LATER RUN CAN RESUME. Without this a chain lives only as long as one execution. The id is minted by the vendor mid-stream, and a streaming call deliberately sets no `calls.<name>` value because picking which event counted would be a guess - but a node declaring `continuity` has already said which event counts and which field to read, so here it is not a guess. The loop also drives the node's LAST call, so there is no later step that could do the write instead.\n\nDeclare it and the loop writes the SETTLED id - the last turn's, never an earlier one - to `key` once the turns finish. The next run seeds itself by reading that key in an ordinary `state: read` call and naming the id in its request body; the loop only overrides `into` from turn two onward, so the seed stands on turn one.\n\nKey on something STABLE across turns - a thread id, never a per-turn id - or every run writes a key nothing ever reads.",
+              "properties": {
+                "when": {
+                  "$ref": "_defs.schema.json#/definitions/expression"
+                },
+                "key": {
+                  "type": "string",
+                  "description": "State key the settled id is written to, templated against the run's scope."
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "skills": {
+          "type": "object",
+          "description": "SKILLS IN FORCE WHERE THE CONVERSATION IS STANDING. A person attaches a skill to an intent or sub-intent; a spatial search anchors the query on the map; the region it landed in decides which skills apply. No model judgement anywhere in that chain.\n\nThe loop keeps the set and exposes it to the request as `skillsText`, which the manifest folds into whatever the vendor calls a system prompt:\n\n    instructions: \"{{ config.systemPrompt }}{{ skillsText }}\"\n\nEmpty until a search resolves into a region that has one, so a node that never loads a skill sends exactly what it always did.\n\nWHY THE SYSTEM PROMPT AND NOT A TOOL RESULT. A tool result is an ITEM in the conversation and items cannot be removed; a system prompt is re-sent every request and is gone the moment it stops being sent. That is what makes a skill droppable when the conversation moves on.\n\nWHAT IS IN FORCE IS WHERE YOU ARE: the resolved set REPLACES the held one. Moving into ground with no attached skill, including unassigned, clears it. A skill already held is never reloaded.",
+          "properties": {
+            "remember": {
+              "type": "object",
+              "required": [
+                "key"
+              ],
+              "description": "Hold the set across runs. Every user message is a fresh execution and a fresh loop, so without this a skill would be re-applied from nothing on the next message and its event would fire again as though it were new. Key on the CONVERSATION, not the turn.",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "State key the in-force set is held under, templated against the run's scope."
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "transcript": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "FOR A VENDOR WITH NO CHAIN ID. `continuity` covers the Responses API, which hands back a previous_response_id the next turn simply names. Chat Completions - GLM, Grok, most OpenAI-COMPATIBLE vendors - resends the whole history every turn instead.\n\nDeclare this and the loop maintains that history, exposing it to the request as `transcript` so the manifest spreads it into its own message array: messages: [{ role: 'system', ... }, { role: 'user', ... }, ...transcript]. Empty on turn one, so a node that never calls a tool sends exactly what it always did.\n\nThe ORDER is the executor's, not yours: the assistant's tool-call turn is appended before its results, because a tool message with no preceding tool_call is a vendor error rather than a warning.",
+          "properties": {
+            "text": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "The assistant's own words this turn, read per streamed event and concatenated - e.g. \"return response.choices[0].delta.content\". Keeps a preamble in the history; without it the model loses its own reasoning thread between turns."
+            },
+            "assistant": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "The assistant's tool-call turn, built from `calls` and `text`. Its SHAPE is the vendor's: Chat Completions wants { role: 'assistant', content, tool_calls: [...] }."
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "narrate": {
+      "type": "object",
+      "required": [
+        "request",
+        "response"
+      ],
+      "description": "A second, cheaper model that writes a short status line while the main call runs. Which connector its line lands on is declared by a `from: narrator` row in `events`.",
+      "properties": {
+        "fallback": {
+          "$ref": "_defs.schema.json#/definitions/template",
+          "description": "Shown when the narrator call fails or times out. Narration is best-effort, so there is always a line."
+        },
+        "instant": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Local lines, one picked at random and emitted at 0ms so the row exists before the first token. No network call, which is the whole point: the written line replaces this about a second later."
+        },
+        "request": {
+          "$ref": "#/definitions/call",
+          "description": "The narrator's own call, described in full: its endpoint, auth, model, instructions and the input for each moment. `event` is in scope ({kind, userMessage} or {kind, toolName, args}).\n\nSingular, and not a `run` list, because this is not the node's work: it is one cheap aside that writes a status line while the work happens. It has no name because nothing reads its reply back, and it can never be a chain, since a narrator that took two round trips would finish after the thing it was narrating."
+        },
+        "response": {
+          "type": "object",
+          "required": [
+            "line"
+          ],
+          "properties": {
+            "line": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "Reads the line out of the reply."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "publish": {
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "description": "api/publish.yaml — a GENERIC WRITE INTO THE CALLER'S TEMPLATE STATE, pushed over the data plane after the node settles. The producer names the keys (Suggestions sends `{ faqs, actions, recommendations }`); the client merges `data` opaquely and the template picks the keys up — core knows NO key names (UNOVERSE_STATE_MODEL §2/§8).\n\nA SIDE CHANNEL TO A SCREEN, not an output: connectors answer the graph, this reaches the person watching. Evaluated over `output` (the connectors this run emitted) plus the usual roots, so the pushed value and the emitted value cannot drift apart. With no live session (builder, tests, headless, cron) it no-ops — a run nobody is watching should carry on, not throw.",
+      "properties": {
+        "when": {
+          "$ref": "_defs.schema.json#/definitions/expression",
+          "description": "Skip the push when false. Absent means always."
+        },
+        "data": {
+          "$ref": "_defs.schema.json#/definitions/expression",
+          "description": "The OBJECT merged into template state. Must evaluate to a plain object; anything else is refused with a log line rather than pushed, because a client merging a string into state would fail far from here."
+        }
+      },
+      "additionalProperties": false
+    },
+    "renderComponents": {
+      "$ref": "_defs.schema.json#/definitions/expression",
+      "description": "api/renderComponents.yaml — rows to render as content cards on the CALLER'S LIVE SCREEN, e.g. \"return response.results\". The RUN LANE'S card lane, the same renderer the service channel's per-method `renderComponents` uses: a row carrying a component app (metadata.app) draws its card the moment the node settles. Data-driven, never a model tool.\n\nEvaluated AFTER the events table, over the FULL settled reply (`response` is the final call's payload; `output` and `calls` are also in scope), because a card needs the full row (component uri, images, authored copy) that an events projection strips.\n\nFire-and-forget: a card is a side channel to a screen and must not hold up the graph. With no live session (builder, tests, headless, cron) it no-ops on the missing session id, so a manifest declaring it stays pure wherever it is not wanted, with no flag to juggle."
+    },
+    "audio": {
+      "$ref": "audio.schema.json",
+      "description": "api/audio.yaml — how a `transport: ws` voice node binds to the platform's AUDIO LANE, which is a different socket from the vendor one in `run`. It exists for exactly one reason: MCP cannot carry binary audio. Everything that is NOT audio belongs in `events`, where it reaches the client over MCP streaming by landing on an output connector. Full shape in audio.schema.json."
+    }
+  },
+  "additionalProperties": false,
+  "anyOf": [
+    {
+      "required": [
+        "run",
+        "events"
+      ]
+    },
+    {
+      "required": [
+        "service"
+      ]
+    },
+    {
+      "required": [
+        "events"
+      ],
+      "description": "EVENTS-ONLY: an events table and no calls. A node that reaches no host and simply decides which output dot the payload lands on — `IfElse` forks on a condition, `Relay` forwards. There is no url, so a `run` entry would be a fiction.\n\nNOT an escape hatch, which is the only reason this shape is allowed (DECLARATIVE_NODES.md §2). The safety property is that a manifest cannot EXECUTE, and this executes nothing: it is an events table over already-resolved config and the incoming signal, evaluated by the same sandbox as every other expression. Nothing new becomes reachable; there is simply no request in front of it.\n\nIn an events-only node `response` IS THE INCOMING SIGNAL, since there is no reply for it to be. Route with `when` on each row: exactly one row firing is what makes a fork a fork rather than a broadcast."
+    }
+  ]
+}

@@ -35,7 +35,7 @@ rather than typing settings each time.
 That is most of why `test.yaml` earns its place.
 
 ```yaml test.yaml
-$schema: ../../../_schema/test.schema.json
+$schema: https://docs.unoverse.ai/schemas/nodes/test.schema.json
 
 testData:
   config:

@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://unoverse/nodes/node.schema.json",
+  "title": "Unoverse node",
+  "description": "node.yaml — what this node IS: its identity, its kind, and how it is discovered. The only required file in a node folder.\n\nThe wiring surface lives next door in interface.yaml, so \"what can I connect to this?\" is answered without reading past the node's branding. config/api/test/interface may each be inlined here instead of living in their own file, but never both (that is a lint error, not a merge). See docs/architecture/DECLARATIVE_NODES.md §5.",
+  "type": "object",
+  "required": [
+    "type",
+    "kind",
+    "name",
+    "category",
+    "description",
+    "whenToUse",
+    "auth"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "type": {
+      "$ref": "_defs.schema.json#/definitions/nodeType"
+    },
+    "kind": {
+      "enum": [
+        "PromiseNode",
+        "CallbackNode"
+      ],
+      "description": "The node's execution shape. This is THE first decision about a node, and it is stated here rather than inferred so it is visible on the node itself.\n\n  PromiseNode   one input, one output, settles once: an API call, a transform, a DB or file operation.\n  CallbackNode  emits repeatedly: streaming, iteration over a collection, long-running work, or waiting on a signal.\n\nLint VERIFIES this against the rest of the manifest rather than trusting it. A node is CallbackNode when the response transport streams (sse, ndjson, awsEventStream) OR any input declares signal CONTINUE or SPAWN. Declaring PromiseNode while doing either is an error, and it is the mistake that used to surface only as a runtime validation failure.\n\nNote that transport alone is insufficient: a node iterating a collection settles its HTTP call once yet still needs callback machinery, and its CONTINUE port is the tell."
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name, e.g. \"OpenAI Stream\". Independent of `type` and of the folder name."
+    },
+    "description": {
+      "type": "string",
+      "description": "What this node is, in one line. Shown in the node picker."
+    },
+    "category": {
+      "$ref": "_defs.schema.json#/definitions/nodeCategory"
+    },
+    "whenToUse": {
+      "$ref": "_defs.schema.json#/definitions/whenToUse"
+    },
+    "color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$",
+      "description": "Node accent on the canvas."
+    },
+    "logoUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Vendor mark. Remote by convention today; an on-prem universe may not be able to reach it."
+    },
+    "template": {
+      "enum": [
+        "service",
+        "mini",
+        "memory",
+        "uiComponent",
+        "printComponent",
+        "harness"
+      ],
+      "description": "How the CANVAS DRAWS this node, when the default card is wrong. Omit for the ordinary node card.\n\nThese are the shapes WorkflowCanvas.jsx implements, and like every other enum in these schemas the list is the capability list: a value the canvas does not know silently falls back to the default card.\n\nservice / mini: a compact card for a node that is attached to another rather than wired in sequence, which is what an MCP provider is. memory, uiComponent, printComponent, harness: their own renderers."
+    },
+    "allowedHosts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "The hosts THIS node calls, when that is fewer than its package allows. Omit when the node uses all of them.\n\nThe package sets the ceiling and a node may only NARROW it; naming a host the package does not allow is an error, because widening a boundary from inside the thing it contains is not a boundary.\n\nWorth declaring whenever a package spans more than one vendor: `gtm` calls Apollo and Hunter, so without this every Apollo node is also permitted to reach Hunter, and a reviewer reading the node's page sees a host it never touches."
+    },
+    "visibility": {
+      "enum": [
+        "public",
+        "internal"
+      ],
+      "default": "public",
+      "description": "`internal` nodes load everywhere but never appear in the node library or palette. Used by harness and builder nodes."
+    },
+    "capabilities": {
+      "type": "object",
+      "description": "Engine-level behaviour of this node type. All optional.",
+      "properties": {
+        "isTrigger": {
+          "const": true,
+          "description": "This node can start a workflow, so it needs no upstream edge.\n\nOnly ever set it to TRUE. Omit it otherwise: `isTrigger: false` is the default and says nothing.\n\nIt is worth knowing that today the engine decides triggers from a HARDCODED set of four type names in CatalogService.ts (InputTrigger, InputAction, WebhookTrigger, ScheduleTrigger) and treats this flag only as a fallback that almost no definition sets. It also affects the builder layer (layout, validation, test runs), not execution.\n\nThe field stays because it is the ONLY way a node outside that hardcoded set can declare itself a trigger. A customer-authored webhook or schedule trigger has no way to get its name into an engine constant, so for manifest nodes this fallback becomes the mechanism rather than the afterthought."
+        },
+        "cacheable": {
+          "description": "Output may be MEMOIZED: the engine may serve a prior run's output when the fingerprint (type + version + RESOLVED config + credential ref + scope) matches.\n\nSet ONLY for idempotent side-effect-free READS (search, scrape, fetch-by-id, pure transform). NEVER for effectful nodes (send, write, post, charge) where reuse silently skips the side effect, and NEVER for non-deterministic ones (LLM completions, time or random dependent) where re-running is the correct behaviour. Memoization is off engine-wide by default; this flag only makes the node eligible.\n\nOBJECT FORM, for nodes whose config carries a VOLATILE field (a presigned/expiring URL) over content whose identity arrives on an input (an etag). `ignore` drops the named top-level resolved-config fields from the fingerprint; `key` names input leaf fields (dot-suffix match, e.g. \"etag\" or \"file.etag\") the engine collects from the resolved inputs as the content's identity. If a key field collects NOTHING on a run, that run is not cached — no identity, no reuse. Declaring the object form IS the opt-in.",
+          "oneOf": [
+            { "type": "boolean" },
+            {
+              "type": "object",
+              "properties": {
+                "ignore": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Top-level resolved-config fields excluded from the fingerprint because they are volatile, not identity (a presigned URL that changes every run). Every OTHER config field still busts the cache."
+                },
+                "key": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "minItems": 1,
+                  "description": "Input leaf fields that identify the content, matched by dot-suffix against every leaf path in the resolved inputs (wiring-independent: \"etag\" matches inputs.file.<anyNode>.file.etag). All matches, sorted by path, enter the fingerprint. A key that matches nothing disables caching for that run."
+                }
+              },
+              "required": ["key"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "emitsExternally": {
+          "const": true,
+          "description": "This node EMITS outside the platform: it sends, posts, charges, or writes into somewhere the platform cannot take back (a mailbox, a payment, a third-party record).\n\nTEST RUNS WITHHOLD IT. runTest / startTestRun / stepNode trace what the node would have done and do NOT perform it, because the build loop re-runs a workflow after every stage and an emitting node would otherwise deliver a real message to a real person once per attempt. A real send is a real run of the workflow, never a test. There is no flag to override this: an effect with no inverse is not something a test gets to do.\n\nSet it whenever the effect cannot be undone by the engine. Deleting a scratch row is undoable and does NOT need it; sending an email, charging a card, posting to a third party, or firing a webhook does. If in doubt, set it — a withheld node costs a build nothing, an unwanted send costs a real person something.\n\nOnly ever set it to TRUE. Omit it otherwise: `emitsExternally: false` is the default and says nothing.\n\nThis is the POSITIVE half of the distinction `cacheable` already describes. `cacheable: false` says a node is effectful only by omission, which nothing downstream can act on."
+        }
+      },
+      "additionalProperties": false
+    },
+    "interface": {
+      "$ref": "interface.schema.json",
+      "description": "Inlined interface.yaml. Use for simple nodes; split it out once it grows."
+    },
+    "config": {
+      "$ref": "config.schema.json",
+      "description": "Inlined config.yaml."
+    },
+    "api": {
+      "$ref": "api.schema.json",
+      "description": "Inlined api.yaml."
+    },
+    "test": {
+      "$ref": "test.schema.json",
+      "description": "Inlined test.yaml."
+    },
+    "auth": {
+      "type": "object",
+      "description": "WHO MAY RUN THIS NODE — inbound, about the caller (docs/architecture/DECLARATIVE_NODES.md §9.13). Not to be confused with a call's `credential` in api/run.yaml, which is outbound: how the node proves itself to a vendor. Both were spelled `auth` until 2026-07-28.\n\nCOMPULSORY, which is the point. It was optional (`requires: { role }`) until 2026-07-28, and every node in the tree said nothing — so a node that had been considered and left open looked exactly like a node nobody had thought about. Silence is not an answer to this question.",
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "description": "Must the caller be signed in? `false` does NOT mean public: it means this node adds no requirement of its own and runs for whoever the trigger admitted, which is the right answer for most nodes. The trigger instance's publicEntry toggle still owns the door. `true` demands a real identity no matter what the trigger allowed — requirements only ever narrow."
+        },
+        "role": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$",
+          "description": "The single role the caller's token must carry, always noun:verb (finance:approve, payments:refund) — the grammar workflow:author and marketplace:publish already speak. Singular on purpose: a node does one privileged thing; if it seems to need two, it is usually two nodes. Implies required: true, and declaring it alongside required: false is a lint error rather than a promise that can never be kept."
+        }
+      },
+      "required": [
+        "required"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

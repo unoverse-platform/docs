@@ -30,9 +30,10 @@ A deployed node is live in that universe's node library as soon as the deploy fi
 
 ## Every file has a `$schema`
 
-Each file carries a `$schema` pointer, so your editor autocompletes every field and shows
-errors as you type. The schema descriptions are the field reference, so they cannot drift
-from the format.
+Each file opens with a `$schema` line naming the schema this site serves for it. An editor
+with the YAML language server, such as VS Code with the YAML extension, reads it and
+autocompletes every field and marks errors as you type. The same schemas are what
+`unoverse lint` validates against, so the two cannot disagree.
 
 ### The split is by rate of change
 
@@ -58,7 +59,7 @@ Taken from the real `OpenAI` node, trimmed of its comments.
 ### `node.yaml`
 
 ```yaml node.yaml
-$schema: ../../../_schema/node.schema.json
+$schema: https://docs.unoverse.ai/schemas/nodes/node.schema.json
 
 type: OpenAI
 kind: PromiseNode
@@ -129,7 +130,7 @@ real person something.
 ### `interface.yaml`
 
 ```yaml interface.yaml
-$schema: ../../../_schema/interface.schema.json
+$schema: https://docs.unoverse.ai/schemas/nodes/interface.schema.json
 
 inputs:
   - name: signal
@@ -156,7 +157,7 @@ Canvas renders the form from this, and the executor resolves `{{ config.* }}` ag
 saved values.
 
 ```yaml config.yaml
-$schema: ../../../_schema/config.schema.json
+$schema: https://docs.unoverse.ai/schemas/nodes/config.schema.json
 
 configSchema:
   type: object
@@ -319,7 +320,7 @@ For a streaming node, two controls matter:
 ### `test.yaml`
 
 ```yaml test.yaml
-$schema: ../../../_schema/test.schema.json
+$schema: https://docs.unoverse.ai/schemas/nodes/test.schema.json
 
 testData:
   config:

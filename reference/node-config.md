@@ -6,7 +6,7 @@ title: "config.yaml"
 The settings form someone fills in on the canvas.
 
 <div className="ref-source">
-Generated from <code>nodes/_schema/config.schema.json</code>, the same file the node
+Generated from <code>schemas/nodes/config.schema.json</code>, the same file the node
 linter validates against.
 </div>
 

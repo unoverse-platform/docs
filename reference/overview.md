@@ -13,7 +13,7 @@ field the platform does not accept, and they cannot fall behind one it does.
 | | You write | Validated by |
 |---|---|---|
 | **Design** | `design/<org>/components/`, `apps/` | `design/_schema/unoverse.schema.json` |
-| **Nodes** | `nodes/<name>/` | the eight schemas in `nodes/_schema/` |
+| **Nodes** | `nodes/<name>/` | the nine schemas at [schemas/nodes](https://docs.unoverse.ai/schemas/nodes/node.schema.json) |
 
 ## Not here yet
 

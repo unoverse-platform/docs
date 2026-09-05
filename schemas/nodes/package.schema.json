@@ -1,0 +1,171 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://unoverse/nodes/package.schema.json",
+  "title": "Unoverse node package",
+  "description": "package.yaml \u2014 the envelope for a folder of nodes. Replaces the `gravity` block in package.json for packages that no longer ship code. See docs/architecture/DECLARATIVE_NODES.md \u00a75.",
+  "type": "object",
+  "required": [
+    "name",
+    "displayName",
+    "version"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Folder-safe package id, e.g. openai. Not an npm name: a manifest package is deployed as rows, not published."
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semver. Bumped when any node in the package changes; the deploy step compares it against what the target universe already holds."
+    },
+    "category": {
+      "enum": [
+        "ai",
+        "storage",
+        "ingest",
+        "communication",
+        "cloud",
+        "flow",
+        "media",
+        "search",
+        "productivity"
+      ],
+      "description": "The PACKAGE vocabulary, deliberately different from the NODE category vocabulary in _defs.schema.json. This one groups the marketplace; that one describes a node's job (package-marketplace.md)."
+    },
+    "logoUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Square icon, .webp or .svg preferred."
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Marketing bullets for the package card."
+    },
+    "allowedHosts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(\\*$|(\\*\\*\\.|\\*\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+$)"
+      },
+      "description": "The ONLY hosts this package's nodes may call. The executor refuses any other, and lint refuses a request URL outside it.\n\nThis is the control that makes a manifest safe to accept from someone else. A manifest cannot execute, but it CAN say \"POST this credential to evil.example\", and that is exfiltration without a line of code. Bounding allowedHosts means a package's secrets can only ever reach hosts it declared in writing, and the declaration is one short reviewable list at install time.\n\nSECURITY.md draws the line as: a NODE is trusted code bounded by provenance; a TEMPLATE EXPRESSION is untrusted data bounded by having no credentials in scope. A manifest node is neither \u2014 it arrives as data but holds a credential and a URL. AllowedHosts is its boundary.\n\n`*.` matches ONE subdomain level, e.g. \"*.slack.com\" reaches api.slack.com but not a.b.slack.com.\n\n`**.` matches ANY depth, and is written with two stars because it is a deliberately weaker claim the author should have to make on purpose. AWS forced it: `dynamodb.us-east-1.amazonaws.com` is two labels deep and an S3 bucket is three, since the region AND the bucket are part of the host. Listing every region defeats itself the day AWS adds one, and a bucket name comes from config so it cannot be listed at all. Still bounded: \"**.amazonaws.com\" reaches any AWS host and nothing else.\n\n`*` alone means ANY HOST, and it applies ONLY to calls that send no credential. Some nodes legitimately fetch a url a person supplies (an image for a model to look at, a document to read) and that url cannot be declared in advance. It is safe exactly there: this boundary exists to stop exfiltration, and a call with no `auth` block has no credential to leak. Non-https is still refused, so cloud metadata and plaintext internal services stay out of reach, and the moment a call carries a credential the wildcard stops matching and the declared list applies.",
+      "examples": [
+        [
+          "api.openai.com"
+        ],
+        [
+          "api.hubapi.com",
+          "*.hubspot.com"
+        ]
+      ]
+    },
+    "requires": {
+      "type": "object",
+      "description": "Executor capabilities every node in this package depends on. Deploy REFUSES a package whose target universe cannot satisfy these, which is what stops a manifest naming a capability that only exists on a newer executor.",
+      "properties": {
+        "credential": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The credential SCHEMES this package's calls use (bearer, basic, apiKeyHeader, apiKeyQuery, oauth2ClientCredentials, awsSigV4). Named `auth` until 2026-07-28, renamed with the call key it mirrors so the package's promise and the call's spelling stay the same word. Nothing to do with node.yaml's `auth`, which is who may RUN a node."
+        },
+        "transport": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "executorVersion": {
+          "type": "string",
+          "description": "Minimum executor version, e.g. \">=1.2.0\"."
+        },
+        "state": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "read",
+              "merge",
+              "drain",
+              "save"
+            ]
+          },
+          "description": "Platform state operations this package's nodes use. Declared for the same reason as auth and transport: on an executor without them a state call would silently no-op, a cache would look permanently cold, and a queue would never drain, with nothing anywhere reporting it."
+        },
+        "loop": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "open",
+              "read",
+              "advance"
+            ]
+          },
+          "description": "Iteration operations this package's nodes use. Declared like auth and transport, and with more at stake than most: a loop whose executor cannot keep an index does not iterate at all, so an install against an older executor should fail at install rather than run a loop body exactly once and report success."
+        },
+        "paginate": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "cursor",
+              "page",
+              "offset"
+            ]
+          },
+          "description": "Pagination strategies this package's nodes use. Declared like auth and transport: on an executor without them a paginated call would return only the first page, which looks like a small result rather than a failure."
+        },
+        "chunk": {
+          "type": "boolean",
+          "description": "True when a node writes a collection in vendor-sized batches. On an executor without it the whole collection would go in one request and the vendor would reject it."
+        },
+        "poll": {
+          "type": "boolean",
+          "description": "True when a node waits on an asynchronous JOB: start it, then ask until it is done. On an executor without it the node settles on the START reply, which is a receipt carrying a job id, and emits that as its answer \u2014 every downstream field reads empty and nothing errors."
+        },
+        "encoding": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "dynamodbJson",
+              "binary",
+              "multipart",
+              "ndjson"
+            ]
+          },
+          "description": "Body encodings this package's nodes use. Declared like auth and transport, and for the same reason: on an executor without one, the body is sent as plain JSON instead. That is not an error anywhere \u2014 the vendor simply rejects a shape it did not expect, or worse accepts it and ignores the file, so an upload silently transcribes nothing."
+        },
+        "renderComponents": {
+          "type": "boolean",
+          "description": "The executor renders the COMPONENTS a service method's rows name (metadata.app) onto the caller's live screen. Declare it, or a package using `renderComponents` on an older runtime silently renders nothing."
+        },
+        "publish": {
+          "type": "boolean",
+          "description": "The executor pushes a node's api/publish.yaml object into the caller's live template state over the data plane. Declared for the same reason as renderComponents: on an older runtime the push silently never happens, and a node whose whole job is reaching the screen looks like it worked."
+        },
+        "docstore": {
+          "type": "boolean",
+          "description": "The executor's sectioned markdown document store (`docstore:` calls): hash-checked section edits in Redis with WATCH/MULTI concurrency, and the hybrid re-fire after a mutating service method. Declared because on an older runtime every one of this package's tools is missing at once."
+        }
+      },
+      "additionalProperties": false
+    },
+    "publisher": {
+      "type": "string",
+      "description": "WHO published this package. Shown beside every node it registers, because a node that reaches the network with a credential is a question of trust before it is a question of features. `unoverse` marks a first-party package; anything else is third-party and is labelled as such."
+    }
+  },
+  "additionalProperties": false
+}

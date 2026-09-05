@@ -8,7 +8,7 @@ The calls the node makes, and what leaves it.
 The `api/` folder holds one file per key below. `run` is `api/run.yaml`, `events` is `api/events.yaml`, and each of those files IS its list — there is no wrapping `run:` or `events:` key inside them.
 
 <div className="ref-source">
-Generated from <code>nodes/_schema/api.schema.json</code>, the same file the node
+Generated from <code>schemas/nodes/api.schema.json</code>, the same file the node
 linter validates against.
 </div>
 

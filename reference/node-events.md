@@ -6,7 +6,7 @@ title: "api/events.yaml"
 Everything that leaves the node, one row per output connector.
 
 <div className="ref-source">
-Generated from <code>nodes/_schema/api.schema.json</code>, the same file the node
+Generated from <code>schemas/nodes/api.schema.json</code>, the same file the node
 linter validates against.
 </div>
 

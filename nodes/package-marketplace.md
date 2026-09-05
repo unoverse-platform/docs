@@ -9,7 +9,7 @@ marketplace shows.
 `package.yaml` describes it, and there is one per package.
 
 ```yaml package.yaml
-$schema: ../_schema/package.schema.json
+$schema: https://docs.unoverse.ai/schemas/nodes/package.schema.json
 
 name: example
 displayName: Example

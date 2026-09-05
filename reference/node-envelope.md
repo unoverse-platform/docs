@@ -6,7 +6,7 @@ title: "node.yaml"
 One file per node, naming what it is and how an Agent finds it.
 
 <div className="ref-source">
-Generated from <code>nodes/_schema/node.schema.json</code>, the same file the node
+Generated from <code>schemas/nodes/node.schema.json</code>, the same file the node
 linter validates against.
 </div>
 

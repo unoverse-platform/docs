@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://unoverse/nodes/audio.schema.json",
+  "title": "Unoverse node audio lane",
+  "description": "api/audio.yaml — how a duplex voice node is wired to the platform's audio lane. Only meaningful beside a `transport: ws` call.\n\nWHY THIS FILE EXISTS, and it is not a design preference. There are TWO sockets in a voice call. The VENDOR socket lives in api/run.yaml and is the node's conversation with OpenAI, xAI or Nova. The AUDIO LANE is the platform's own socket to the browser, and it exists for exactly ONE reason: MCP cannot carry binary audio.\n\nSo the rule that keeps this file small: EVERYTHING THAT IS NOT AUDIO BELONGS IN `events`. Transcripts, tool results, speech state, usage — all of it reaches the client over MCP streaming already, by landing on an output connector like any other node's output. Nothing needs a side channel to get there. If something non-audio is being put in this file, the reason is almost always that it was easier to reach the lane than to declare an output, and that is the wrong trade: an output is visible on the canvas, wirable, and testable, and a side channel is none of those.\n\nWHAT THE EXECUTOR CONTRIBUTES. Everything here names computation rather than describing data, which is why it is a handful of keys rather than a body template. Resampling is an interpolation over samples. Coalescing is a timer and a byte budget. Barge-in is discarding a buffer rather than flushing it. None of those can be written as an expression, and all of them are identical for every vendor, which is exactly the test for belonging to the executor (DECLARATIVE_NODES.md §2).",
+  "type": "object",
+  "properties": {
+    "in": {
+      "type": "object",
+      "required": [
+        "message"
+      ],
+      "description": "Microphone audio, from the client's lane into the vendor socket.",
+      "properties": {
+        "resampleTo": {
+          "type": "number",
+          "description": "Sample rate the VENDOR wants, in Hz. The client captures at 16000 and vendors disagree: OpenAI and xAI want 24000, Nova wants 16000. When this differs from the incoming rate the executor resamples by linear interpolation before wrapping.\n\nThis is a rate, not a switch, because getting it wrong is not an error anywhere — the vendor accepts the bytes and transcribes them at the wrong speed, so the model hears a chipmunk and the failure looks like poor accuracy rather than a misconfiguration."
+        },
+        "message": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "_defs.schema.json#/definitions/expression"
+            }
+          ],
+          "description": "The vendor's envelope for a chunk of microphone audio, with the chunk in scope as `audio` ({ base64, bytes, rate }). An OBJECT whose leaves are templates is the normal case; an expression when the shape is conditional. OpenAI wants { type: 'input_audio_buffer.append', audio }, Nova wants an audioInput event inside its content block. This is the description half; the resampling above is the computation half."
+        }
+      },
+      "additionalProperties": false
+    },
+    "out": {
+      "type": "object",
+      "required": [
+        "match",
+        "value"
+      ],
+      "description": "Model audio, from the vendor socket out to the client's lane.\n\nThis is the ONLY thing that should ever bypass an output connector, and only because MCP cannot carry it.",
+      "properties": {
+        "match": {
+          "type": "string",
+          "description": "The inbound event type carrying an audio chunk, e.g. response.output_audio.delta. Matched like an events row."
+        },
+        "value": {
+          "$ref": "_defs.schema.json#/definitions/expression",
+          "description": "The base64 audio out of that event, e.g. \"return response.delta\"."
+        },
+        "done": {
+          "type": "string",
+          "description": "The inbound event type meaning this utterance is finished, e.g. response.output_audio.done. Flushes whatever is still buffered and then signals SPEECH_ENDED.\n\nORDER MATTERS and the executor guarantees it: the flush goes out BEFORE the end signal. SPEECH_ENDED marks the END of the utterance and the client finishes playback as soon as its queue drains, so a frame sent after it can arrive on a player that has already stopped and reset — dropped, or replayed as a stray fragment.\n\nThe executor also sends SPEECH_STARTED on the FIRST chunk of each utterance, without it needing to be declared: the vendor has no 'about to speak' event, so the first delta after silence IS the start. The client sets up playback on it."
+        },
+        "interruptOn": {
+          "type": "string",
+          "description": "The inbound event type meaning the USER started talking over the model, e.g. input_audio_buffer.speech_started. Buffered audio is DISCARDED rather than flushed.\n\nThe distinction from a flush is the whole point of barge-in: flushing plays a fragment of a sentence the person already interrupted, which is the most obvious way a voice call feels broken.\n\nNO CONTROL STATE OF ITS OWN. The client cuts playback on USER_SPEECH_STARTED, which `control.userSpeaking` already sends on this same event — so the server's whole job here is to throw away the audio that was talked over, so it cannot be flushed later."
+        },
+        "coalesceBytes": {
+          "type": "number",
+          "default": 32768,
+          "description": "Send once this many bytes have accumulated. A vendor emits audio in small deltas and one websocket frame per delta floods the client; a byte budget trades a little latency for far fewer frames."
+        },
+        "coalesceMs": {
+          "type": "number",
+          "default": 50,
+          "description": "Send anyway after this long, even under the byte budget, so the tail of a short utterance is not held back waiting for bytes that will never come."
+        }
+      },
+      "additionalProperties": false
+    },
+    "control": {
+      "type": "object",
+      "description": "Control messages arriving on the audio lane FROM the client, which are about the call rather than about audio.",
+      "properties": {
+        "endOn": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Control message types that end the call, e.g. [END_CALL, stop]. The executor runs the `close` list from api/run.yaml and then closes the vendor socket.\n\nWithout this the only way a call ends is the vendor timing out or the workflow being torn down, and the user pressing hang up does nothing."
+        },
+        "userSpeaking": {
+          "type": "string",
+          "description": "The vendor event meaning the PERSON started talking, e.g. input_audio_buffer.speech_started. Sends USER_SPEECH_STARTED on the lane.\n\nThis is the vendor's own voice-activity detection, and it is separate from `out.interruptOn` even when both name the same event: one tells the client the person is talking, the other throws away the assistant audio they talked over."
+        },
+        "userStopped": {
+          "type": "string",
+          "description": "The vendor event meaning the person stopped talking, e.g. input_audio_buffer.speech_stopped. Sends USER_SPEECH_ENDED on the lane."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

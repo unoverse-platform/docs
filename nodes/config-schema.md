@@ -9,7 +9,7 @@ calls read the saved values as `{{ config.<field> }}`.
 It is the file you touch most. Every new option a node grows lands here and nowhere else.
 
 ```yaml config.yaml
-$schema: ../../../_schema/config.schema.json
+$schema: https://docs.unoverse.ai/schemas/nodes/config.schema.json
 
 configSchema:
   type: object

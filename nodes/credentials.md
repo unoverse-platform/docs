@@ -50,7 +50,7 @@ One file per credential type, in the package's `credentials/` folder. It describ
 shape, never a value.
 
 ```yaml credentials/exampleCredential.yaml
-$schema: ../../_schema/credential.schema.json
+$schema: https://docs.unoverse.ai/schemas/nodes/credential.schema.json
 
 name: exampleCredential
 displayName: Example

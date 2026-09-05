@@ -6,7 +6,7 @@ title: "credentials"
 The shape of a credential, declared once per package. Never a value.
 
 <div className="ref-source">
-Generated from <code>nodes/_schema/credential.schema.json</code>, the same file the node
+Generated from <code>schemas/nodes/credential.schema.json</code>, the same file the node
 linter validates against.
 </div>
 
