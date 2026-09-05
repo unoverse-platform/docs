@@ -6,13 +6,10 @@ title: "Anatomy of a node"
 Build a node file by file, following a real one. The folder shape is on
 [Nodes](/nodes/overview).
 
-> Computation over the request belongs to the platform. Description of the service belongs
-> to you.
-
-Auth schemes, retries, SSE framing and Handlebars resolution are the platform's job, written
-once. Base URL, method, parameters, credentials and what comes out are yours, written as
-data. You name a capability and the platform performs it. `unoverse lint` fails on a capability
-that does not exist, so you find out while you write rather than at run time.
+You write what the service needs: the URL, the method, the parameters, the credential, and
+what comes out. The platform does the rest: auth, retries, streaming and Handlebars.
+`unoverse lint` fails on anything the platform does not do, so you find out while you write
+rather than at run time.
 
 ## Build and check
 
@@ -28,21 +25,23 @@ There is no server to start and no database to connect to, so it works offline.
 
 A deployed node is live in that universe's node library as soon as the deploy finishes.
 
-## Every file has a `$schema`
+## Editor help
 
-Each file opens with a `$schema` line naming the schema this site serves for it. An editor
-with the YAML language server, such as VS Code with the YAML extension, reads it and
-autocompletes every field and marks errors as you type. The same schemas are what
-`unoverse lint` validates against, so the two cannot disagree.
+A **studio** workspace carries a `.vscode/settings.json` that maps every node file to its
+schema on this site. With the YAML extension installed, your editor autocompletes every
+field and marks errors as you type, in every file of every node, with nothing written in
+the file itself. The same schemas are what `unoverse lint` validates against, so the two
+cannot disagree. Any other editor that reads JSON Schema can use the same URLs, which start
+at [node.schema.json](https://docs.unoverse.ai/schemas/nodes/node.schema.json).
 
-### The split is by rate of change
+## The split is by rate of change
 
 | File | Holds | How often you touch it |
 |---|---|---|
 | `node.yaml` | type, kind, name, category, description, whenToUse | Once |
 | `interface.yaml` | inputs, outputs, credentials, serviceConnectors | When the node's shape changes |
 | `config.yaml` | `configSchema` + `ui:order` | Constantly. Every new option lands here |
-| `api/` | one file per call, plus the events table | When the upstream API changes |
+| `api/` | the calls, and the events table that puts values on outputs | When the upstream API changes |
 | `test.yaml` | `testData` | Alongside config |
 
 `interface.yaml` is its own file for a different reason. It answers the question asked most
@@ -54,23 +53,23 @@ be one file. Defining a section in two places is an error, never a merge.
 
 ## The files, in full
 
-Taken from the real `OpenAI` node, trimmed of its comments.
+Taken from the real `OpenAI` node, exactly as it ships, with only its comments removed.
 
 ### `node.yaml`
 
 ```yaml node.yaml
-$schema: https://docs.unoverse.ai/schemas/nodes/node.schema.json
-
 type: OpenAI
 kind: PromiseNode
 
 name: OpenAI
 category: AI
+color: "#2F6F66"
 description: One prompt in, one completion out, with no streaming or tools
-
 whenToUse: >-
   Single prompt to single completion, the plain one-shot text generator: summarise,
-  rewrite, classify, answer. No streaming, no tools, no schema enforcement.
+  rewrite, classify, answer. No streaming, no tools, no schema enforcement; reach for a
+  heavier node only when a step genuinely needs token streaming, iterative tool use, or
+  strict JSON output.
 
 auth:
   required: false
@@ -79,18 +78,21 @@ capabilities:
   cacheable: false
 ```
 
+`kind` is `PromiseNode` for a node that answers once and `CallbackNode` for one that keeps
+answering. Lint checks the declaration against the calls. [Node types](/nodes/node-types)
+covers the choice.
+
 `auth` is compulsory on every node, and `required: false` is the usual answer. It says your
 node adds no requirement of its own, so the run reaches it as whoever the trigger admitted.
 It does not mean public. [Who can run it](/nodes/who-can-run-it) covers the other half,
 which the person building the workflow sets.
 
-`whenToUse` is not documentation. The catalog embeds it and ranks it against what a
+`whenToUse` is not documentation. The catalogue embeds it and ranks it against what a
 workflow-building agent is trying to do, so it decides whether your node is ever
-**offered**. Read [node-discoverability.md](/nodes/node-discoverability) before you
-write it.
+**offered**. Read [Node discoverability](/nodes/node-discoverability) before you write it.
 
-`cacheable` opts the node into memoization: the engine may serve a prior run's output when
-nothing that matters has changed, instead of re-executing. `true` is for idempotent,
+`cacheable` opts the node into caching: the engine may serve a prior run's output when
+nothing that matters has changed, instead of running again. `true` is for idempotent,
 side-effect-free reads (search, scrape, fetch-by-id), never for anything effectful or
 non-deterministic. Nodes that read content through a **volatile URL** (a presigned link
 that changes every run) use the object form and declare the content's real identity
@@ -116,8 +118,8 @@ capabilities:
   emitsExternally: true
 ```
 
-Test runs withhold these nodes. `runTest`, `startTestRun` and `stepNode` record what the
-node would have done and do not perform it. An agent building a workflow re-runs it after
+Test runs on the **canvas** withhold these nodes. They record what the node would have done
+and do not perform it. An agent building a workflow re-runs it after
 every stage, and each attempt would otherwise put a real message in a real inbox. The
 withheld output is marked `__withheld` and deliberately does not look like a success, so
 nothing downstream can mistake it for a delivery. Your node's inputs are still traced, so
@@ -129,9 +131,9 @@ real person something.
 
 ### `interface.yaml`
 
-```yaml interface.yaml
-$schema: https://docs.unoverse.ai/schemas/nodes/interface.schema.json
+One input, two outputs, and the credential the calls will need.
 
+```yaml interface.yaml
 inputs:
   - name: signal
     type: object
@@ -140,35 +142,53 @@ inputs:
 outputs:
   - name: text
     type: string
-    description: The generated text
+    description: The generated text response
   - name: usage
     type: object
-    description: Token usage for this call
+    description: Token burn (prompt_tokens, completion_tokens, total_tokens)
 
 credentials:
   - name: openAICredential
     required: true
     displayName: OpenAI API
+    description: OpenAI API credentials for authentication
 ```
 
 ### `config.yaml`
 
-Canvas renders the form from this, and the executor resolves `{{ config.* }}` against the
-saved values.
+**canvas** renders the form from this, and the platform resolves `{{ config.* }}` against
+the saved values.
 
 ```yaml config.yaml
-$schema: https://docs.unoverse.ai/schemas/nodes/config.schema.json
-
 configSchema:
   type: object
-  required: [model]
+  required: [model, prompt]
   properties:
     model:
       type: string
       title: Model
+      description: Select the OpenAI model to use
       enum: { $ref: models#enum }
       enumNames: { $ref: models#enumNames }
       default: { $ref: models#default }
+      resolve: modelTier
+    maxTokens:
+      type: number
+      title: Max Tokens
+      description: >-
+        Hard ceiling on the reply. The model stops when it hits this, mid-sentence and
+        without an error, so raise it for long output rather than leaving it to trim.
+      default: 1200
+      minimum: 1
+      maximum: 128000
+    systemPrompt:
+      type: string
+      title: System Prompt
+      description: >-
+        Standing instructions for every run: the model's role, tone and limits. Optional.
+        Shared blocks work here, e.g. {{prompt.markdownGuidelines}}.
+      default: ""
+      ui:field: template
     prompt:
       type: string
       title: Prompt
@@ -176,8 +196,13 @@ configSchema:
       default: ""
       ui:field: template
 
-"ui:order": [model, prompt]
+ui:order: [model, maxTokens, systemPrompt, prompt]
 ```
+
+`{ $ref: models#enum }` reads a fragment from `shared/models.yaml`, so every node in the
+package offers the same list. [Packages](/nodes/package-marketplace) covers `shared/`.
+`resolve: modelTier` lets a saved workflow keep working when a model generation is retired:
+the platform resolves the saved name to the current model of the same tier.
 
 Every node's form also ends with two access controls, **Require sign-in** and **Require
 role**, which the platform injects. You never declare them, and their names `authRequired`
@@ -204,6 +229,7 @@ A list, always, even when there is one call. Each entry is named for what it fet
   body:
     model: "{{ config.model }}"
     input: "{{ config.prompt }}"
+    instructions: "{{ config.systemPrompt }}"
     max_output_tokens: "{{ config.maxTokens }}"
 
   timeoutMs: 120000
@@ -211,7 +237,7 @@ A list, always, even when there is one call. Each entry is named for what it fet
   retry:
     attempts: 3
     backoff: exponential
-    on: [429, 500, 502, 503, 504]
+    on: [429, 500, 502, 503, 504, 520, 522, 524]
 
   transport: json
 
@@ -223,26 +249,6 @@ A list, always, even when there is one call. Each entry is named for what it fet
 **A call is one thing.** `transport`, `terminator` and `error` sit inside the call. Whether a
 reply arrives as one body or as a stream is decided by the request you make. Ask for
 `stream: true` and you get a stream.
-
-### How the reply arrives
-
-| `transport` | The reply is |
-|---|---|
-| `json` | one JSON body |
-| `text` | one body of plain text |
-| `xml` | one XML body, parsed to the same plain shape JSON gives |
-| `headers` | the headers themselves, for an endpoint whose answer is a header |
-| `binary` | bytes, handed on rather than parsed |
-| `sse` | a stream of events, so the node needs `match` rows in `events.yaml` |
-| `ws` | a socket that stays open in both directions |
-
-`xml` is for the services that never moved, and it parses to the same shape as JSON so an
-events row reads it identically.
-
-`encoding` is a second axis. `transport` says how the reply is framed, `encoding` says how
-the values inside it are spelled. `dynamodbJson` is the one to know: DynamoDB carries
-`{ name: { S: "Ada" } }` where you want `{ name: "Ada" }`, and the platform translates both
-ways so a node never writes type tags.
 
 **It is a list because one fact often takes more than one call.** Resolving a contact is a
 search by email, then a second call built from the first reply. Later calls read earlier
@@ -256,6 +262,10 @@ job. `state` remembers between runs. See [Beyond one request](/nodes/calls-that-
 `error` matters more than it looks. An API that returns HTTP 200 with an error in the
 body will otherwise read as success and hand nonsense downstream.
 
+The `{{ }}` values are Handlebars strings and the `return` values are expressions. The
+field decides which applies, and [Handlebars and expressions](/nodes/expressions) is the
+grammar, the sandbox and every root a call can see.
+
 ### `api/events.yaml`
 
 **One row per output connector, in the same order `interface.yaml` declares them.** Read
@@ -264,42 +274,17 @@ and the order, so it stays true after edits.
 
 ```yaml api/events.yaml
 - emit: text
-  from: response
-  value: "return response.output.filter(o => o.type === 'message').map(...).join('')"
+  value: >-
+    return response.output
+      .filter(item => item.type === 'message')
+      .flatMap(item => item.content)
+      .filter(part => part.type === 'output_text')
+      .map(part => part.text)
+      .join('')
 
 - emit: usage
-  from: response
   value: "return response.usage"
 ```
-
-A row's `from` says where it fires:
-
-| `from` | Fires | What's in scope |
-|---|---|---|
-| `response` | a streamed event matching `match`, or the whole body when the transport settles | `response` |
-| `narrator` | each line the narrator writes | `narrator.line` |
-| `tool` | after a tool call RETURNS, with its result | `call.name`, `call.args`, `call.output` |
-| `complete` | once at the end, over everything emitted | `events` |
-
-`from: tool` exists because a tool's result is never in the HTTP stream. The tool loop
-produced it.
-
-**Two things are recorded without any row here**, because they are execution facts rather
-than node outputs:
-
-- **Every tool call** becomes a bar on the execution timeline the moment it returns, with
- its arguments, its result, its duration, and whether it succeeded.
-- **Token usage** is read straight off the vendor's reply and summed across the turns of a
- run, detail blocks included (reasoning tokens, cached tokens). The runtime checks the
- three places a wire carries it: `usage` on the body or final chunk, `response.usage` on a
- Responses stream, and `metadata.usage` on a Bedrock stream. A node on any of those wires
- fills the execution's Token Usage view with nothing declared. A vendor that reports usage
- anywhere else is a platform gap to raise, not something to work around in the node. A
- connector named `usage`, as in the example above, is a different thing: the node choosing
- to hand the block downstream as data.
-
-Both are fire and forget. Recording never slows a run and never fails one. A run from the
-**Nodes** screen has no execution to attach to, so it records nothing.
 
 For a streaming node, two controls matter:
 
@@ -320,15 +305,15 @@ For a streaming node, two controls matter:
 ### `test.yaml`
 
 ```yaml test.yaml
-$schema: https://docs.unoverse.ai/schemas/nodes/test.schema.json
-
 testData:
   config:
-    model: gpt-5.6
-    prompt: Explain what a workflow engine does, in two sentences.
-    maxTokens: 1200
+    model: gpt-5.6-terra
+    maxTokens: 256
+    systemPrompt: You are a concise assistant.
+    prompt: Write a one-sentence summary of what a workflow engine does.
   inputs:
-    signal: { topic: workflow engines }
+    signal:
+      question: What does a workflow engine do?
   expect:
     text: "return output.text.length > 0"
     usage: "return output.usage.total_tokens > 0"
@@ -343,59 +328,16 @@ case with the trailing `Credential` dropped, so `openAICredential.apiKey` reads
 and stored nowhere. This is deliberate: you test with **your** key, never with a universe's
 stored credentials, which your manifest has no way to reach.
 
-This catches the class of mistake no static check can. A real example: Handlebars always
-produces a string, so `max_output_tokens: "{{ config.maxTokens }}"` once sent `"2048"` and
-the API rejected it. Only running it showed that.
+This catches the class of mistake no static check can: a field the service rejects, a path
+that resolves to nothing, a reply shaped differently from what the events rows expect.
+Running the node is the only way to see the request as the service sees it.
 
-## Declaring `kind`
+## Allowed hosts and checks
 
-Every node states `PromiseNode` or `CallbackNode` in `node.yaml`, and lint checks the
-declaration rather than trusting it. [Node types](/nodes/node-types) covers which to choose
-and what makes a node one or the other.
-
-## Handlebars and expressions
-
-Two syntaxes read values out of the run and shape them into a call. The field decides which
-applies: a `string` takes a `{{ }}` Handlebars string, and an `object` or `array` takes a
-`return` expression.
-
-[Handlebars and expressions](/nodes/expressions) is the full grammar, the sandbox, and every
-root your calls can see.
-
-## Allowed hosts
-
-`package.yaml` lists the only hosts this package's nodes may reach. **Deny by default.**
-
-```yaml package.yaml
-allowedHosts:
-  - api.openai.com
-```
-
-The host list is what makes a manifest safe to accept from someone else. "Data cannot
-execute" does not save you on its own: a URL plus `{{ credentials.x.apiKey }}` is
-exfiltration in six lines with nothing to sandbox. So the capability is restricted instead.
-
-Enforced twice: statically by lint, and at run time **after** templating, because a host
-can itself come from a Handlebars string. Non-https is refused outright, since a credential must never
-travel in clear text. `*.example.com` matches exactly one subdomain level.
-
-## Check it
-
-```bash
-unoverse lint
-```
-
-Every message names the rule it broke. Errors stop a deploy. Warnings inform.
-`unoverse deploy studio` runs the same check before it sends anything.
-
-It catches what would otherwise surface much later, in a workflow, as nothing happening:
-
-- an output connector nothing emits to
-- an events table out of connector order
-- a credential field that does not exist
-- a `testData.config` key your `config.yaml` never declared
-- a host missing from `allowedHosts`
-- a capability the platform does not implement
+Every host a node calls is listed in its package's `allowedHosts`, and a call to anywhere
+else is refused: [Packages](/nodes/package-marketplace) covers the list. `unoverse lint`
+checks every file against every rule before you deploy: [Testing nodes](/nodes/testing-nodes)
+covers what it catches.
 
 ## Next steps
 

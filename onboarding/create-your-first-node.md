@@ -10,13 +10,15 @@ There is nothing to compile and no package to install. You write the files, run 
 | | |
 | --- | --- |
 | **What you'll build** | <span className="node-chip">Quote</span>, a node that fetches a famous quote |
-| **Where it lives** | `nodes/quote/` in your Studio project workspace |
+| **Where it lives** | `nodes/quote/` in your **studio** workspace |
 | **What it outputs** | Two connectors: `quote` and `author` |
 | **Why this API** | It needs no key, so you can build and run it in under a minute |
 
 ## Before you begin
 
-The platform is running (`unoverse start`). You've built the workflow from [Create Your First Agent](/onboarding/create-your-first-agent); you'll extend it to test your node.
+You have a **studio** workspace, from `unoverse studio`. Building and running the node needs
+nothing else. For the last step, where you use it in a workflow, your universe is running
+and you have the workflow from [Create Your First Agent](/onboarding/create-your-first-agent).
 
 Here is the node you are about to build, as **canvas** will draw it:
 
@@ -45,10 +47,10 @@ Four small files, and none of them is code.
 <div className="security-callout">
   <div className="security-eyebrow">What a node cannot do</div>
   <ul>
-    <li><strong>It adds no code.</strong> The platform runs its own executor, the same one for every node.</li>
+    <li><strong>It adds no code.</strong> The platform makes every call itself, the same way for every node.</li>
     <li><strong>It reaches only declared hosts.</strong> Anything else is refused, and https only.</li>
-    <li><strong>It carries no keys.</strong> Yours stay in <strong>Canvas</strong>, supplied as it runs.</li>
-    <li><strong>It is sealed.</strong> A stored copy that changed is refused at load.</li>
+    <li><strong>It carries no keys.</strong> Yours stay in <strong>canvas</strong>, supplied as it runs.</li>
+    <li><strong>It is sealed.</strong> A deployed copy that was changed by hand is refused.</li>
   </ul>
 </div>
 
@@ -61,11 +63,9 @@ already filled in.
 <Steps>
 <Step title="Create the package">
 
-A package holds one or more nodes and declares which hosts they may call. In your Studio project workspace, create `nodes/quote/` with one file in it:
+A package holds one or more nodes and declares which hosts they may call. In your **studio** workspace, create `nodes/quote/` with one file in it:
 
 ```yaml package.yaml
-$schema: ../_schema/package.schema.json
-
 name: quote
 displayName: Quote
 description: A famous quote, fetched fresh each run
@@ -84,8 +84,6 @@ allowedHosts:
 Create `quote/nodes/Quote/node.yaml`. This one file says what the node is, what it connects to, and how to test it.
 
 ```yaml nodes/Quote/node.yaml
-$schema: ../../../_schema/node.schema.json
-
 type: Quote
 kind: PromiseNode
 
@@ -138,7 +136,7 @@ Each entry in `outputs` becomes a connector on the node. Downstream nodes read t
 A bigger node splits `interface` and `test` into their own files. This one is small, so they stay here.
 
 <Note>
-`whenToUse` decides whether the AI workflow builder can find your node at all. The catalog ranks it against the task being built, so lead with the outcome in plain words and keep it to one or two sentences. Describe what disqualifies your node as a property ("no settings to fill in"), and never name another node. The full guide is [Node discoverability](/nodes/node-discoverability); read it before writing this field for a real node.
+`whenToUse` decides whether the AI workflow builder can find your node at all. The catalogue ranks it against the task being built, so lead with the outcome in plain words and keep it to one or two sentences. Describe what disqualifies your node as a property ("no settings to fill in"), and never name another node. The full guide is [Node discoverability](/nodes/node-discoverability); read it before writing this field for a real node.
 </Note>
 
 </Step>
@@ -184,9 +182,26 @@ This calls the real API. No platform is running, the keys come from your own `.e
 nothing is published. [Testing nodes](/nodes/testing-nodes) covers it in full.
 
 </Step>
-<Step title="Use it in a workflow">
+<Step title="Check it and deploy it">
 
-Deploy the node, and <span className="node-chip">Quote</span> is in the node library in **canvas**.
+From anywhere in your workspace:
+
+```bash
+unoverse lint
+```
+
+Every rule a node must meet is checked, and each message names the one it broke. Then ship
+it to your universe:
+
+```bash
+unoverse deploy studio
+```
+
+Deploy runs the same check first, and <span className="node-chip">Quote</span> is in the
+node library in **canvas** the moment it finishes.
+
+</Step>
+<Step title="Use it in a workflow">
 
 Open your workflow from [Create Your First Agent](/onboarding/create-your-first-agent), drag <span className="node-chip">Quote</span> in, and connect <span className="node-chip">Input Trigger</span> to it.
 
@@ -228,9 +243,9 @@ A node carries no keys, so sharing one never shares a secret. [Credentials](/nod
 
 Your node runs from the files in your repo, which is all you need while you build.
 
-To give it to anyone else, ship it from your terminal with `unoverse deploy studio`. That writes the node into a universe as a record: no build, no package, nothing to download.
+To give it to anyone else, ship it from your terminal with `unoverse deploy studio`. That writes the node into a universe as a record: no build, no package, nothing to download, and it is live in that universe's node library as soon as the deploy finishes.
 
-A node arrives pending, because it is the only thing you publish that holds a URL and a key. Whoever runs the universe sees the hosts it wants to call and the credentials it needs, and accepting it makes it live. After that you publish freely, and it only pauses again if the node reaches for something new.
+The node carries a URL and asks for a key, so the two things anyone installing it will read are its `allowedHosts` and its credential declaration. Keep both honest.
 
 ## Have Claude Code build it
 

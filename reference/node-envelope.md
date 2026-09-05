@@ -42,7 +42,7 @@ How the node runs. `PromiseNode` settles once; `CallbackNode` emits as it goes a
 </ResponseField>
 
 <ResponseField name="name" type="string" post={["required"]}>
-The node's id, unique in its package. Used everywhere it is referenced.
+The display name, shown on the node. Independent of `type` and of the folder name.
 </ResponseField>
 
 <ResponseField name="description" type="string" post={["required"]}>
@@ -78,7 +78,7 @@ Whether the node appears in the library, or is reachable only by another node.
 </ResponseField>
 
 <ResponseField name="capabilities" type="object">
-Platform features this node needs. Publishing refuses where a universe cannot satisfy them.
+Engine behaviour this node opts into: `cacheable` for a pure read, `emitsExternally` for an effect that cannot be undone.
 </ResponseField>
 
 <ResponseField name="interface" type="interface.schema.json">

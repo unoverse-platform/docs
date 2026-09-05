@@ -9,8 +9,6 @@ marketplace shows.
 `package.yaml` describes it, and there is one per package.
 
 ```yaml package.yaml
-$schema: https://docs.unoverse.ai/schemas/nodes/package.schema.json
-
 name: example
 displayName: Example
 description: Example integration for unoverse
@@ -74,23 +72,23 @@ The list is checked when you lint and again at run time, after the URL has been 
 That second check matters because a host can itself come from a Handlebars string, and only the
 finished URL can be judged.
 
-It is also what somebody accepts when you publish the package. Keep it short and keep it
-honest. A list of two hosts is read and approved in seconds. A list that quietly grows is
-the one that gets questioned.
+Keep it short and keep it honest. A list of two hosts is read in a second, and it is the
+promise anyone installing the package can check.
 
 ## `requires`: what the platform must support
 
-What your nodes need from the platform in order to run.
+Every capability the package's nodes use: each credential scheme, each transport, and each
+of `paginate`, `chunk`, `poll` and `state` a call names.
 
 ```yaml
 requires:
   credential: [bearer]
   transport: [json, sse]
-  executorVersion: ">=1.0.0"
+  paginate: [cursor]
 ```
 
-Publishing refuses the package where the universe cannot satisfy it. Without that, a node
-using a newer capability would publish cleanly and then fail when something ran it.
+Lint refuses a node that uses a capability its package does not list, so the list is always
+a true account of what the package needs.
 
 ## Sharing what nodes have in common
 

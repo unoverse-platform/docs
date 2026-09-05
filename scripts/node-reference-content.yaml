@@ -24,7 +24,7 @@ pages:
 node:
   type: "The node's identity. A saved workflow stores it, so renaming it orphans every workflow that placed the node."
   kind: "How the node runs. `PromiseNode` settles once; `CallbackNode` emits as it goes and settles later. The last call's transport decides it, and lint checks the declaration."
-  name: "The node's id, unique in its package. Used everywhere it is referenced."
+  name: "The display name, shown on the node. Independent of `type` and of the folder name."
   description: "One line saying what the node does, shown in the node library."
   category: "The job's domain, used in the library and in discovery ranking. Name the work, never the implementation."
   whenToUse: "The text an Agent's search is ranked against, so this is what decides whether the node is ever chosen. Write the words a person would actually say, outcome first, and disqualify by property rather than by naming a sibling. Getting it wrong fails silently: the node still works, it is just never picked. Full rules: [Node discoverability](/nodes/node-discoverability)."
@@ -33,7 +33,7 @@ node:
   template: "A starter configuration, prefilled when someone drops the node onto a canvas."
   allowedHosts: "Every host this node may reach. No entry, no network."
   visibility: "Whether the node appears in the library, or is reachable only by another node."
-  capabilities: "Platform features this node needs. Publishing refuses where a universe cannot satisfy them."
+  capabilities: "Engine behaviour this node opts into: `cacheable` for a pure read, `emitsExternally` for an effect that cannot be undone."
   interface: "Points at `interface.yaml`, or declares the wiring surface inline."
   config: "Points at `config.yaml`, or declares the settings form inline."
   api: "Points at the `api/` folder, or declares the calls inline."
@@ -76,7 +76,7 @@ package:
   logoUrl: "The logo shown on the listing."
   features: "What the package offers, listed on its marketplace page."
   allowedHosts: "Every host any node in this package may reach, and part of the package's content hash."
-  requires: "Platform capabilities every node here needs. Publishing refuses where a universe cannot satisfy them."
+  requires: "Every capability the package's nodes use: credential schemes, transports, and each looping capability. Lint refuses a node that uses one the package does not list."
   publisher: "Who publishes the package."
 
 test:

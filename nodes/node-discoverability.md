@@ -12,23 +12,25 @@ ranked by how close their meta reads to that description. You are in that handfu
 are invisible. The failure is silent, because the thing works perfectly and is simply never
 reached for.
 
-The same contract covers **nodes, apps, components, templates and agent skills**. A node
-carries the fields in `node.yaml`; everything else carries them in its `manifest.yaml`.
+The same contract covers **nodes, apps, components, templates and Agent skills**. A node
+carries the fields in `node.yaml`, where the thing's name is `name`; everything else carries
+them in its `manifest.yaml`, where it is `title`.
 
-| Field | Its one job | Enforced |
-|---|---|---|
-| `title` | The thing itself. No project prefix, no mechanism | A warning if missing, because the name or the folder slug leads the ranking text instead |
-| `description` | What it **is**: the listing subtitle, one line, 20 to 120 characters. No "use when…" inside it | An error at both bounds |
-| `whenToUse` | The **selection text**, which replaces `description` in the ranking when present | An error if under 20 characters, selector-shaped, or mechanism-led |
-| `category` | The domain of the job, never the implementation | A warning |
+| Field | Its one job |
+|---|---|
+| `name` or `title` | The thing itself. No project prefix, no mechanism |
+| `description` | What it **is**: the listing subtitle, one line. No "use when…" inside it |
+| `whenToUse` | The **selection text**, which replaces `description` in the ranking when present |
+| `category` | The domain of the job, never the implementation |
 
-The ranked text is assembled as `<title>. <whenToUse> <description>`, so `title` leads it
-and a missing one puts a kebab slug in front of the ranker. Apps and nodes also carry their
-category into that text; a component's and a template's category is shelf organisation
-rather than ranking signal.
+The ranked text for a node is its name, then `whenToUse`, then its category. `description`
+is used only when there is no `whenToUse`. So `whenToUse` is the field that matters most.
+It is not a footnote. It is the text being matched.
 
-`whenToUse` is the field that matters most, because it replaces `description` in the
-ranking when present. It is not a footnote. It is the text being matched.
+Lint holds you to it. A node with no `whenToUse` is an error, because it can never be
+found. One that merely repeats its description is an error, because it carries no signal.
+One that opens with plumbing or marketing is a warning. A component's or app's
+`description` must be one line of 20 to 120 characters, or it is an error.
 
 ```yaml node.yaml
 name: Smart Document
@@ -116,8 +118,8 @@ catch-all.
 4. Does `category` match the job the node does?
 5. Is every claim true of what the node actually does?
 
-Ranking uses what is published and accepted, so publish the node before expecting new
-wording to change what gets picked.
+Ranking uses what is published, so deploy the node before expecting new wording to change
+what gets picked.
 
 ## The same rule for apps and skills
 

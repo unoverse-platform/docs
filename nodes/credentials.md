@@ -50,8 +50,6 @@ One file per credential type, in the package's `credentials/` folder. It describ
 shape, never a value.
 
 ```yaml credentials/exampleCredential.yaml
-$schema: https://docs.unoverse.ai/schemas/nodes/credential.schema.json
-
 name: exampleCredential
 displayName: Example
 description: Credentials for the Example API
@@ -124,7 +122,7 @@ platform, so you pick one rather than assembling headers yourself.
 | `basic` | `Authorization: Basic <base64 of username:password>` |
 | `apiKeyHeader` | your key in a header you name |
 | `apiKeyQuery` | your key as a query parameter you name |
-| `oauth2ClientCredentials` | fetches a token, then retries once if the service answers 401 |
+| `oauth2ClientCredentials` | exchanges the client id and secret for a token, and refreshes it before it expires |
 | `awsSigV4` | signs the request with AWS Signature Version 4 |
 | `none` | no auth, for a public API |
 

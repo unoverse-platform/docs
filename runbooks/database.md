@@ -7,7 +7,7 @@ Create database tables and schema.
 
 ## Overview
 
-Postgres is provisioned by your Terraform ground, in one of three modes chosen in `terraform.tfvars`:
+Postgres is provisioned by your Terraform ground. On DigitalOcean there are three modes, chosen in `terraform.tfvars`; on AWS the ground provisions a fresh database:
 
 | Mode | tfvars | What Terraform does |
 | --- | --- | --- |
@@ -25,7 +25,7 @@ Either way the rendered production configuration arrives complete: `DATABASE_URL
 unoverse deploy db
 ```
 
-This applies the baseline migration (idempotent, safe to re-run): it enables the `vector` and `pg_stat_statements` extensions and creates the complete schema, 26 tables covering:
+This applies every migration in order, and is safe to re-run. The baseline enables the `vector` and `pg_stat_statements` extensions and creates the schema, 26 tables covering:
 
 - **Workflows**: `workflows`, `workflow_executions`, `workflow_snapshots`, `node_traces`
 - **Nodes and marketplace**: `node_definitions`, `service_definitions`, `installed_plugins`, `items`, `publish_keys`
@@ -34,7 +34,7 @@ This applies the baseline migration (idempotent, safe to re-run): it enables the
 - **Spatial and content**: the `dictionary_*` family (chunks, ingestion, need states), `content_sources`
 - **Evaluation and security**: `eval_runs`, `security_attack_corpus`, `security_run_results`
 
-The migration file itself is the authoritative list: `engine/migrations/001_baseline.sql`.
+The migrations themselves are the authoritative list, and later ones add to the baseline.
 
 ### 2. Verify
 
@@ -62,30 +62,6 @@ With `byo_postgres_url`, the ground manages nothing about your database, so the 
 | SSL required       | Missing `?sslmode=require` | BYO only: add SSL mode to your URL        |
 | Auth failed        | Wrong credentials          | Fix `terraform.tfvars`, then `unoverse deploy <cloud>`: it re-renders the env from the ground |
 | Extension denied   | Provider gates extensions  | BYO only: allow `vector` in your provider's console |
-
-## Relocating Data Between Databases
-
-To move data between database providers (e.g., Timescale → DigitalOcean):
-
-```bash
-cd ansible
-ansible-playbook playbooks/relocate-db.yml \
-  -e 'source_db=postgres://user:pass@source-host:port/db?sslmode=require' \
-  -e 'target_db=postgres://user:pass@target-host:port/db?sslmode=require'
-```
-
-This will:
-
-1. Install PostgreSQL 17 client tools (if needed)
-2. `pg_dump` the source database (read-only: source is not modified)
-3. Enable `vector` and `pg_stat_statements` extensions on target
-4. `pg_restore` to the target database
-5. Update `/opt/gravity/.env` with the new `DATABASE_URL`
-6. Restart the unoverse service
-
-**Note:** Timescale-specific errors (continuous_agg, bgw_job) during restore are expected and harmless, all application tables migrate correctly.
-
-After relocating, verify with `unoverse deploy test`.
 
 ## Next Steps
 

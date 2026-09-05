@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/nodes/narrate.schema.json",
+  "title": "api/narrate.yaml: a second model narrating progress",
+  "$ref": "api.schema.json#/properties/narrate"
+}

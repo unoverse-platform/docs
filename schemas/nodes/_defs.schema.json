@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://unoverse/nodes/_defs.schema.json",
+  "$id": "https://docs.unoverse.ai/schemas/nodes/_defs.schema.json",
   "title": "Shared node definitions",
   "description": "Fragments $ref'd by the sibling node schemas. Not authored directly. See docs/architecture/DECLARATIVE_NODES.md.",
   "definitions": {

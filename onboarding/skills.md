@@ -16,8 +16,7 @@ right folder, your project's own tokens. You do not have to learn the rules firs
 | `unoverse-create` | Everything you can author: components, apps, atoms, styles, themes, Agent skills, prompt blocks, nodes and workflows. It works out which one you are building, then applies the rules for it. |
 
 A skill points at the documentation rather than copying it, so the two cannot drift apart.
-The skills are pages of this site, under [Skills](/skills/index), so you can read every
-rule your agent applies.
+Everything a skill tells your agent is on a page of this site, which is where to read it.
 
 ## Install them
 
@@ -25,7 +24,7 @@ rule your agent applies.
 unoverse update
 ```
 
-The CLI downloads the skill pages from this site into `~/.claude/skills`, which is why
+The CLI downloads the skills from this site into `~/.claude/skills`, which is why
 Claude Code finds them in every folder you open. `unoverse create` and a first
 `unoverse studio` install them too, and every update keeps them current.
 
@@ -44,6 +43,6 @@ claude mcp add unoverse https://docs.unoverse.ai/mcp
 Build and preview everything your agent writes.
 </Card>
 
-<Card title="Read the skills" icon="book-open" href="/skills/index" horizontal>
-Every rule your agent follows, as pages of this site.
+<Card title="Build a component" icon="palette" href="/onboarding/create-a-component" horizontal>
+See what the skill writes, by writing one yourself.
 </Card>

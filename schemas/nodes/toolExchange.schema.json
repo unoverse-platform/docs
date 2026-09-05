@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/nodes/toolExchange.schema.json",
+  "title": "api/toolExchange.yaml: how this API expresses a tool call",
+  "$ref": "api.schema.json#/properties/toolExchange"
+}

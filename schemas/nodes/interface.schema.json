@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://unoverse/nodes/interface.schema.json",
+  "$id": "https://docs.unoverse.ai/schemas/nodes/interface.schema.json",
   "title": "Unoverse node interface",
   "description": "interface.yaml — the node's WIRING SURFACE, and nothing else. Everything another node, an agent, or a developer needs in order to connect to this one: what goes in, what comes out, what services it offers or consumes, and what credentials it needs.\n\nIt has its own file because this is the question asked most often about a node, and it should never require reading past a node's branding to answer. See docs/architecture/DECLARATIVE_NODES.md §5.",
   "type": "object",

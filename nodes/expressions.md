@@ -13,7 +13,8 @@ which one applies is decided by the field, never by the node.
 
 ## Handlebars
 
-`{{ }}` resolves against the run context. Registered helpers work anywhere Handlebars does,
+`{{ }}` resolves against the run context, which is everything the run knows: this node's
+settings, its credentials, the outputs of the nodes before it, and who is asking. Registered helpers work anywhere Handlebars does,
 so conditional prompt text is an ordinary `{{#if}}`:
 
 ```yaml
@@ -29,7 +30,7 @@ single most common reason a call arrives with a field missing. Array elements an
 keys are dot segments, never brackets: `records.0.Name`.
 
 **`prompt.<blockName>` is why a manifest never hard-codes instruction text.** Blocks live in
-`prompts/blocks/**/*.md`, are toggleable, and are camelCased from the filename, so
+`prompts/blocks/**/*.md` and are camelCased from the filename, so
 `markdown-guidelines.md` becomes `{{prompt.markdownGuidelines}}`. A block's words copied
 into a node is a fork that stops tracking the block.
 

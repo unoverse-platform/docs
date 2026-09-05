@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://unoverse/nodes/config.schema.json",
+  "$id": "https://docs.unoverse.ai/schemas/nodes/config.schema.json",
   "title": "Unoverse node config",
-  "description": "config.yaml \u2014 the node's settings form. `configSchema` is itself a JSON Schema: this file describes the SHAPE OF THAT SCHEMA, not the shape of a config. Canvas renders the form from it and the executor resolves {{ config.* }} against the saved values.\n\nThis is the file with the most churn: every new option lands here and nowhere else. Full reference for the options: docs-starter/nodes/config-schema.md.",
+  "description": "config.yaml — the node's settings form. `configSchema` is itself a JSON Schema: this file describes the SHAPE OF THAT SCHEMA, not the shape of a config. Canvas renders the form from it and the executor resolves {{ config.* }} against the saved values.\n\nThis is the file with the most churn: every new option lands here and nowhere else. Full reference for the options: docs-starter/nodes/config-schema.md.",
   "type": "object",
   "required": [
     "configSchema"
@@ -116,7 +116,7 @@
           "enum": [
             "modelTier"
           ],
-          "description": "An executor RESOLVER applied to this field's saved value just before the request is built. IMPLEMENTED resolvers only.\n\n`modelTier` is the migration of shared/models.ts resolveModel(): a saved workflow stores a concrete model id, and if that id is later retired the resolver falls back to the current best model in the same tier, warning the operator. Without it, replacing a model generation breaks every saved workflow that named an old id.\n\nThis is the \u00a72 line in miniature: the model LIST is description and lives in shared/models.yaml, while the fallback is computation and lives in the executor.",
+          "description": "An executor RESOLVER applied to this field's saved value just before the request is built. IMPLEMENTED resolvers only.\n\n`modelTier` is the migration of shared/models.ts resolveModel(): a saved workflow stores a concrete model id, and if that id is later retired the resolver falls back to the current best model in the same tier, warning the operator. Without it, replacing a model generation breaks every saved workflow that named an old id.\n\nThis is the §2 line in miniature: the model LIST is description and lives in shared/models.yaml, while the fallback is computation and lives in the executor.",
           "$comment": "Adding a value here without implementing it produces a node that lints clean and fails at run time."
         },
         "ui:field": {
@@ -137,7 +137,7 @@
             "checkboxes",
             "domainSelector"
           ],
-          "description": "IMPLEMENTED widgets only, verified against the renderer in apps/canvas/src/components/workflow/ConfigurationForm/FieldRenderer.jsx:\n\n  toggle          a boolean switch\n  select          an enum picker\n  textarea        a multi-line box (FieldRenderer.jsx:248). Pair with ui:options.rows\n  slider          a number, dragged rather than typed (:162)\n  checkboxes      an array of enum values, all visible at once (:208)\n  domainSelector  an array of hostnames (:195)\n\nNOT `color`. The retired Note node declared `ui:widget: color` and the renderer has never implemented it, so it fell through to a plain text input \u2014 a setting that looked bespoke and was not. Adding a value here without a branch in FieldRenderer reproduces exactly that: it lints clean and silently renders as something else."
+          "description": "IMPLEMENTED widgets only, verified against the renderer in apps/canvas/src/components/workflow/ConfigurationForm/FieldRenderer.jsx:\n\n  toggle          a boolean switch\n  select          an enum picker\n  textarea        a multi-line box (FieldRenderer.jsx:248). Pair with ui:options.rows\n  slider          a number, dragged rather than typed (:162)\n  checkboxes      an array of enum values, all visible at once (:208)\n  domainSelector  an array of hostnames (:195)\n\nNOT `color`. The retired Note node declared `ui:widget: color` and the renderer has never implemented it, so it fell through to a plain text input — a setting that looked bespoke and was not. Adding a value here without a branch in FieldRenderer reproduces exactly that: it lints clean and silently renders as something else."
         },
         "ui:dependencies": {
           "type": "object",

@@ -3,98 +3,55 @@ sidebarTitle: "Restart & Rebuild"
 title: "Runbook: Restart & Rebuild"
 ---
 
-Rebuild packages and restart services so the platform picks up your latest changes. Component nodes are definition-backed: they re-synthesize from `design/` at boot; there is no generation step, ever.
+What needs a restart, and what does not.
 
-## When To Use
-
-- **Marketplace installs and Studio publishes**: live immediately, no restart (database-driven)
-- **Platform image updates**: `unoverse deploy` (server) / `unoverse update` or `unoverse start --pull` (local)
-
-## Quick Commands
-
-### Local Development
-
-```bash
-# Full rebuild: builds all node packages, restarts services
-unoverse build
-
-# Build one package only
-unoverse build @unoverse-platform/my-package
-
-# Restart only: component nodes re-synthesize from design/ definitions at boot
-unoverse build
-
-```
-
-### Production Server
-
-Content does not ride deploys. Nodes, design, and prompts reach a server through
-Studio publish (over the API, live immediately) and the Marketplace (installed per
-item, database-driven). `unoverse deploy` moves platform images only:
-
-```bash
-unoverse deploy    # pull latest images + restart
-```
-
-## What Each Step Does
-
-| Step | Command | What happens |
-|------|---------|-------------|
-| **1. Install deps** | `npm install` | Installs workspace dependencies |
-| **2. Build packages** | `npm run build` | Compiles node packages (TypeScript → `dist/`) |
-| **3. Restart unoverse** | `unoverse build` | Reloads built packages, and re-synthesizes component nodes from `design/` definitions: the node catalog is loaded **at boot**, so a rebuild without a restart appears to do nothing |
-
-## Which change needs which step?
+## Nothing you author needs one
 
 | You changed | Do |
 |---|---|
-| A newly published node (from Studio) | nothing: live on the next workflow run |
-| An **existing** component/app's look (`design/`) | nothing: definitions are read live; hard-refresh the client |
-| A **new** component, or props/structure changes (`design/`) | `unoverse build` |
-| A skill or prompt block (`prompts/`) | `unoverse build` |
+| A node, component, app, skill or block, through `unoverse deploy studio` | Nothing. It is live when the deploy finishes |
+| Something installed from the marketplace | Nothing. It is live when the install finishes |
+| The platform images | Update them, below |
 
-## Manual Step-by-Step (when CLI commands aren't enough)
+## Update the platform images
 
 ```bash
-# 1. Install dependencies
-npm install
+# On a server
+unoverse deploy
 
-# 2. Build all node packages
-npm run build
-
-# 3. Restart the service that loads packages (the workflow engine runs
-#    in-process in unoverse, so one restart covers everything: component
-#    nodes re-synthesize from design/ at this boot)
-unoverse build
-
-# 4. Verify
-unoverse check
+# On this machine
+unoverse start --pull
 ```
 
-## Nuclear Restart (full teardown + rebuild)
+Both pull the latest images and restart the services.
+
+## Restart a service
+
+```bash
+docker compose restart unoverse
+```
+
+The workflow engine runs inside the unoverse container, so that one restart covers it.
+
+## Full teardown and start
 
 When things are truly stuck:
 
 ```bash
 unoverse stop
-npm install
-npm run build
 unoverse start
 ```
-
-`unoverse start` also rebuilds the universal component-node package in-container, so a cold start always runs fresh executor code.
 
 ## Verify
 
 ```bash
-# Check all services are running
 unoverse check
+```
 
-# Full health check
-unoverse check
+Services, schema and environment. To count the nodes the platform loaded, from inside the
+container, since `:4106` is Docker-internal:
 
-# Check nodes loaded in unoverse (:4106 is Docker-internal and :4105 /plugins
-# is JWT-gated, so count from inside the container)
+```bash
 docker compose exec -T unoverse node -e \
   "fetch('http://127.0.0.1:4106/nodes').then(r=>r.json()).then(d=>console.log((d.nodes||[]).length)).catch(()=>console.log(0))"
 ```
@@ -103,11 +60,9 @@ docker compose exec -T unoverse node -e \
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
-| New component not in **canvas** | unoverse not restarted since the definition was added | `unoverse build` |
-| Node shows in **canvas** but errors | Package not built | `unoverse build` |
-| Component renders old version | Client caching | hard-refresh the browser |
-| `nodes: 0` in status | unoverse didn't load packages | Check `docker compose logs unoverse` |
-| Build fails | Dependencies missing | `npm install`, then `unoverse build` |
+| A deployed node or component is not in **canvas** | The deploy did not finish, or hit a lint error | Re-run `unoverse deploy studio` and read its output |
+| A component renders its old version | The browser cached it | Hard-refresh |
+| `nodes: 0` | unoverse did not load its packages | `unoverse logs unoverse` |
 
 ## Related
 

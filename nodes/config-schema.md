@@ -9,8 +9,6 @@ calls read the saved values as `{{ config.<field> }}`.
 It is the file you touch most. Every new option a node grows lands here and nowhere else.
 
 ```yaml config.yaml
-$schema: https://docs.unoverse.ai/schemas/nodes/config.schema.json
-
 configSchema:
   type: object
   required: [model]
@@ -177,11 +175,11 @@ chrome, injected into every runnable node's form, and declaring either yourself 
 error. [Who can run it](/nodes/who-can-run-it) covers how your floor and the builder's
 controls resolve together.
 
-## The rest of the vocabulary
+## Other keys you will meet
 
 | Key | Does |
 |---|---|
-| `ui:order` | The order fields appear in. Lint warns about any field you leave out |
+| `ui:order` | The order fields appear in. Lint refuses a name that is not a field |
 | `ui:widget: toggle` | A switch instead of a checkbox |
 | `ui:widget: select` | A dropdown where the default control would not be one |
 | `ui:field: textarea` | A multi-line box |
@@ -189,6 +187,8 @@ controls resolve together.
 | `ui:field: code` | A code editor |
 | `ui:hidden` | Keeps the field in the schema and out of the form |
 | `required` | Named at the `configSchema` level, not on the field |
+
+The [reference](/reference/node-config) lists every `ui:` key.
 
 ## When it goes wrong
 

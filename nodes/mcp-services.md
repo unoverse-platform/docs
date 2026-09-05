@@ -90,19 +90,10 @@ multi-turn by definition. Lint enforces that.
 ### What the exchange describes
 
 The platform counts the turns and runs the tools. The manifest describes the wire format,
-because every API expresses the same idea differently.
-
-| Key | Says |
-|---|---|
-| `tool` | how one tool is offered to the model |
-| `toolsInto` | which request field the tool list goes in |
-| `call` | how a tool call arrives, and how to read its id, name and arguments |
-| `result` | how one result goes back |
-| `resultsInto` | which request field results go in |
-| `choice`, `choiceInto` | whether the model is free to pick |
-| `continuity` | how one turn chains to the next |
-| `maxTurns` | how many turns before it stops |
-| `stuckAfterRepeats` | how many identical calls count as stuck |
+because every API expresses the same idea differently: how a tool is offered to the model
+and which request field the list goes in, how a call arrives and how to read its name and
+arguments, how a result goes back, and how one turn chains to the next. The
+[reference](/reference/node-api) lists every key.
 
 That is a lot to write per node, so **put it in `shared/` once and `$ref` it**. Every node
 for the same API imports the same protocol, and local keys layer on top.
@@ -144,10 +135,6 @@ Include it when:
    the error already carries the new hash" saves a wasted call.
 4. **Show sequences.** The value is in the choreography, not the inventory.
 5. **Keep it short.** Under a hundred lines, because it is in the prompt on every turn.
-
-Instructions follow the same lifecycle as the tools they came with. Wired on the canvas, they
-last the session. Discovered through **spatial**, they are replaced when a new search returns
-a different set.
 
 Agent skills are a different thing, authored in `prompts/skills/` and discovered at run time.
 `instructions` is part of the MCP schema and travels with the tools.

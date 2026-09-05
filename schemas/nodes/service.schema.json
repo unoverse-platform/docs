@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/nodes/service.schema.json",
+  "title": "api/service.yaml: methods offered over a service edge",
+  "$ref": "api.schema.json#/properties/service"
+}

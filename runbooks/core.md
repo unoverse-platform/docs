@@ -3,7 +3,7 @@ sidebarTitle: "Core Services"
 title: "Runbook: Core Services"
 ---
 
-Deploy the core Gravity Platform services to a VM.
+Deploy the core unoverse services to a VM.
 
 ## Services Deployed
 
@@ -42,12 +42,9 @@ A platform team can drive Terraform directly instead
 
 ### 2. Run Core Platform Installation
 
-The same `unoverse deploy` continues straight into this once the ground is up. To re-run
-this phase on its own:
-
-```bash
-unoverse deploy init
-```
+The same `unoverse deploy` continues straight into this once the ground is up. It knows a
+server it has not set up yet, and runs the first-time install by itself; there is no
+separate command for it.
 
 One command, three phases: installs Docker, pulls DOCR images, and starts every service (unoverse, memory, **canvas**, umap, Dozzle); sets up the database; and verifies connectivity. Hardening is a deliberate follow-up (`unoverse deploy harden`, [harden](/runbooks/harden)) when a universe graduates from POC. The CLI reads the deploy target from your ground's rendered configuration and generates a temporary Ansible inventory on every run, so there is no inventory file to maintain.
 
@@ -66,21 +63,21 @@ unoverse deploy test
 ## Expected Output
 
 ```
-GRAVITY PLATFORM DEPLOYED
 ============================================
-Host: gravity-prod (<YOUR_VM_IP>)
+UNOVERSE PLATFORM DEPLOYED
+============================================
+Host: universe-prod (203.0.113.10)
 
 Service Health:
-  - Unoverse:      OK
-  - Memory:        OK
-  - Canvas:        OK
+  - Unoverse (:4105):  OK
+  - Engine   (:4101):  OK
+  - Memory   (:4104):  OK
 
 Access URLs:
-  - Canvas:  http://<YOUR_VM_IP>:3001
-  - API:     http://<YOUR_VM_IP>:4105
-
-Internal Only (SSH tunnel required):
-  - Memory:  http://localhost:4104/dashboard
+  - Canvas:    http://203.0.113.10:3001
+  - API:       http://203.0.113.10:4105
+  - Memory:    http://203.0.113.10:4104/dashboard
+============================================
 ```
 
 > **Memory dashboard is internal-only.** Access via SSH tunnel: `ssh -L 4104:localhost:4104 root@<VM_IP>` then open `http://localhost:4104/dashboard`. It is never exposed through the load balancer.
@@ -89,12 +86,11 @@ Internal Only (SSH tunnel required):
 
 | Issue | Cause | Fix |
 | ------------------- | ---------------- | ---------------------------------------------- |
-| DOCR login failed | Invalid token | Get a new DOCR token from your Gravity admin |
+| DOCR login failed | Invalid token | Get a new DOCR token from your unoverse admin |
 | Service unhealthy | Missing env vars | Check `/opt/gravity/.env` on the VM (placed there by deploy) |
 | Port already in use | Previous install | Run `docker compose down` first |
-| `Timeout (12s) waiting for privilege escalation prompt` | `ansible_become_password` set to empty string in inventory | Remove `ansible_become_password` and `ansible_become_flags` from inventory entirely: cloud default users (azureuser, ubuntu) have passwordless sudo and need no password |
 
 ## Next Steps
 
 - [database.md](/runbooks/database) - Configure database connection
-- Your own nodes, design, and prompts arrive via Studio publish or the Marketplace (never via deploy)
+- Your own nodes, design, and prompts arrive through `unoverse deploy studio` or the marketplace, never through this deploy

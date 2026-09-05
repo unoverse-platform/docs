@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://unoverse/nodes/node.schema.json",
+  "$id": "https://docs.unoverse.ai/schemas/nodes/node.schema.json",
   "title": "Unoverse node",
   "description": "node.yaml — what this node IS: its identity, its kind, and how it is discovered. The only required file in a node folder.\n\nThe wiring surface lives next door in interface.yaml, so \"what can I connect to this?\" is answered without reading past the node's branding. config/api/test/interface may each be inlined here instead of living in their own file, but never both (that is a lint error, not a merge). See docs/architecture/DECLARATIVE_NODES.md §5.",
   "type": "object",
@@ -89,23 +89,31 @@
         "cacheable": {
           "description": "Output may be MEMOIZED: the engine may serve a prior run's output when the fingerprint (type + version + RESOLVED config + credential ref + scope) matches.\n\nSet ONLY for idempotent side-effect-free READS (search, scrape, fetch-by-id, pure transform). NEVER for effectful nodes (send, write, post, charge) where reuse silently skips the side effect, and NEVER for non-deterministic ones (LLM completions, time or random dependent) where re-running is the correct behaviour. Memoization is off engine-wide by default; this flag only makes the node eligible.\n\nOBJECT FORM, for nodes whose config carries a VOLATILE field (a presigned/expiring URL) over content whose identity arrives on an input (an etag). `ignore` drops the named top-level resolved-config fields from the fingerprint; `key` names input leaf fields (dot-suffix match, e.g. \"etag\" or \"file.etag\") the engine collects from the resolved inputs as the content's identity. If a key field collects NOTHING on a run, that run is not cached — no identity, no reuse. Declaring the object form IS the opt-in.",
           "oneOf": [
-            { "type": "boolean" },
+            {
+              "type": "boolean"
+            },
             {
               "type": "object",
               "properties": {
                 "ignore": {
                   "type": "array",
-                  "items": { "type": "string" },
+                  "items": {
+                    "type": "string"
+                  },
                   "description": "Top-level resolved-config fields excluded from the fingerprint because they are volatile, not identity (a presigned URL that changes every run). Every OTHER config field still busts the cache."
                 },
                 "key": {
                   "type": "array",
-                  "items": { "type": "string" },
+                  "items": {
+                    "type": "string"
+                  },
                   "minItems": 1,
                   "description": "Input leaf fields that identify the content, matched by dot-suffix against every leaf path in the resolved inputs (wiring-independent: \"etag\" matches inputs.file.<anyNode>.file.etag). All matches, sorted by path, enter the fingerprint. A key that matches nothing disables caching for that run."
                 }
               },
-              "required": ["key"],
+              "required": [
+                "key"
+              ],
               "additionalProperties": false
             }
           ]

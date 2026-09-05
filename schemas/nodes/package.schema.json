@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://unoverse/nodes/package.schema.json",
+  "$id": "https://docs.unoverse.ai/schemas/nodes/package.schema.json",
   "title": "Unoverse node package",
-  "description": "package.yaml \u2014 the envelope for a folder of nodes. Replaces the `gravity` block in package.json for packages that no longer ship code. See docs/architecture/DECLARATIVE_NODES.md \u00a75.",
+  "description": "package.yaml — the envelope for a folder of nodes. Replaces the `gravity` block in package.json for packages that no longer ship code. See docs/architecture/DECLARATIVE_NODES.md §5.",
   "type": "object",
   "required": [
     "name",
@@ -61,7 +61,7 @@
         "type": "string",
         "pattern": "^(\\*$|(\\*\\*\\.|\\*\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+$)"
       },
-      "description": "The ONLY hosts this package's nodes may call. The executor refuses any other, and lint refuses a request URL outside it.\n\nThis is the control that makes a manifest safe to accept from someone else. A manifest cannot execute, but it CAN say \"POST this credential to evil.example\", and that is exfiltration without a line of code. Bounding allowedHosts means a package's secrets can only ever reach hosts it declared in writing, and the declaration is one short reviewable list at install time.\n\nSECURITY.md draws the line as: a NODE is trusted code bounded by provenance; a TEMPLATE EXPRESSION is untrusted data bounded by having no credentials in scope. A manifest node is neither \u2014 it arrives as data but holds a credential and a URL. AllowedHosts is its boundary.\n\n`*.` matches ONE subdomain level, e.g. \"*.slack.com\" reaches api.slack.com but not a.b.slack.com.\n\n`**.` matches ANY depth, and is written with two stars because it is a deliberately weaker claim the author should have to make on purpose. AWS forced it: `dynamodb.us-east-1.amazonaws.com` is two labels deep and an S3 bucket is three, since the region AND the bucket are part of the host. Listing every region defeats itself the day AWS adds one, and a bucket name comes from config so it cannot be listed at all. Still bounded: \"**.amazonaws.com\" reaches any AWS host and nothing else.\n\n`*` alone means ANY HOST, and it applies ONLY to calls that send no credential. Some nodes legitimately fetch a url a person supplies (an image for a model to look at, a document to read) and that url cannot be declared in advance. It is safe exactly there: this boundary exists to stop exfiltration, and a call with no `auth` block has no credential to leak. Non-https is still refused, so cloud metadata and plaintext internal services stay out of reach, and the moment a call carries a credential the wildcard stops matching and the declared list applies.",
+      "description": "The ONLY hosts this package's nodes may call. The executor refuses any other, and lint refuses a request URL outside it.\n\nThis is the control that makes a manifest safe to accept from someone else. A manifest cannot execute, but it CAN say \"POST this credential to evil.example\", and that is exfiltration without a line of code. Bounding allowedHosts means a package's secrets can only ever reach hosts it declared in writing, and the declaration is one short reviewable list at install time.\n\nSECURITY.md draws the line as: a NODE is trusted code bounded by provenance; a TEMPLATE EXPRESSION is untrusted data bounded by having no credentials in scope. A manifest node is neither — it arrives as data but holds a credential and a URL. AllowedHosts is its boundary.\n\n`*.` matches ONE subdomain level, e.g. \"*.slack.com\" reaches api.slack.com but not a.b.slack.com.\n\n`**.` matches ANY depth, and is written with two stars because it is a deliberately weaker claim the author should have to make on purpose. AWS forced it: `dynamodb.us-east-1.amazonaws.com` is two labels deep and an S3 bucket is three, since the region AND the bucket are part of the host. Listing every region defeats itself the day AWS adds one, and a bucket name comes from config so it cannot be listed at all. Still bounded: \"**.amazonaws.com\" reaches any AWS host and nothing else.\n\n`*` alone means ANY HOST, and it applies ONLY to calls that send no credential. Some nodes legitimately fetch a url a person supplies (an image for a model to look at, a document to read) and that url cannot be declared in advance. It is safe exactly there: this boundary exists to stop exfiltration, and a call with no `auth` block has no credential to leak. Non-https is still refused, so cloud metadata and plaintext internal services stay out of reach, and the moment a call carries a credential the wildcard stops matching and the declared list applies.",
       "examples": [
         [
           "api.openai.com"
@@ -133,7 +133,7 @@
         },
         "poll": {
           "type": "boolean",
-          "description": "True when a node waits on an asynchronous JOB: start it, then ask until it is done. On an executor without it the node settles on the START reply, which is a receipt carrying a job id, and emits that as its answer \u2014 every downstream field reads empty and nothing errors."
+          "description": "True when a node waits on an asynchronous JOB: start it, then ask until it is done. On an executor without it the node settles on the START reply, which is a receipt carrying a job id, and emits that as its answer — every downstream field reads empty and nothing errors."
         },
         "encoding": {
           "type": "array",
@@ -145,7 +145,7 @@
               "ndjson"
             ]
           },
-          "description": "Body encodings this package's nodes use. Declared like auth and transport, and for the same reason: on an executor without one, the body is sent as plain JSON instead. That is not an error anywhere \u2014 the vendor simply rejects a shape it did not expect, or worse accepts it and ignores the file, so an upload silently transcribes nothing."
+          "description": "Body encodings this package's nodes use. Declared like auth and transport, and for the same reason: on an executor without one, the body is sent as plain JSON instead. That is not an error anywhere — the vendor simply rejects a shape it did not expect, or worse accepts it and ignores the file, so an upload silently transcribes nothing."
         },
         "renderComponents": {
           "type": "boolean",

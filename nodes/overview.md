@@ -14,13 +14,15 @@ There is a marketplace of nodes. When none of them suits your situation, build y
 A node you build is a folder of YAML files. You describe the API call, and the platform
 makes it.
 
-[Anatomy of a node](/nodes/manifest-nodes) is the place to start.
+Never built one? [Create your first node](/onboarding/create-your-first-node) walks a real
+one from an empty folder to a run. Then [Anatomy of a node](/nodes/manifest-nodes) is the
+place to start.
 
 ## The shape of a node
 
 <Tree>
   <Tree.Folder name={<><b>nodes/&lt;package&gt;</b> <span className="tree-note">in your studio project workspace</span></>} defaultOpen>
-    <Tree.File name={<><b>package.yaml</b> <span className="tree-note">the package envelope</span></>} />
+    <Tree.File name={<><b>package.yaml</b> <span className="tree-note">what the package is and may call</span></>} />
     <Tree.Folder name={<><b>credentials</b> <span className="tree-note">the credentials its nodes ask for</span></>} />
     <Tree.Folder name={<><b>shared</b> <span className="tree-note">fragments more than one node reuses</span></>} />
     <Tree.Folder name="nodes" defaultOpen>
@@ -33,7 +35,7 @@ makes it.
           <Tree.File name={<><b>events.yaml</b> <span className="tree-note">everything that leaves it</span></>} />
           <Tree.File name={<><b>service.yaml</b> <span className="tree-note">methods other nodes call</span></>} />
         </Tree.Folder>
-        <Tree.File name={<><b>test.yaml</b> <span className="tree-note">a fixture that runs</span></>} />
+        <Tree.File name={<><b>test.yaml</b> <span className="tree-note">sample data to run it with</span></>} />
       </Tree.Folder>
     </Tree.Folder>
   </Tree.Folder>
@@ -47,12 +49,15 @@ One folder is one node. The package around it holds anything its nodes share.
 | `credentials/` | The credentials its nodes ask for. The shape of each one, never a value |
 | `shared/` | Fragments more than one node reuses, such as a base URL or a list of models |
 | `node.yaml` | What the node is: its name, colour, and the words that decide when an Agent picks it |
-| `interface.yaml` | What it connects to: its inputs, its outputs, and the credentials it needs |
+| `interface.yaml` | What it connects to: its inputs and outputs, the dots on the node a line attaches to, and the credentials it needs |
 | `config.yaml` | The settings form someone fills in on the **canvas** |
 | `api/` | What the node calls, what comes out, and what it offers to other nodes |
-| `test.yaml` | Sample settings and inputs, so you can run the node for real before wiring it up |
+| `test.yaml` | Sample settings and inputs, so you can run the node for real before wiring it up. The docs call this a fixture |
 
-Only `node.yaml` is required. A small node can hold everything in that one file.
+A node that calls a service needs four of these: `node.yaml`, `api/run.yaml`,
+`api/events.yaml` and `test.yaml`. Lint refuses a node with calls but no events table, and
+a node with no sample data, because neither can be run. Everything except `api/` can be
+written inside `node.yaml` instead of its own file, so a small node can be two files.
 
 ### Inside `api/`
 
@@ -67,9 +72,22 @@ One file per job, and a node uses the ones it needs.
 | `narrate.yaml` | A second, cheaper model writing a status line while the main call runs |
 
 A node the workflow triggers has `run.yaml` and `events.yaml`. A node that exists to be
-called by other nodes has `service.yaml` instead, and no outputs at all. Some have both.
+called by other nodes has `service.yaml` instead, and no outputs at all. Some have both. A
+voice node adds `audio.yaml`, and the [reference](/reference/node-api) lists every file.
 
 [Anatomy of a node](/nodes/manifest-nodes) walks through each of them with a real example.
+
+## Which files your node needs
+
+| Your node | Files |
+|---|---|
+| Calls one API and answers | `node.yaml`, `interface.yaml`, `config.yaml`, `api/run.yaml`, `api/events.yaml`, `test.yaml` |
+| Streams its reply | The same, with `transport: sse` on the last call and `match` on its events rows |
+| Is called by other nodes, not by the workflow | `node.yaml`, `interface.yaml`, `api/service.yaml`, `test.yaml`. No outputs, no `events.yaml` |
+| Hands tools to an Agent | The service shape above, with an `mcp` connector in `interface.yaml` |
+| Needs a key | Any of the above, plus one file in the package's `credentials/` |
+
+Every node's package carries `package.yaml` with the hosts its nodes may call.
 
 ## How you build one
 

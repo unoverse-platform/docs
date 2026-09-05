@@ -53,7 +53,8 @@ Walk the pages and accumulate the results.
 names the query parameter it goes back as, and the first request carries none.
 
 For a numbered API use `strategy: page`, which also needs `size` so the platform can tell a
-full page from the last one.
+full page from the last one. `strategy: offset` counts records instead of pages. `in: body` sends the page number in the
+request body for an API that reads it there rather than from the query.
 
 **The reply becomes `{ items, pages, truncated }`**, not the last page's body. The
 accumulation is the answer, and handing back the final page would quietly lose the rest.
@@ -109,10 +110,12 @@ import works this way.
     until: "return response.status === 'completed'"
     failed: "return response.status === 'failed'"
     message: "return response.error"
-    url: "https://api.example.com/jobs/{{ calls.crawl.id }}/status"
+    url: "return 'https://api.example.com/jobs/' + response.jobId"
     intervalMs: 2000
     maxAttempts: 90
 ```
+
+`url` is an expression over the start reply, which is where the job id is.
 
 **The reply is the final status payload, not the start reply.** The start reply is a receipt
 carrying a job id. Handing that back would give `events` a handle where it expected the
@@ -267,11 +270,15 @@ requires:
   credential: [bearer]
   transport: [json]
   paginate: [cursor]
+  chunk: true
+  poll: true
   state: [read, merge]
-  loop: [open, read, advance]
 ```
 
-Publishing refuses the package where the universe cannot satisfy it. Without that, a
+`paginate`, `state` and `loop` name the strategies or operations used. `chunk` and `poll`
+are switches.
+
+Lint refuses a node that uses a capability its package does not list. Without that, a
 paginated call would fetch one page and stop, a cache would look permanently cold, and a
 queue would never drain, with nothing anywhere reporting it.
 

@@ -18,15 +18,15 @@ service, open it on the **Nodes** screen in **studio**.
 |---|---|
 | `api must be a FOLDER` | Split `api.yaml` into `api/run.yaml` and `api/events.yaml` |
 | `is retired: this is api/run.yaml, a LIST` | Make it a list, each entry starting `- name:` |
-| `"api" is defined in api/ and node.yaml` | A section lives in one place. Delete one |
+| `is defined in api/ and in node.yaml. Pick one; this is never a merge` | A section lives in one place. Delete one |
 | `has no testData` | Add `test.yaml`, or a `test:` block in `node.yaml` |
 | `events rows are ordered X but the connectors are Y` | Reorder the rows to match `interface.yaml` |
 | `emits to "x", which is not a declared output` | The row names a connector that does not exist |
-| `output "x" is declared but nothing emits to it` | Add a row, or drop the output |
+| `output "x" is declared but no events row emits to it` | Add a row, or drop the output |
 | `needs credential "x" but no credentials/x.yaml exists` | Add the credential file to the package |
 | `request.url is not https` | A credential must not travel in clear text |
-| `capability is declared but not implemented` | Use one that exists, or ask for it to be built |
-| `enumNames is a different length from enum` | They are positional |
+| `uses transport "x" but package.yaml requires.transport does not list it` | Add it to `requires` in `package.yaml`. The same rule covers credential schemes and state operations |
+| `enum has 3 values but enumNames has 2` | They are positional |
 | `ui:order names a field that does not exist` | A rename left the list behind |
 
 ## The node runs but nothing happens

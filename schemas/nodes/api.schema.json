@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://unoverse/nodes/api.schema.json",
+  "$id": "https://docs.unoverse.ai/schemas/nodes/api.schema.json",
   "title": "Unoverse node API call",
   "description": "api.yaml — the upstream call this node makes, and how its response maps onto the node's outputs. This is the file that replaces an executor. NAMED api, not service: `service` already means serviceConnectors / isService / MCP providers / /service-call in this platform. See docs/architecture/DECLARATIVE_NODES.md §8.\n\nEVERY enum below is the EXECUTOR'S CAPABILITY LIST. A manifest may only name a capability that is already implemented in code. Adding a value here without implementing it produces a node that lints clean and fails at run time, and allowing a manifest to name arbitrary code would end the safety property this whole format exists for (§2).\n\nA node is reached two ways, and they never cross. The GRAPH RUNS it: `run` is the ordered list of calls it makes, and `events` says what lands on its output connectors. Or a SERVICE CALLS it ad-hoc, exposed as MCP: `service` holds those methods, each with its own list of calls, each handing one value straight back to the caller rather than touching a connector. A pure service node has only `service`.\n\nCalls are ALWAYS a `run` list, even when there is one of them. There is no `request` key.",
   "type": "object",

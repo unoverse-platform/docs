@@ -45,57 +45,59 @@ docker compose logs --tail=50 canvas
 ## Expected Output
 
 ```
+============================================
 PLATFORM HEALTH CHECK
 ============================================
-Host: gravity-prod (<YOUR_VM_IP>)
+Host: universe-prod (203.0.113.10)
 
 ── Infrastructure ──
 Docker: OK
 
 Containers:
-  gravity-unoverse running Up 2 hours
-  gravity-memory running Up 2 hours
-  gravity-canvas running Up 2 hours
-  gravity-umap running Up 2 hours
+  unoverse   Up 2 hours
+  memory     Up 2 hours
+  canvas     Up 2 hours
+  umap       Up 2 hours
 
 Restarting: NONE
 
 ── Ports ──
   - Canvas (3001): OK
   - Unoverse (4105): OK
-  - Engine (4101, served by unoverse): OK
+  - Engine (4101): OK
   - Memory (4104): OK
 
 ── External Dependencies ──
 Redis: REACHABLE
-  host=your-redis.db.ondigitalocean.com port=25061
 Database: REACHABLE
-  host=your-db.db.ondigitalocean.com port=25060
 
 ── Health Endpoints ──
   - Unoverse: OK
-  - Workflow engine: OK
+  - Engine: OK
   - Memory: OK
 
+── UMAP (Docker DNS) ──
+Unoverse → umap:5001: OK
+
 ── API Endpoints (read) ──
-  - GET /api/workflows: HTTP 200
-  - GET /api/nodes: HTTP 200
-  - GET /api/prompt-blocks: HTTP 200
+  - GET /api/workflows: 200
+  - GET /api/nodes: 200
 
 ── API Write Test ──
-  - POST /api/workflows: HTTP 201
+  - POST /workflows (engine): 201
 
-── Plugins & Packages ──
-Unoverse: nodes=97
-Packages: design-system openai flow skills ...
-packages_mounted=16
+── Prompt Blocks (internal :4106) ──
+  blocks=12
+
+── Node catalogue ──
+nodes=97
 
 ── Recent Errors in Logs ──
-No recent errors
+(none)
 
 ── Public Domain ──
-Domain: yourdomain.com
-  - https://api.yourdomain.com/health: HTTP 200
+Domain: example.org
+  - https://api.example.org/health: 200
 ============================================
 ```
 
@@ -108,7 +110,7 @@ Domain: yourdomain.com
 | Unoverse     | `http://localhost:4105/health` | 200 OK   |
 | Workflow engine (in-process on unoverse) | `http://localhost:4101/health` | 200 OK   |
 | Memory       | `http://localhost:4104/health` | 200 OK   |
-| UMAP         | `http://localhost:5001/health` | 200 OK   |
+| UMAP         | `http://umap:5001/health`, from inside the Docker network only | 200 OK   |
 
 > unoverse serves `/health` on its public port `:4105` (host-reachable); it has no `/ready` endpoint. Its internal runtime port `:4106` is never published, so there is nothing to health-check from the host. `:4101` is the workflow engine surface, it runs in-process inside the unoverse container.
 
@@ -127,8 +129,8 @@ Domain: yourdomain.com
 # Restart all services
 docker compose restart
 
-# Restart specific service
-unoverse build
+# Restart one service
+docker compose restart unoverse
 
 # View logs
 docker compose logs -f unoverse
@@ -145,14 +147,11 @@ Locally, the whole checklist is one command:
 unoverse check
 ```
 
-It verifies containers, health endpoints (`:4105`, `:4101`, `:4104`, `:5001`), the loaded node catalog, component bundles, and **canvas** reachability, the same checks `unoverse deploy test` runs against a server. If something is off, `unoverse check` diagnoses the environment.
+It checks that every service is up, that the database schema is current, and that the environment is complete.
 
 ## Next Steps
 
 If all tests pass, your deployment is complete!
 
-For ongoing operations:
-
-- **Upgrades:** `unoverse deploy` (pull latest images + restart)
-- **Backups:** `cd ansible && ansible-playbook playbooks/backup.yml`
-- **Rollback:** `cd ansible && ansible-playbook playbooks/rollback.yml`
+For ongoing operations, **upgrades** are `unoverse deploy`, which pulls the latest images
+and restarts.

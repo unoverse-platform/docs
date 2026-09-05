@@ -59,7 +59,7 @@ Every host any node in this package may reach, and part of the package's content
 </ResponseField>
 
 <ResponseField name="requires" type="object">
-Platform capabilities every node here needs. Publishing refuses where a universe cannot satisfy them.
+Every capability the package's nodes use: credential schemes, transports, and each looping capability. Lint refuses a node that uses one the package does not list.
 </ResponseField>
 
 <ResponseField name="publisher" type="string">

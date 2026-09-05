@@ -35,16 +35,15 @@ rather than typing settings each time.
 That is most of why `test.yaml` earns its place.
 
 ```yaml test.yaml
-$schema: https://docs.unoverse.ai/schemas/nodes/test.schema.json
-
 testData:
   config:
-    model: gpt-5.6
-    prompt: Explain what a workflow engine does, in two sentences.
-    maxTokens: 1200
+    model: gpt-5.6-terra
+    maxTokens: 256
+    systemPrompt: You are a concise assistant.
+    prompt: Write a one-sentence summary of what a workflow engine does.
   inputs:
     signal:
-      topic: workflow engines
+      question: What does a workflow engine do?
   expect:
     text: "return output.text.length > 0"
 ```
@@ -100,8 +99,8 @@ testData:
 
 ## What a run cannot tell you
 
-A node can pass here and still misbehave in a workflow, because the bench feeds it
-`testData.inputs` while a workflow feeds it whatever the edges carry.
+A node can pass here and still misbehave in a workflow, because the **Nodes** screen feeds
+it `testData.inputs` while a workflow feeds it whatever the edges carry.
 
 When that happens, the difference is almost always a Handlebars path: the node id or the
 output name does not match the edge you drew. [Troubleshooting](/nodes/troubleshooting)

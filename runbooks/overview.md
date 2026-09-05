@@ -23,7 +23,7 @@ interface underneath, and a platform team can drive it directly instead
 (`cd infra/digitalocean && terraform init && terraform apply`); deploy then picks up from
 the applied ground.
 
-Everything infrastructure is the ground's job and never a runbook's: TLS (DO managed Let's Encrypt / AWS ACM at the load balancer, no proxy software on the VM), DNS records, the cloud firewall (SSH and Dozzle admin-IP-only), Postgres (fresh, adopted, or BYO, see [database](/runbooks/database)), and Redis (always provisioned, TLS).
+Everything infrastructure is the ground's job and never a runbook's: TLS (DO managed Let's Encrypt / AWS ACM at the load balancer, no proxy software on the VM), DNS records, the cloud firewall (SSH and Dozzle admin-IP-only), Postgres (fresh by default; see [database](/runbooks/database)), and Redis (always provisioned, TLS).
 
 ### Sizes
 
@@ -39,7 +39,7 @@ Everything infrastructure is the ground's job and never a runbook's: TLS (DO man
 
 | Component      | Requirement                 | Notes                                                                |
 | -------------- | --------------------------- | -------------------------------------------------------------------- |
-| **PostgreSQL** | 14+                         | Terraform-provisioned by default; adopt or BYO via terraform.tfvars  |
+| **PostgreSQL** | 14+                         | Terraform-provisioned by default; the DigitalOcean ground can adopt or bring your own |
 | **Redis**      | 7+                          | Always Terraform-provisioned (managed, TLS)                          |
 | **Domain**     | DNS A records               | `api.<domain>` → the load balancer IP (Terraform prints it; can create the records too) |
 | **TLS**        | The ground's load balancer  | DO managed Let's Encrypt / AWS ACM; on-prem brings its own terminator (443 → :4105, idle ≥ 3600s) |
@@ -57,18 +57,16 @@ Everything infrastructure is the ground's job and never a runbook's: TLS (DO man
 # Everything: provision if needed, then install, database, verify
 unoverse deploy
 
-# Re-run first-time setup on its own, if you ever need to
-unoverse deploy init
-
 # When a universe graduates from POC: deliberate, never a default
 unoverse deploy harden   # SSH keys-only, fail2ban, auto security updates
 ```
 
-Each phase of `init` stays available on its own for re-runs: `deploy db`, `deploy test`.
+The first deploy of a server installs, sets up the database and verifies, end to end. Two
+of those phases can be re-run on their own: `unoverse deploy db` and `unoverse deploy test`.
 
 The CLI reads the deploy target from your ground's rendered configuration and generates a temporary Ansible inventory on every run, so there is no inventory file to maintain.
 
-Your own work (nodes, design, prompts) never rides a deploy: it arrives via Studio publish (over the API, live immediately) or the Marketplace (per item, database-driven).
+Your own work (nodes, design, prompts) never rides a deploy. It arrives through `unoverse deploy studio`, live immediately, or from the marketplace, one item at a time.
 
 ---
 
@@ -76,7 +74,7 @@ Your own work (nodes, design, prompts) never rides a deploy: it arrives via Stud
 
 | Runbook                                                                                                              | Description                                                                      | Command                     |
 | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | --------------------------- |
-| [core](/runbooks/core)                                                                                              | Deploy core app services                                                         | `unoverse deploy init` / `deploy` |
+| [core](/runbooks/core)                                                                                              | Deploy core app services                                                         | `unoverse deploy` |
 | [database](/runbooks/database)                                                                                      | Database modes, tables, relocation                                               | `unoverse deploy db`        |
 | [harden](/runbooks/harden)                                                                                          | Security hardening                                                               | `unoverse deploy harden`    |
 | [test](/runbooks/test)                                                                                              | Verify connectivity and health                                                   | `unoverse deploy test`      |

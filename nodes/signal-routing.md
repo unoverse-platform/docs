@@ -72,11 +72,34 @@ event it fires on, and it fires every time that event arrives.
 | `throttleMs`, `throttleChars` | emit at most this often. Nothing held back is lost, it is flushed at the end |
 | `from` | where the row fires from, when it is not the reply |
 
-`from: complete` fires once at the end, over everything already emitted. That is how a
-streaming node also produces a single settled value for downstream nodes to use.
+### Where a row fires from
 
-The other `from` values cover what leaves the node without ever being in the reply. `tool`
-is the result of a tool call. `narrator` is a status line written alongside the main work.
+`from` says where a row fires. `response` is the default, which is why most rows do not
+write it. `complete` fires once at the end, over everything already emitted, and is how a
+streaming node also produces one settled value.
+
+| `from` | Fires | What's in scope |
+|---|---|---|
+| `response` | a streamed event matching `match`, or the whole body when the transport settles | `response`, and earlier calls as `calls.<name>` |
+| `narrator` | each line the narrator writes | `narrator.line` |
+| `tool` | after a tool call RETURNS, with its result | `call.name`, `call.args`, `call.output` |
+| `complete` | once at the end, over everything emitted | `events` |
+
+`from: tool` exists because a tool's result is never in the HTTP stream. The tool loop
+produced it.
+
+**Two things are recorded without any row here**, because they are execution facts rather
+than node outputs:
+
+- **Every tool call** becomes a bar on the execution timeline the moment it returns, with
+ its arguments, its result, its duration, and whether it succeeded.
+- **Token usage** is read off the vendor's reply and summed across the turns of a run,
+ with nothing declared. The `usage` connector on a node that declares one is a different thing:
+ the node choosing to hand the block downstream as data.
+
+Both are fire and forget. Recording never slows a run and never fails one. A run from the
+**Nodes** screen has no execution to attach to, so it records nothing.
+
 
 ## Reading what arrives
 
