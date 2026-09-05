@@ -75,8 +75,8 @@ That second check matters because a host can itself come from a Handlebars strin
 finished URL can be judged.
 
 It is also what somebody accepts when you publish the package. Keep it short and keep it
-honest: a list of two hosts is read and approved in seconds, and a list that quietly grows
-is the one that gets questioned.
+honest. A list of two hosts is read and approved in seconds. A list that quietly grows is
+the one that gets questioned.
 
 ## `requires`: what the platform must support
 

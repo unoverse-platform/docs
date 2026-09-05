@@ -1,6 +1,6 @@
 ---
-sidebarTitle: "Config Schema"
-title: "Config Schema"
+sidebarTitle: "Config schema"
+title: "Config schema"
 ---
 
 `config.yaml` is the settings form. **canvas** renders it, someone fills it in, and your

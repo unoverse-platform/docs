@@ -143,7 +143,7 @@ region:
 
 ## Next steps
 
-<Card title="Config Schema" icon="sliders-horizontal" href="/nodes/config-schema" horizontal>
+<Card title="Config schema" icon="sliders-horizontal" href="/nodes/config-schema" horizontal>
 The settings form these values resolve into.
 </Card>
 

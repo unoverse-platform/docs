@@ -52,7 +52,7 @@ Four small files, and none of them is code.
   </ul>
 </div>
 
-[Anatomy of a Node](/nodes/manifest-nodes) covers each of those in full.
+[Anatomy of a node](/nodes/manifest-nodes) covers each of those in full.
 
 **Read a working one first.** Your project ships with sample nodes in `nodes/samples`, and
 **studio** lists them beside your own. Open one to see the same files you are about to write,
@@ -138,7 +138,7 @@ Each entry in `outputs` becomes a connector on the node. Downstream nodes read t
 A bigger node splits `interface` and `test` into their own files. This one is small, so they stay here.
 
 <Note>
-`whenToUse` decides whether the AI workflow builder can find your node at all. The catalog ranks it against the task being built, so lead with the outcome in plain words and keep it to one or two sentences. Describe what disqualifies your node as a property ("no settings to fill in"), and never name another node. The full guide is [Node Discoverability](/nodes/node-discoverability); read it before writing this field for a real node.
+`whenToUse` decides whether the AI workflow builder can find your node at all. The catalog ranks it against the task being built, so lead with the outcome in plain words and keep it to one or two sentences. Describe what disqualifies your node as a property ("no settings to fill in"), and never name another node. The full guide is [Node discoverability](/nodes/node-discoverability); read it before writing this field for a real node.
 </Note>
 
 </Step>

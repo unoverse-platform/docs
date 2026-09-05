@@ -5,17 +5,16 @@ title: "Nodes"
 
 A node is a service you drag onto the **canvas**. It connects an Agent to another system.
 
-There is a marketplace of nodes. When none of them suits your situation, you build your own,
-and this section is about building one.
+There is a marketplace of nodes. When none of them suits your situation, build your own.
 
 <Tip>
-**Check the marketplace first.** It ships with a library of ready-made nodes covering AI, Voice, Go To Market, Search, Web Scraping, Media & Design, Documents, Knowledge & Vectors, Storage & Data, Communication, Flow and Output. Adding one takes a click, and most of what an Agent needs is already there.
+**Check the marketplace first.** It ships with a library of ready-made nodes. They cover AI, Voice, Go To Market, Search, Web Scraping, Media & Design, Documents, Knowledge & Vectors, Storage & Data, Communication, Flow and Output. Adding one takes a click, and most of what an Agent needs is already there.
 </Tip>
 
 A node you build is a folder of YAML files. You describe the API call, and the platform
 makes it.
 
-[Anatomy of a Node](/nodes/manifest-nodes) is the place to start.
+[Anatomy of a node](/nodes/manifest-nodes) is the place to start.
 
 ## The shape of a node
 
@@ -70,7 +69,7 @@ One file per job, and a node uses the ones it needs.
 A node the workflow triggers has `run.yaml` and `events.yaml`. A node that exists to be
 called by other nodes has `service.yaml` instead, and no outputs at all. Some have both.
 
-[Anatomy of a Node](/nodes/manifest-nodes) walks through each of them with a real example.
+[Anatomy of a node](/nodes/manifest-nodes) walks through each of them with a real example.
 
 ## How you build one
 

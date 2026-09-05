@@ -1,16 +1,16 @@
 ---
-sidebarTitle: "Node Discoverability"
-title: "Node Discoverability"
+sidebarTitle: "Node discoverability"
+title: "Node discoverability"
 ---
 
-Write the four fields that decide whether your work is ever chosen. This page is the
-contract, and every other guide links here rather than restating it.
+Write the four fields that decide whether your work is ever chosen. Every other guide links
+here rather than restating the rules.
 
 **Nothing selects your artifact by name.** When an Agent needs something, it does not see
-your catalogue: it describes the job, and the platform returns a handful of candidates
+your catalogue. It describes the job, and the platform returns a handful of candidates
 ranked by how close their meta reads to that description. You are in that handful or you
-are invisible, and the failure is silent, because the thing works perfectly and is simply
-never reached for.
+are invisible. The failure is silent, because the thing works perfectly and is simply never
+reached for.
 
 The same contract covers **nodes, apps, components, templates and agent skills**. A node
 carries the fields in `node.yaml`; everything else carries them in its `manifest.yaml`.
@@ -51,7 +51,7 @@ Those nouns and verbs are what your `name` and `whenToUse` have to match. If you
 words are not in that sentence, your node loses to one whose are.
 
 **The opening dominates.** A `whenToUse` that starts "Hybrid MCP node, attach via a service
-edge…" is matched against wiring vocabulary rather than the job, so it ranks low and never
+edge…" is matched against wiring vocabulary rather than the job. It ranks low and never
 surfaces. Same node, same capability, invisible.
 
 ## The formula

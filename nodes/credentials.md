@@ -3,8 +3,8 @@ sidebarTitle: "Credentials"
 title: "Credentials"
 ---
 
-Most services want a key before they will answer. So most nodes need one, and this page is
-how yours gets it.
+Give your node the key a service wants, without the value ever touching your files. Most
+services want one before they answer, so most nodes need this.
 
 **The value never goes in your files.** Not in a config default, not in a `.example`, not
 commented out. Your node names the credential it needs, and that name is all your YAML ever
@@ -40,7 +40,7 @@ it, whoever set the run off. The credential never asks who is calling.
 
 That is precisely why the second question exists. Nothing about holding the key limits who
 may pull the trigger, so a node that does something serious has to say so separately.
-[Who Can Run It](/nodes/who-can-run-it) is that half.
+[Who can run it](/nodes/who-can-run-it) is that half.
 
 ## Three steps
 

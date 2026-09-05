@@ -1,6 +1,6 @@
 ---
-sidebarTitle: "Service Connectors"
-title: "Service Connectors"
+sidebarTitle: "Service connectors"
+title: "Service connectors"
 ---
 
 Most nodes pass data along a workflow. Some instead offer a capability that other nodes call
@@ -109,7 +109,7 @@ There are two.
 | `embedding` | turning text into vectors |
 | `mcp` | tools an Agent can choose to call |
 
-`mcp` is the larger of the two and has its own page: [MCP Services](/nodes/mcp-services).
+`mcp` is the larger of the two and has its own page: [MCP services](/nodes/mcp-services).
 
 A provider may also carry `instructions`, which tell an Agent how to use its tools well
 together. That is strategy, and it is separate from the description of each method.
@@ -125,7 +125,7 @@ together. That is strategy, and it is separate from the description of each meth
 
 ## Next steps
 
-<Card title="MCP Services" icon="wrench" href="/nodes/mcp-services" horizontal>
+<Card title="MCP services" icon="wrench" href="/nodes/mcp-services" horizontal>
 Handing an Agent tools it can choose to call.
 </Card>
 

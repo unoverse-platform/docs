@@ -1,13 +1,13 @@
 ---
-sidebarTitle: "Beyond One Request"
-title: "Beyond One Request"
+sidebarTitle: "Beyond one request"
+title: "Beyond one request"
 ---
 
-`api/run.yaml` is an ordered list of different calls. It can say "start, then check once",
-and it cannot say "check until".
+Walk pages, write in batches, wait on a job, or remember between runs. Each is one key on
+the call it belongs to, so it stays in the same ordered list as every other call.
 
-These are the tools for everything that is not one plain request. Each is a key on the call
-it belongs to, so they stay in the same ordered list as everything else.
+`api/run.yaml` on its own can say "start, then check once". It cannot say "check until".
+These keys are how you say it.
 
 | Capability | Use it when |
 |---|---|
@@ -28,7 +28,7 @@ can page through a lookup first.
 
 What decides `kind` is the **last** call's transport, because that is the node's answer.
 Every earlier call settles by definition, so an earlier step can do anything at all. See
-[Node Types](/nodes/node-types).
+[Node types](/nodes/node-types).
 
 ## The capabilities
 
@@ -58,8 +58,8 @@ full page from the last one.
 **The reply becomes `{ items, pages, truncated }`**, not the last page's body. The
 accumulation is the answer, and handing back the final page would quietly lose the rest.
 
-`truncated` is true when a limit stopped the walk while there was still more to fetch, so a
-consumer can tell "that is everything" from "that is the first hundred".
+`truncated` is true when a limit stopped the walk with more still to fetch. A consumer can
+tell "that is everything" from "that is the first hundred".
 
 There is a ceiling of 100 requests per call whatever `max` says, because an API that keeps
 returning the same cursor would otherwise loop forever.
@@ -87,8 +87,8 @@ Each slice is in scope as `batch`, so you describe one request and the platform 
 HubSpot takes 100, Salesforce 200.
 
 **The reply is `{ sent, batches, results, errors }`, and partial success is normal.** One
-rejected batch out of ten is neither a failed call nor a successful one, and the batches
-before it have already landed and cannot be taken back. A failing batch is recorded and the
+rejected batch out of ten is neither a failed call nor a successful one. The batches before
+it have already landed and cannot be taken back. A failing batch is recorded and the
 walk continues, so check `errors` rather than assuming all or nothing.
 
 There is a ceiling of 200 per batch whatever `size` says.
@@ -115,7 +115,7 @@ import works this way.
 ```
 
 **The reply is the final status payload, not the start reply.** The start reply is a receipt
-carrying a job id, and handing that back would give `events` a handle where it expected the
+carrying a job id. Handing that back would give `events` a handle where it expected the
 answer.
 
 **Always write `failed`.** Without it, a job that fails terminally is polled until it runs
@@ -187,9 +187,9 @@ no request.
 `{{ scope.nodeId }}` and `LoopEnd` passes the paired id from its own settings. The run is
 supplied by the platform, so a loop can never reach another execution's state.
 
-One capability rather than a handful of state operations, which is the point: expressing
-this by hand took eight different store operations between them, and the ordering lived in
-whoever wrote it.
+One capability rather than a handful of state operations, which is the point. Expressing
+this by hand took eight different store operations, and the ordering lived in whoever wrote
+it.
 
 ### `presign`
 

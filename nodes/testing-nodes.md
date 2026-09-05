@@ -1,6 +1,6 @@
 ---
-sidebarTitle: "Testing Nodes"
-title: "Testing Nodes"
+sidebarTitle: "Testing nodes"
+title: "Testing nodes"
 ---
 
 Run your node against the real service before you put it in a workflow. **studio** has a
@@ -60,9 +60,9 @@ Check every node in the workspace, with nothing running:
 unoverse lint
 ```
 
-It runs every static rule: an output nothing emits to, an events table out of connector
-order, a host missing from `allowedHosts`, a fixture that does not match the settings form.
-Each message names the rule it broke. `unoverse deploy studio` runs the same check before
+It runs every static rule. An output nothing emits to, an events table out of connector
+order, a host missing from `allowedHosts`, a fixture that does not match the settings form:
+each message names the rule it broke. `unoverse deploy studio` runs the same check before
 it sends anything, so a tick here is a tick there.
 
 ## Keys stay yours

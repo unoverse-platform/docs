@@ -1,6 +1,6 @@
 ---
-sidebarTitle: "Node Types"
-title: "Node Types"
+sidebarTitle: "Node types"
+title: "Node types"
 ---
 
 A node either answers once or keeps answering. Settle that first, because everything else
@@ -41,7 +41,7 @@ page through a list and then stream its reply.
 
 **Many requests is not many emissions.** Paging, batching, waiting on a job and remembering
 between runs all work on either kind and change neither. A node that walks forty pages still
-settles once if its last call settles. [Beyond One Request](/nodes/calls-that-loop) covers
+settles once if its last call settles. [Beyond one request](/nodes/calls-that-loop) covers
 them.
 
 ## A node that answers once

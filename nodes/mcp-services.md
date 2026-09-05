@@ -1,6 +1,6 @@
 ---
-sidebarTitle: "MCP Services"
-title: "MCP Services"
+sidebarTitle: "MCP services"
+title: "MCP services"
 ---
 
 MCP is how an Agent gets tools. A node offers tools, an Agent node calls them, and the two
@@ -120,8 +120,8 @@ When the API changes how a function call is expressed, exactly one file changes.
 pass and cannot call a tool at all.
 
 `stuckAfterRepeats` catches a different failure. The same tool with the same arguments three
-times is stuck, and `maxTurns` does not catch it, because a model calling many *different*
-tools forever is not stuck by that rule.
+times is stuck. `maxTurns` does not catch it, because a model calling many *different* tools
+forever is not stuck by that rule.
 
 ## Writing instructions
 

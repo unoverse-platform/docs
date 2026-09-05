@@ -3,7 +3,7 @@ sidebarTitle: "Troubleshooting"
 title: "Troubleshooting"
 ---
 
-One command and one screen answer most of it.
+One command and one screen answer most node problems.
 
 ```bash
 unoverse lint

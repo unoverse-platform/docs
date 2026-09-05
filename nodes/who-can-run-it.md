@@ -1,10 +1,10 @@
 ---
-sidebarTitle: "Who Can Run It"
-title: "Who Can Run It"
+sidebarTitle: "Who can run it"
+title: "Who can run it"
 ---
 
-A credential is your node's key to a service. This page is the other question: who is
-allowed to make your node run at all.
+Decide who is allowed to make your node run at all. A credential is the other direction,
+your node's key to a service, and the two are easy to confuse.
 
 Two directions, two keys, and it is worth keeping them apart from the start:
 
@@ -20,13 +20,13 @@ Outbound and inbound. This page is the inbound one.
 You are one of them. The other is whoever builds a workflow with your node in it, and they
 know something you cannot.
 
-**You set the floor, in `node.yaml`.** It is compulsory on every node. Not because most need
-protecting (most do not), but because a node that says nothing is indistinguishable from a
-node nobody thought about, and a reviewer cannot tell those apart.
+**You set the floor, in `node.yaml`.** It is compulsory on every node. Most nodes need no
+protecting. But a node that says nothing looks the same as a node nobody thought about,
+and a reviewer cannot tell those apart.
 
 There are three shapes. Each one is described first, then written.
 
-**1. Adds nothing, and this is almost every node.** The run arrived through a trigger, the
+**1. Adds nothing, and this is almost every node.** The run arrived through a trigger. The
 trigger already decided who was let in, and your node runs as that person. It does **not**
 mean public.
 
@@ -118,8 +118,8 @@ a string in.
 ## What you actually write
 
 `node.yaml` gets the floor. **That is all.** The builder's two controls are platform
-chrome: the platform injects them into every runnable node's settings form, after your
-own fields, so every box on every canvas carries them and no author writes them.
+chrome. The platform injects them into every runnable node's settings form, after your own
+fields. Every box on every canvas carries them, and no author writes them.
 
 The two field names, `authRequired` and `authRole`, are therefore **reserved**. A
 `config.yaml` declaring either is a lint error: the platform's definition supersedes a
@@ -172,7 +172,7 @@ change worth seeing before it goes live.
 
 ## Next steps
 
-<Card title="Config Schema" icon="sliders-horizontal" href="/nodes/config-schema" horizontal>
+<Card title="Config schema" icon="sliders-horizontal" href="/nodes/config-schema" horizontal>
 The settings form, and every field type it renders.
 </Card>
 

@@ -1,6 +1,6 @@
 ---
-sidebarTitle: "Connectors & Signals"
-title: "Connectors & Signals"
+sidebarTitle: "Connectors and signals"
+title: "Connectors and signals"
 ---
 
 Connectors are the dots on a node. Inputs on the left, outputs on the right, and the lines
@@ -75,9 +75,8 @@ event it fires on, and it fires every time that event arrives.
 `from: complete` fires once at the end, over everything already emitted. That is how a
 streaming node also produces a single settled value for downstream nodes to use.
 
-The other `from` values cover the cases where something leaves the node that was never in
-the reply at all: `tool` for the result of a tool call, and `narrator` for a status line
-written alongside the main work.
+The other `from` values cover what leaves the node without ever being in the reply. `tool`
+is the result of a tool call. `narrator` is a status line written alongside the main work.
 
 ## Reading what arrives
 
@@ -105,7 +104,7 @@ later, and a good name is the difference between `signal.crm1.contact` and
 
 `type` also decides how a wired field is written. A `string` field takes a Handlebars
 string, an `object` or `array` field takes a `return` expression.
-[Config Schema](/nodes/config-schema) covers both.
+[Config schema](/nodes/config-schema) covers both.
 
 ## Required, and what waiting means
 
@@ -128,9 +127,9 @@ runs once per item like any other step.
 
 That keeps a node simple: it takes what it is given, does one job, and emits.
 
-A service connector is a different thing entirely: it is a node calling another node on
+A service connector is a different thing entirely. It is a node calling another node on
 demand, rather than a value travelling along an edge, and it fires no outputs. See
-[Service Connectors](/nodes/service-connectors).
+[Service connectors](/nodes/service-connectors).
 
 ## When it goes wrong
 

@@ -1,28 +1,23 @@
 ---
-sidebarTitle: "Anatomy of a Node"
-title: "Anatomy of a Node"
+sidebarTitle: "Anatomy of a node"
+title: "Anatomy of a node"
 ---
 
-A node is a service you drag onto the **canvas**. It connects an Agent to another system.
-
-There is a marketplace of nodes. When none of them suits your situation, you build your own.
-
-A node you build is a folder of YAML files. You describe the API call, and the platform
-makes it.
+Build a node file by file, following a real one. The folder shape is on
+[Nodes](/nodes/overview).
 
 > Computation over the request belongs to the platform. Description of the service belongs
 > to you.
 
 Auth schemes, retries, SSE framing and Handlebars resolution are the platform's job, written
 once. Base URL, method, parameters, credentials and what comes out are yours, written as
-data. You name a capability and the platform performs it, and `unoverse lint` fails on a
-capability that does not exist, so you find out while you write rather than at run time.
+data. You name a capability and the platform performs it. `unoverse lint` fails on a capability
+that does not exist, so you find out while you write rather than at run time.
 
 ## Build and check
 
-You build a node in **studio**, on your own machine. It reads your files straight off disk,
-so there is no server to start and no database to connect to while you work, which is why
-it works offline.
+You build a node in **studio**, on your own machine. It reads your files straight off disk.
+There is no server to start and no database to connect to, so it works offline.
 
 | Step | Where |
 |---|---|
@@ -33,32 +28,7 @@ it works offline.
 
 A deployed node is live in that universe's node library as soon as the deploy finishes.
 
-## One folder is one node
-
-<Tree>
-  <Tree.Folder name={<><b>nodes/&lt;package&gt;</b> <span className="tree-note">in your studio project workspace</span></>} defaultOpen>
-    <Tree.File name={<><b>package.yaml</b> <span className="tree-note">name, category, allowedHosts, requires</span></>} />
-    <Tree.Folder name="credentials" defaultOpen>
-      <Tree.File name={<><b>&lt;name&gt;Credential.yaml</b> <span className="tree-note">one credential type</span></>} />
-    </Tree.Folder>
-    <Tree.Folder name="shared" defaultOpen>
-      <Tree.File name={<><b>endpoints.yaml</b> <span className="tree-note">fragments several nodes reuse</span></>} />
-      <Tree.File name={<><b>helpers.yaml</b> <span className="tree-note">named functions every expression can call</span></>} />
-    </Tree.Folder>
-    <Tree.Folder name="nodes" defaultOpen>
-      <Tree.Folder name="&lt;NodeName&gt;" defaultOpen>
-        <Tree.File name={<><b>node.yaml</b> <span className="tree-note">what it is: the only required file</span></>} />
-        <Tree.File name={<><b>interface.yaml</b> <span className="tree-note">what it connects to</span></>} />
-        <Tree.File name={<><b>config.yaml</b> <span className="tree-note">the settings form</span></>} />
-        <Tree.Folder name={<><b>api</b> <span className="tree-note">always a folder</span></>} defaultOpen>
-          <Tree.File name={<><b>run.yaml</b> <span className="tree-note">the calls it makes</span></>} />
-          <Tree.File name={<><b>events.yaml</b> <span className="tree-note">everything that leaves the node</span></>} />
-        </Tree.Folder>
-        <Tree.File name={<><b>test.yaml</b> <span className="tree-note">a fixture that runs</span></>} />
-      </Tree.Folder>
-    </Tree.Folder>
-  </Tree.Folder>
-</Tree>
+## Every file has a `$schema`
 
 Each file carries a `$schema` pointer, so your editor autocompletes every field and shows
 errors as you type. The schema descriptions are the field reference, so they cannot drift
@@ -74,9 +44,9 @@ from the format.
 | `api/` | one file per call, plus the events table | When the upstream API changes |
 | `test.yaml` | `testData` | Alongside config |
 
-`interface.yaml` is its own file for a different reason than the rest: it answers the
-question asked most about any node, "what can I connect to this?", and that should never
-mean scrolling past a logo URL.
+`interface.yaml` is its own file for a different reason. It answers the question asked most
+about any node: what can I connect to this? That answer should never mean scrolling past a
+logo URL.
 
 Every section except `api` may instead be inlined into `node.yaml`, so a simple node can
 be one file. Defining a section in two places is an error, never a merge.
@@ -110,7 +80,7 @@ capabilities:
 
 `auth` is compulsory on every node, and `required: false` is the usual answer. It says your
 node adds no requirement of its own, so the run reaches it as whoever the trigger admitted.
-It does not mean public. [Who Can Run It](/nodes/who-can-run-it) covers the other half,
+It does not mean public. [Who can run it](/nodes/who-can-run-it) covers the other half,
 which the person building the workflow sets.
 
 `whenToUse` is not documentation. The catalog embeds it and ranks it against what a
@@ -134,11 +104,10 @@ capabilities:
 
 Every config field you did not `ignore` still busts the cache. `key` fields are matched by
 dot suffix against the resolved inputs, so the declaration works whatever the upstream node
-is called; if a key field collects nothing on a run, that run is not cached.
+is called. If a key field collects nothing on a run, that run is not cached.
 
-`emitsExternally` is the other side of that coin, and you set it when your node's effect
-**cannot be undone**: it sends, posts, charges, or writes into somewhere outside the
-platform. A deleted scratch row can be undone and needs nothing; a delivered email cannot.
+`emitsExternally` is the other side of that coin. Set it when your node's effect **cannot be
+undone**: it sends, posts, charges, or writes somewhere outside the platform. A deleted scratch row can be undone and needs nothing; a delivered email cannot.
 
 ```yaml node.yaml
 capabilities:
@@ -147,11 +116,11 @@ capabilities:
 ```
 
 Test runs withhold these nodes. `runTest`, `startTestRun` and `stepNode` record what the
-node would have done and do not perform it, because an agent building a workflow re-runs it
-after every stage, and without this each attempt would put a real message in a real inbox.
-The withheld output is marked `__withheld` and deliberately does not look like a success, so
-nothing downstream and no reviewer can mistake it for a delivery; your node's inputs are
-still traced, so the message can be checked for correctness. A genuine send is a real run of
+node would have done and do not perform it. An agent building a workflow re-runs it after
+every stage, and each attempt would otherwise put a real message in a real inbox. The
+withheld output is marked `__withheld` and deliberately does not look like a success, so
+nothing downstream can mistake it for a delivery. Your node's inputs are still traced, so
+the message can be checked for correctness. A genuine send is a real run of
 the workflow, and there is no parameter that lets a test perform one.
 
 If you are unsure, set it. A withheld node costs a build nothing; an unwanted send costs a
@@ -209,9 +178,9 @@ configSchema:
 "ui:order": [model, prompt]
 ```
 
-Every node's form also ends with two access controls ("Require sign-in", "Require role")
-that the platform injects; you never declare them, and their names (`authRequired`,
-`authRole`) are reserved. See [Who Can Run It](/nodes/who-can-run-it).
+Every node's form also ends with two access controls, **Require sign-in** and **Require
+role**, which the platform injects. You never declare them, and their names `authRequired`
+and `authRole` are reserved. See [Who can run it](/nodes/who-can-run-it).
 
 `description` is the help text a person reads under the field. Say what the setting
 **does**, keep it short, and don't restate the label.
@@ -250,9 +219,9 @@ A list, always, even when there is one call. Each entry is named for what it fet
     message: "return response.error.message"
 ```
 
-**A call is one thing.** `transport`, `terminator` and `error` sit inside the call, because
-whether a reply arrives as one body or as a stream is decided by the request you make. Ask
-for `stream: true` and you get a stream.
+**A call is one thing.** `transport`, `terminator` and `error` sit inside the call. Whether a
+reply arrives as one body or as a stream is decided by the request you make. Ask for
+`stream: true` and you get a stream.
 
 ### How the reply arrives
 
@@ -276,13 +245,12 @@ ways so a node never writes type tags.
 
 **It is a list because one fact often takes more than one call.** Resolving a contact is a
 search by email, then a second call built from the first reply. Later calls read earlier
-ones as `calls.<name>`, which is why each entry is named. A node that grows a second call
+ones as `calls.<name>`. That is why each entry is named. A node that grows a second call
 does not change shape.
 
 A list covers different calls in order. Where one call is really many, four capabilities
-cover it: `paginate` to walk pages, `chunk` to write a collection in batches, `poll` to wait
-on a job, and `state` to remember between runs. See
-[Beyond One Request](/nodes/calls-that-loop).
+cover it. `paginate` walks pages. `chunk` writes a collection in batches. `poll` waits on a
+job. `state` remembers between runs. See [Beyond one request](/nodes/calls-that-loop).
 
 `error` matters more than it looks. An API that returns HTTP 200 with an error in the
 body will otherwise read as success and hand nonsense downstream.
@@ -322,15 +290,15 @@ than node outputs:
  its arguments, its result, its duration, and whether it succeeded.
 - **Token usage** is read straight off the vendor's reply and summed across the turns of a
  run, detail blocks included (reasoning tokens, cached tokens). The runtime checks the
- three places a wire carries it (`usage` on the body or final chunk, `response.usage` on a
- Responses stream, `metadata.usage` on a Bedrock stream), so a node on any of those wires
+ three places a wire carries it: `usage` on the body or final chunk, `response.usage` on a
+ Responses stream, and `metadata.usage` on a Bedrock stream. A node on any of those wires
  fills the execution's Token Usage view with nothing declared. A vendor that reports usage
- anywhere else will not be picked up automatically: that is a platform gap to raise, not
- something to work around in the node. A connector named `usage` in the example above is a different thing: that is
- the node choosing to hand the block downstream as data.
+ anywhere else is a platform gap to raise, not something to work around in the node. A
+ connector named `usage`, as in the example above, is a different thing: the node choosing
+ to hand the block downstream as data.
 
-Both are fire and forget: recording never slows a run and never fails one, and a run from the
-**Nodes** screen, which has no execution to attach to, records nothing.
+Both are fire and forget. Recording never slows a run and never fails one. A run from the
+**Nodes** screen has no execution to attach to, so it records nothing.
 
 For a streaming node, two controls matter:
 
@@ -386,9 +354,9 @@ and what makes a node one or the other.
 
 ## Handlebars and expressions
 
-Two syntaxes read values out of the run and shape them into a call, and which one applies
-is decided by the field: a `string` takes a `{{ }}` Handlebars string, while an `object` or `array`
-takes a `return` expression.
+Two syntaxes read values out of the run and shape them into a call. The field decides which
+applies: a `string` takes a `{{ }}` Handlebars string, and an `object` or `array` takes a
+`return` expression.
 
 [Handlebars and expressions](/nodes/expressions) is the full grammar, the sandbox, and every
 root your calls can see.
@@ -430,7 +398,7 @@ It catches what would otherwise surface much later, in a workflow, as nothing ha
 
 ## Next steps
 
-<Card title="Node Discoverability" icon="search" href="/nodes/node-discoverability" horizontal>
+<Card title="Node discoverability" icon="search" href="/nodes/node-discoverability" horizontal>
 Read this before writing `whenToUse`. It decides whether your node is ever offered.
 </Card>
 
