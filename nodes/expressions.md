@@ -1,6 +1,6 @@
 ---
-sidebarTitle: "Templates and expressions"
-title: "Templates and expressions"
+sidebarTitle: "Handlebars and expressions"
+title: "Handlebars and expressions"
 ---
 
 Read a value out of the run and shape it on the way into a call. Two syntaxes do this, and
@@ -8,12 +8,12 @@ which one applies is decided by the field, never by the node.
 
 | Write | When the field is |
 |---|---|
-| `{{ }}`, a Handlebars template | a `string` |
+| `{{ }}`, a Handlebars string | a `string` |
 | `return …`, a sandboxed expression | an `object` or an `array` |
 
-## Templates
+## Handlebars
 
-`{{ }}` resolves against the run context. Registered helpers work anywhere a template does,
+`{{ }}` resolves against the run context. Registered helpers work anywhere Handlebars does,
 so conditional prompt text is an ordinary `{{#if}}`:
 
 ```yaml
@@ -42,7 +42,7 @@ present, or a key whose name varies by model.
 Security is by absence. There is no `process`, `require`, `fetch`, `eval`, `new`,
 assignment or `constructor` to reach, because the interpreter never implements them.
 
-Available: member access, indexing, literals, spread, template strings, operators,
+Available: member access, indexing, literals, spread, backtick strings, operators,
 ternaries, arrow callbacks, and `JSON`, `Math`, `Number`, `String`, `Boolean`, `parseInt`,
 `parseFloat`, `encodeURIComponent`, `Object.*` and `Array.*`. The platform adds three more,
 because without them a node could not be a manifest at all:

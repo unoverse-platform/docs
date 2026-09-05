@@ -34,11 +34,11 @@ capabilities:
 ## Fields
 
 <ResponseField name="type" type="nodeType" post={["required"]}>
-How the node runs. `promise` settles once; `callback` streams and settles later. The last call's transport decides it.
+The node's identity. A saved workflow stores it, so renaming it orphans every workflow that placed the node.
 </ResponseField>
 
 <ResponseField name="kind" type="`PromiseNode` · `CallbackNode`" post={["required"]}>
-What the node is for. Picks the executor and the shape the platform expects.
+How the node runs. `PromiseNode` settles once; `CallbackNode` emits as it goes and settles later. The last call's transport decides it, and lint checks the declaration.
 </ResponseField>
 
 <ResponseField name="name" type="string" post={["required"]}>

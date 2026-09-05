@@ -2,7 +2,7 @@
 
 Authoritative agent guide. A node is a folder of YAML, and this file is the condensed
 rulebook. The pages beside it hold the detail: `manifest-nodes.md` first, then the
-numbered guides.
+guides listed under Further reading.
 
 ## A node is a folder
 
@@ -148,7 +148,7 @@ serviceConnectors:
     isService: false          # true offers, false consumes
 ```
 
-Output names become what someone types in a template later, so name them for what they
+Output names become what someone types in a Handlebars string later, so name them for what they
 carry.
 
 ## `api/run.yaml`
@@ -236,7 +236,7 @@ identity provider mints and a published node cannot know it. See who-can-run-it.
 `ui:widget` is `toggle` or `select`. `ui:dependencies` shows a field only when a sibling
 matches. `ui:hidden` keeps a field out of the form.
 
-## Templates and expressions
+## Handlebars and expressions
 
 Decided by the field's `type`, never per node.
 
@@ -294,24 +294,24 @@ service rather than something merely coherent.
 ## Before you finish
 
 ```bash
-unoverse node lint
-unoverse node test <NodeType>
+unoverse lint
 ```
 
-Both must pass. `node test` reads keys from `.env` as `<CREDENTIAL>_<FIELD>` in upper snake
-case, so `openAICredential.apiKey` is `OPENAI_API_KEY`.
+Lint must pass, and the node must run on the **Nodes** screen in **studio** (Load sample,
+then Run). Keys come from `.env`, named from the credential and field in upper snake case
+with the trailing `Credential` dropped, so `openAICredential.apiKey` is `OPENAI_API_KEY`.
 
 ## Checklist
 
 1. Pick `kind`
-2. Write `node.yaml`, including a `whenToUse` per doc 14
+2. Write `node.yaml`, including a `whenToUse` per `node-discoverability.md`
 3. Write `interface.yaml`
 4. Write `config.yaml`
 5. Write `api/run.yaml` and `api/events.yaml`
 6. Add the host to `allowedHosts` in `package.yaml`
 7. Add the credential file if the service needs a key
 8. Write `test.yaml`
-9. `unoverse node lint`, then `unoverse node test <NodeType>`
+9. `unoverse lint`, then run it on the **Nodes** screen in **studio**
 
 ## Common error, and the fix
 
@@ -325,7 +325,7 @@ case, so `openAICredential.apiKey` is `OPENAI_API_KEY`.
 | needs credential `x` but no `credentials/x.yaml` | Add the credential file to the package |
 | refusing a request to `host` | Add the host to `allowedHosts` |
 | a capability is declared but not implemented | Use one that exists, or ask for it to be built |
-| the template resolved to empty | The path matched nothing. Check the node id against the real edge |
+| the value resolved to empty | The path matched nothing. Check the node id against the real edge |
 
 ## Nodes to copy from
 

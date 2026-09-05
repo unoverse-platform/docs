@@ -165,7 +165,7 @@ key and replacing it wholesale would drop their fields.
 `drain` takes items permanently, so nothing is processed twice. `max` defaults to 25 and is
 bounded so one run cannot pull an unbounded queue.
 
-Write `key` as the logical key with no prefix, usually templated from `scope`. The
+Write `key` as the logical key with no prefix, usually built from `scope`. The
 deployment namespace is added by the platform, so a manifest cannot forget it and write
 somewhere nothing reads.
 

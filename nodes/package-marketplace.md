@@ -71,7 +71,7 @@ non-https is refused outright, so a key cannot travel in clear text.
 `a.files.example.com` does not.
 
 The list is checked when you lint and again at run time, after the URL has been assembled.
-That second check matters because a host can itself come from a template, and only the
+That second check matters because a host can itself come from a Handlebars string, and only the
 finished URL can be judged.
 
 It is also what somebody accepts when you publish the package. Keep it short and keep it

@@ -78,10 +78,15 @@ called by other nodes has `service.yaml` instead, and no outputs at all. Some ha
 2. Describe the node: `node.yaml`, `interface.yaml`, `config.yaml`
 3. Describe the calls in `api/run.yaml`, and what comes out in `api/events.yaml`
 4. Add the host to the package's `allowedHosts`
-5. Check it: `unoverse node lint`
-6. Run it against the real service: `unoverse node test <NodeType>`
+5. Run it against the real service, on the **Nodes** screen in **studio**
+6. Check it before you deploy:
 
-Publish it, and once it is accepted the node is in the node library alongside every other node.
+   ```bash
+   unoverse lint
+   ```
+
+`unoverse deploy studio` runs the same check first, then ships every node in the workspace
+alongside your components and skills.
 
 ## Nodes to learn from
 
@@ -113,7 +118,7 @@ Whole packages worth reading: [airtable](https://github.com/unoverse-platform/ma
 ## Next steps
 
 <Card title="Anatomy of a node" icon="boxes" href="/nodes/manifest-nodes" horizontal>
-The folder, the five files, and how a call is described.
+The folder, the files in it, and how a call is described.
 </Card>
 
 <Card title="Reference" icon="book-marked" href="/reference/node-envelope" horizontal>

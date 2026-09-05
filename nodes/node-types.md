@@ -114,7 +114,7 @@ is how a streaming node also produces a settled final value.
 ## Next steps
 
 <Card title="Anatomy of a node" icon="boxes" href="/nodes/manifest-nodes" horizontal>
-The folder, the five files, and how a call is described.
+The folder, the files in it, and how a call is described.
 </Card>
 
 <Card title="node.yaml" icon="book-marked" href="/reference/node-envelope" horizontal>

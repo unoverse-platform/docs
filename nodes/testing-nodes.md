@@ -8,7 +8,7 @@ Nodes tab for exactly that, and nothing has to be published first.
 
 ## In studio
 
-Open the **Nodes** tab and pick your node. You get three panes.
+Open the **Nodes** tab and pick your node. The screen shows three things.
 
 **The node**, as everyone else will read it: name, category, description, and the
 `whenToUse` you wrote. Any credential it needs is named here too, so a node asking for
@@ -52,43 +52,26 @@ testData:
 Write the fixture as a real request, not a minimal one. It is the sample every future
 reader loads first.
 
-## From the command line
+## Before you deploy
 
-The same run, without opening anything:
+Check every node in the workspace, with nothing running:
 
 ```bash
-unoverse node test <NodeType>
+unoverse lint
 ```
 
-It prints the call it is about to make, the sample data it is using, what each output
-received, and whether the `expect` assertions passed.
-
-```
-OpenAI  (openai/OpenAI, PromiseNode)
-POST https://api.openai.com/v1/responses   transport: json
-
-── sample data (test.yaml) ──
-  model              gpt-5.6
-  prompt             Explain what a workflow engine does, in two sentences.
-
-── outputs ──
-  text         A workflow engine automates, coordinates and monitors…
-  usage        {"input_tokens":29,…}
-── expect ──
-  ✓ text  return output.text.length > 0
-
-✓ OpenAI ran in 1302ms
-```
-
-The platform does not need to be running. It is your node, your machine, the real service.
+It runs every static rule: an output nothing emits to, an events table out of connector
+order, a host missing from `allowedHosts`, a fixture that does not match the settings form.
+Each message names the rule it broke. `unoverse deploy studio` runs the same check before
+it sends anything, so a tick here is a tick there.
 
 ## Keys stay yours
 
-Both routes need a real key, and neither stores one.
+A run needs a real key, and **studio** stores none.
 
-The command line reads your own `.env`, using the credential name and field in upper snake
-case with any trailing `Credential` dropped. So `openAICredential.apiKey` is
-`OPENAI_API_KEY`. A missing one is named before anything runs.
+It reads your own `.env`, using the credential name and field in upper snake case with any
+trailing `Credential` dropped. So `openAICredential.apiKey` is `OPENAI_API_KEY`. A missing
+one is named before anything runs.
 
 ## What `expect` is for
 
@@ -120,7 +103,7 @@ testData:
 A node can pass here and still misbehave in a workflow, because the bench feeds it
 `testData.inputs` while a workflow feeds it whatever the edges carry.
 
-When that happens, the difference is almost always a template path: the node id or the
+When that happens, the difference is almost always a Handlebars path: the node id or the
 output name does not match the edge you drew. [Troubleshooting](/nodes/troubleshooting)
 covers it.
 

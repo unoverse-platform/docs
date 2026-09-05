@@ -90,7 +90,7 @@ signal.<nodeId>.<output>.<field>
 `quote1` is the id **canvas** gives the node on the canvas, and `quote` is the output
 connector. So `signal.quote1.quote` is the quote text.
 
-Give outputs names worth reading. They become the reference someone types into a template
+Give outputs names worth reading. They become the reference someone types into a Handlebars string
 later, and a good name is the difference between `signal.crm1.contact` and
 `signal.crm1.output`.
 
@@ -104,7 +104,7 @@ later, and a good name is the difference between `signal.crm1.contact` and
 | `signal` | nothing but the fact that something happened |
 
 `type` also decides how a wired field is written. A `string` field takes a Handlebars
-template, an `object` or `array` field takes a `return` expression.
+string, an `object` or `array` field takes a `return` expression.
 [Config Schema](/nodes/config-schema) covers both.
 
 ## Required, and what waiting means
@@ -137,7 +137,7 @@ demand, rather than a value travelling along an edge, and it fires no outputs. S
 | What you see | Why |
 |---|---|
 | The node never runs | A required connector has nothing wired to it |
-| A template resolves to nothing | The id or the output name is wrong. Check it against the edge you drew |
+| A value resolves to nothing | The id or the output name is wrong. Check it against the edge you drew |
 | An output stays empty | No row in `events.yaml` emits to it |
 | Lint: an output has nothing emitting to it | The connector and the events table have drifted apart |
 | Lint: this must be a `CallbackNode` | The transport streams, or the node declares a `toolExchange` |

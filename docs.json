@@ -240,7 +240,7 @@
             ]
           },
           {
-            "group": "Nodes \u00b7 api/",
+            "group": "Nodes · api/",
             "pages": [
               "reference/node-api",
               "reference/node-events",
@@ -248,10 +248,35 @@
             ]
           },
           {
-            "group": "Nodes \u00b7 package",
+            "group": "Nodes · package",
             "pages": [
               "reference/node-package",
               "reference/node-credentials"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Skills",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "skills/index"
+            ]
+          },
+          {
+            "group": "unoverse-create",
+            "pages": [
+              "skills/unoverse-create/SKILL",
+              "skills/unoverse-create/references/component",
+              "skills/unoverse-create/references/app",
+              "skills/unoverse-create/references/template",
+              "skills/unoverse-create/references/brand",
+              "skills/unoverse-create/references/agent-skill",
+              "skills/unoverse-create/references/block",
+              "skills/unoverse-create/references/node",
+              "skills/unoverse-create/references/workflow"
             ]
           }
         ]

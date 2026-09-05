@@ -128,14 +128,14 @@ prompt:
   ui:field: template
 ```
 
-The syntax follows the field's `type`, on every node: a `string` takes a `{{ }}` template,
+The syntax follows the field's `type`, on every node: a `string` takes a `{{ }}` Handlebars string,
 while an `object` or `array` takes a `return` expression.
 
 ```yaml
 prompt: "Summarise this: {{signal.inputtrigger1.output.message}}"
 ```
 
-[Templates and expressions](/nodes/expressions) covers the grammar, every root a field can
+[Handlebars and expressions](/nodes/expressions) covers the grammar, every root a field can
 reach, and what the sandbox allows. Workflow-level values such as `workflow.variables`
 resolve here, before the node runs, which is why they belong in a config field rather than
 in a call.
@@ -195,15 +195,15 @@ controls resolve together.
 | What you see | Why |
 |---|---|
 | A field labelled with its property name | No `title` |
-| The template arrived empty and nothing errored | The path matched nothing. Check the node id against the edge you drew |
-| The service rejected a number as a string | The value went through a template. A field that is exactly one `{{ path }}` keeps its type; anything else becomes text |
+| The value arrived empty and nothing errored | The path matched nothing. Check the node id against the edge you drew |
+| The service rejected a number as a string | The value went through Handlebars. A field that is exactly one `{{ path }}` keeps its type; anything else becomes text |
 | Lint: `ui:order` names a field that does not exist | A rename left the list behind |
 | Lint: `enumNames` is a different length from `enum` | They are positional |
 | A field never appears | A `ui:dependencies` condition that can never be true |
 
 ## Next steps
 
-<Card title="Templates and expressions" icon="braces" href="/nodes/expressions" horizontal>
+<Card title="Handlebars and expressions" icon="braces" href="/nodes/expressions" horizontal>
 The grammar a wirable field resolves, and every root it can reach.
 </Card>
 

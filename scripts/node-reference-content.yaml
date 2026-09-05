@@ -17,13 +17,13 @@ pages:
   config: The settings form someone fills in on the canvas.
   credential: The shape of a credential, declared once per package. Never a value.
   package: The envelope around a folder of nodes, and what the marketplace lists.
-  test: The fixture behind Load sample and `unoverse node test`.
+  test: The fixture behind Load sample on the studio Nodes screen.
   audio: How a voice node binds to the platform's audio lane.
   events: Everything that leaves the node, one row per output connector.
 
 node:
-  type: "How the node runs. `promise` settles once; `callback` streams and settles later. The last call's transport decides it."
-  kind: "What the node is for. Picks the executor and the shape the platform expects."
+  type: "The node's identity. A saved workflow stores it, so renaming it orphans every workflow that placed the node."
+  kind: "How the node runs. `PromiseNode` settles once; `CallbackNode` emits as it goes and settles later. The last call's transport decides it, and lint checks the declaration."
   name: "The node's id, unique in its package. Used everywhere it is referenced."
   description: "One line saying what the node does, shown in the node library."
   category: "The job's domain, used in the library and in discovery ranking. Name the work, never the implementation."
@@ -84,7 +84,7 @@ test:
 
 events:
   emit: "The output connector this row writes to. Must be one of the outputs declared in `interface.yaml`, in the same order."
-  from: "Where the row fires from. `response` is the last call's reply; `narrator` is the status line; a call name is that step's result."
+  from: "Where the row fires from. `response` is the last call's reply; `narrator` is a status line; `tool` is a tool call's result; `complete` fires once at the end over everything emitted. Earlier calls do not fire rows: read them as `calls.<name>`."
   match: "Streaming only. The event type this row fires on, such as `response.output_text.delta`. A literal, never a pattern."
   when: "An extra test, for when one event type carries more than one meaning."
   value: "What to emit. A `return` expression over whatever the row's `from` puts in scope."
@@ -211,9 +211,14 @@ examples:
       paginate: [cursor]
   test: |
     testData:
-      baseId: appXXXXXXXXXXXXXX
-      tableId: Companies
-      maxRecords: 25
+      config:
+        baseId: appXXXXXXXXXXXXXX
+        tableId: Companies
+        maxRecords: 25
+      inputs:
+        input: {}
+      expect:
+        records: "return Array.isArray(output.records)"
   events: |
     # The file IS the list of rows, one per output connector,
     # in interface.yaml order.

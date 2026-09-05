@@ -34,7 +34,7 @@ The output connector this row writes to. Must be one of the outputs declared in 
 </ResponseField>
 
 <ResponseField name="from" type="`response` · `narrator` · `tool` · `complete`">
-Where the row fires from. `response` is the last call's reply; `narrator` is the status line; a call name is that step's result.
+Where the row fires from. `response` is the last call's reply; `narrator` is a status line; `tool` is a tool call's result; `complete` fires once at the end over everything emitted. Earlier calls do not fire rows: read them as `calls.<name>`.
 </ResponseField>
 
 <ResponseField name="match" type="object">

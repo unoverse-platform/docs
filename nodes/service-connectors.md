@@ -90,7 +90,7 @@ serviceConnectors:
 On the **canvas**, drag from the provider's `service` handle to the consumer's
 `serviceConsumer` handle.
 
-Whether anything is wired is a run-time fact, and templates read it through the `services`
+Whether anything is wired is a run-time fact, and Handlebars strings read it through the `services`
 root. That is how a node adapts to what it was actually given.
 
 ```yaml

@@ -3,7 +3,7 @@ sidebarTitle: "test.yaml"
 title: "test.yaml"
 ---
 
-The fixture behind Load sample and `unoverse node test`.
+The fixture behind Load sample on the studio Nodes screen.
 
 <div className="ref-source">
 Generated from <code>nodes/_schema/test.schema.json</code>, the same file the node
@@ -14,9 +14,14 @@ linter validates against.
 
 ```yaml test.yaml
 testData:
-  baseId: appXXXXXXXXXXXXXX
-  tableId: Companies
-  maxRecords: 25
+  config:
+    baseId: appXXXXXXXXXXXXXX
+    tableId: Companies
+    maxRecords: 25
+  inputs:
+    input: {}
+  expect:
+    records: "return Array.isArray(output.records)"
 ```
 
 ## Fields

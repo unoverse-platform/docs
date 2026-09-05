@@ -149,7 +149,7 @@ does not carry on with a blank where the person should have been.
 That is worth choosing on purpose. A node that no-ops when identity is absent looks fine in
 testing and does nothing in production, and nobody finds out for a week.
 
-## Identity in your templates
+## Identity in your calls
 
 An authenticated run gives your manifest the person:
 

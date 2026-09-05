@@ -13,46 +13,25 @@ makes it.
 > Computation over the request belongs to the platform. Description of the service belongs
 > to you.
 
-Auth schemes, retries, SSE framing and template resolution are the platform's job, written
+Auth schemes, retries, SSE framing and Handlebars resolution are the platform's job, written
 once. Base URL, method, parameters, credentials and what comes out are yours, written as
-data. You name a capability and the platform performs it, and `unoverse node lint` fails on
-a capability that does not exist, so you find out while you write rather than at run time.
+data. You name a capability and the platform performs it, and `unoverse lint` fails on a
+capability that does not exist, so you find out while you write rather than at run time.
 
-## Build and publish
+## Build and check
 
 You build a node in **studio**, on your own machine. It reads your files straight off disk,
 so there is no server to start and no database to connect to while you work, which is why
 it works offline.
 
-Publishing is a separate act pointed at a separate place. It writes your node into a
-universe as a record. There is no commit, no package to build and no image to push. Where
-you keep your files before that is your business.
-
 | Step | Where |
 |---|---|
 | Write the node | **studio**, on your own files |
-| Check and run it | your machine, against the real service |
-| Publish it | a record in the universe you chose |
+| Run it against the real service | the **Nodes** screen in **studio** |
+| Check it | `unoverse lint`, the same check `unoverse deploy studio` runs before it sends |
+| Ship it | `unoverse deploy studio`, which carries every node in the workspace with your components and skills |
 
-### A published node waits to be accepted
-
-A node is the only thing you publish that holds a URL and a credential, so it is the only
-one somebody reviews.
-
-Your node arrives **pending**. Whoever runs the universe sees what it is asking for before
-it can run: the hosts it wants to call, the credential types it needs, and what changed
-since the last version. Accepting it makes it live.
-
-**After that, you are not interrupted.** Fix a prompt, change a mapping, correct an
-expression, and publishing takes effect straight away. Publishing stops for acceptance again
-only when the node reaches for something new, such as another host or another credential
-type.
-
-So the list in `allowedHosts` is not paperwork. It is the thing somebody says yes to, and it
-is why they can say yes quickly.
-
-> Publishing from **studio** is not available yet. Today you write, check and run nodes
-> locally with the two commands on this page.
+A deployed node is live in that universe's node library as soon as the deploy finishes.
 
 ## One folder is one node
 
@@ -102,7 +81,7 @@ mean scrolling past a logo URL.
 Every section except `api` may instead be inlined into `node.yaml`, so a simple node can
 be one file. Defining a section in two places is an error, never a merge.
 
-### The five files, in full
+## The files, in full
 
 Taken from the real `OpenAI` node, trimmed of its comments.
 
@@ -350,8 +329,8 @@ than node outputs:
  something to work around in the node. A connector named `usage` in the example above is a different thing: that is
  the node choosing to hand the block downstream as data.
 
-Both are fire and forget: recording never slows a run and never fails one, and a node test,
-which has no execution to attach to, records nothing.
+Both are fire and forget: recording never slows a run and never fails one, and a run from the
+**Nodes** screen, which has no execution to attach to, records nothing.
 
 For a streaming node, two controls matter:
 
@@ -386,14 +365,12 @@ testData:
     usage: "return output.usage.total_tokens > 0"
 ```
 
-Then run it against the real API, with no platform running:
+Then open it on the **Nodes** screen in **studio**, press **Load sample**, then **Run**. The
+node calls the real API, with no platform running.
 
-```bash
-unoverse node test OpenAI
-```
-
-Keys come from your own `.env` as `<CREDENTIAL>_<FIELD>` in upper snake case, so
-`openAICredential.apiKey` reads `OPENAICREDENTIAL_APIKEY`. They are read for that one run
+Keys come from your own `.env`, named from the credential and the field in upper snake
+case with the trailing `Credential` dropped, so `openAICredential.apiKey` reads
+`OPENAI_API_KEY`. They are read for that one run
 and stored nowhere. This is deliberate: you test with **your** key, never with a universe's
 stored credentials, which your manifest has no way to reach.
 
@@ -407,20 +384,20 @@ Every node states `PromiseNode` or `CallbackNode` in `node.yaml`, and lint check
 declaration rather than trusting it. [Node types](/nodes/node-types) covers which to choose
 and what makes a node one or the other.
 
-## Templates and expressions
+## Handlebars and expressions
 
 Two syntaxes read values out of the run and shape them into a call, and which one applies
-is decided by the field: a `string` takes a `{{ }}` template, while an `object` or `array`
+is decided by the field: a `string` takes a `{{ }}` Handlebars string, while an `object` or `array`
 takes a `return` expression.
 
-[Templates and expressions](/nodes/expressions) is the full grammar, the sandbox, and every
+[Handlebars and expressions](/nodes/expressions) is the full grammar, the sandbox, and every
 root your calls can see.
 
 ## Allowed hosts
 
 `package.yaml` lists the only hosts this package's nodes may reach. **Deny by default.**
 
-```yaml test.yaml
+```yaml package.yaml
 allowedHosts:
   - api.openai.com
 ```
@@ -430,17 +407,17 @@ execute" does not save you on its own: a URL plus `{{ credentials.x.apiKey }}` i
 exfiltration in six lines with nothing to sandbox. So the capability is restricted instead.
 
 Enforced twice: statically by lint, and at run time **after** templating, because a host
-can itself be templated. Non-https is refused outright, since a credential must never
+can itself come from a Handlebars string. Non-https is refused outright, since a credential must never
 travel in clear text. `*.example.com` matches exactly one subdomain level.
 
 ## Check it
 
 ```bash
-unoverse node lint
+unoverse lint
 ```
 
-Every message names the rule it broke and the page that explains it. Errors stop the build.
-Warnings inform.
+Every message names the rule it broke. Errors stop a deploy. Warnings inform.
+`unoverse deploy studio` runs the same check before it sends anything.
 
 It catches what would otherwise surface much later, in a workflow, as nothing happening:
 

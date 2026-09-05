@@ -3,14 +3,14 @@ sidebarTitle: "Troubleshooting"
 title: "Troubleshooting"
 ---
 
-Two commands answer most of it.
+One command and one screen answer most of it.
 
 ```bash
-unoverse node lint          # every static rule, before anything runs
-unoverse node test <Type>   # the node against the real service
+unoverse lint
 ```
 
-Lint messages name the rule they broke and the page that explains it. Start there.
+Lint messages name the rule they broke. Start there. To watch the node run against the real
+service, open it on the **Nodes** screen in **studio**.
 
 ## Lint stops you
 
@@ -44,7 +44,7 @@ emits the running total rather than each fragment.
 **The node never runs at all.** A required input has nothing wired to it. The node is
 waiting, which is a legitimate state, so nothing reports an error.
 
-## A template resolved to empty
+## A value resolved to empty
 
 This is the one that wastes the most time, because nothing errors.
 
@@ -62,7 +62,7 @@ path is wrong.
 ## The service rejects the request
 
 **A number arrived as a string.** A field that is exactly one `{{ path }}` keeps its type.
-Anything else, including a template with text around it, becomes a string.
+Anything else, including a Handlebars string with text around it, becomes a string.
 
 **A 200 that is really a failure.** Some services answer 200 with an error in the body. Add
 `error` to the call, and it will surface instead of flowing downstream as nonsense.

@@ -14,9 +14,10 @@ right folder, your project's own tokens. You do not have to learn the rules firs
 | Skill | What it covers |
 | --- | --- |
 | `unoverse-create` | Everything you can author: components, apps, atoms, styles, themes, Agent skills, prompt blocks, nodes and workflows. It works out which one you are building, then applies the rules for it. |
-| `unoverse-prompt-component` | Components an Agent fills with content. Which fields the Agent may write, and what silently throws its work away. |
 
 A skill points at the documentation rather than copying it, so the two cannot drift apart.
+The skills are pages of this site, under [Skills](/skills/index), so you can read every
+rule your agent applies.
 
 ## Install them
 
@@ -24,17 +25,18 @@ A skill points at the documentation rather than copying it, so the two cannot dr
 unoverse update
 ```
 
-Every update installs them, so they arrive with your tooling and stay current with it. They
-live in `~/.claude/skills`, which is why Claude Code finds them in every folder you open.
+The CLI downloads the skill pages from this site into `~/.claude/skills`, which is why
+Claude Code finds them in every folder you open. `unoverse create` and a first
+`unoverse studio` install them too, and every update keeps them current.
 
-For an agent the CLI does not manage:
+## Let your agent search this site
+
+This site serves its own MCP server, with a search tool over every page. Add it once and
+Claude Code answers from the documentation instead of guessing:
 
 ```bash
-npx skills add unoverse-platform/skills
+claude mcp add unoverse https://docs.unoverse.ai/mcp
 ```
-
-Both skills are plain markdown, and you can read every rule they apply at
-[github.com/unoverse-platform/skills](https://github.com/unoverse-platform/skills).
 
 ## Next steps
 
@@ -42,6 +44,6 @@ Both skills are plain markdown, and you can read every rule they apply at
 Build and preview everything your agent writes.
 </Card>
 
-<Card title="Read the skills on GitHub" icon="book-open" href="https://github.com/unoverse-platform/skills" horizontal>
-Every rule your agent follows, in plain markdown.
+<Card title="Read the skills" icon="book-open" href="/skills/index" horizontal>
+Every rule your agent follows, as pages of this site.
 </Card>
