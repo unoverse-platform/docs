@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://docs.unoverse.ai/schemas/nodes/_defs.schema.json",
   "title": "Shared node definitions",
-  "description": "Fragments $ref'd by the sibling node schemas. Not authored directly. See docs/architecture/DECLARATIVE_NODES.md.",
+  "description": "Fragments $ref'd by the sibling node schemas. Not authored directly. See docs/architecture/authoring/DECLARATIVE_NODES.md.",
   "definitions": {
     "nodeType": {
       "type": "string",

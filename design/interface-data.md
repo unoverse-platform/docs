@@ -46,18 +46,17 @@ Every row carries these, whatever kind of item it is:
 | `source_id` | Which source it came from, for scoping a follow-up to one document |
 
 **`object_type` is the field to know.** Ingesting a page extracts `need` rows, which carry
-one editorial field between them. Promoting a page writes a `service` row, which is the
+one editorial field between them. Promoting a page writes a `product` row, which is the
 authored content item a card is built from, and it carries the full set:
 
 | Field | What it holds | On |
 |---|---|---|
-| `tagline` | The one-line hook, or the category line | `service` |
-| `shortDescription` | A short summary, longer than the tagline | `service` |
-| `introParagraph` | The opening paragraph | `service` |
-| `callToAction` | The label for the action, written for a button | `service` |
-| `actionPrompt` | The prompt behind that action | `service` |
-| `primaryImage` | The item's main image | `service` |
-| `images` | Every image the item carries | `service` |
+| `tagline` | The one-line hook, or the category line | `product` |
+| `shortDescription` | A short summary, longer than the tagline | `product` |
+| `introParagraph` | The opening paragraph | `product` |
+| `callToAction` | The label for the action, written for a button | `product` |
+| `primaryImage` | The item's main image | `product` |
+| `images` | Every image the item carries | `product` |
 | `action` | The short verb the page leads with, such as "Check requirements" | `need` |
 
 Rows of other kinds live in **spatial** too, such as `image`, `skill` and `mcp`. They are

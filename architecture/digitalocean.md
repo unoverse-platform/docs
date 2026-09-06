@@ -233,8 +233,7 @@ where that rule earns its keep. `digitalocean_database_firewall` is *authoritati
 replaces a cluster's entire trusted-sources list rather than adding to it. Applied to an
 adopted cluster it therefore deletes every rule the account already had: your own IP,
 your other droplets, your App Platform apps. It locks you out of a database this universe
-merely borrows. That happened once, on 2026-08-01, to the cluster running other
-production work.
+merely borrows. That has happened, to a cluster running other production work.
 
 So Terraform manages the database firewall **only for a cluster it created**. For an
 adopted one, `unoverse deploy` appends this universe's droplet to the existing rules

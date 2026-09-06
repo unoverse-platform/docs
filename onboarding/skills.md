@@ -30,11 +30,11 @@ Claude Code finds them in every folder you open. `unoverse create` and a first
 
 ## Let your agent search this site
 
-This site serves its own MCP server, with a search tool over every page. Add it once and
-Claude Code answers from the documentation instead of guessing:
+This documentation is also served as an MCP server, with a search tool over every page.
+Add it once and Claude Code answers from the documentation instead of guessing:
 
 ```bash
-claude mcp add unoverse https://docs.unoverse.ai/mcp
+claude mcp add --transport http unoverse https://docs.unoverse.ai/mcp
 ```
 
 ## Next steps

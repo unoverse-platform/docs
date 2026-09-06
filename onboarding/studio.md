@@ -59,7 +59,7 @@ version. There is nothing to update.
 
 ## What you can author
 
-Seven kinds of asset, in the order the tabs appear. Every one is a file in your own
+Eight kinds of asset, in the order the tabs appear. Every one is a file in your own
 repository.
 
 <AccordionGroup>
@@ -71,6 +71,13 @@ booking flow, a dashboard.
 An app owns its own states and layouts, and arranges components inside it.
 
 Lives in `design/<project>/apps/`. [How apps work](/design/apps).
+</Accordion>
+
+<Accordion title="Templates" icon="layout-template">
+Build an arrangement with open sections a delivery fills: a shelf grid, an email, a
+comparison page. You place what you know and leave open what the Agent decides.
+
+Lives in `design/<project>/templates/`. [How templates work](/design/templates).
 </Accordion>
 
 <Accordion title="Components" icon="square-dashed">
@@ -121,7 +128,7 @@ Lives in `nodes/`. [Building a node](/nodes/overview), and [testing one](/nodes/
 
 </AccordionGroup>
 
-There is an eighth kind, the **recipe**, which is a workflow graph copied onto a canvas
+There is a ninth kind, the **recipe**, which is a workflow graph copied onto a canvas
 rather than authored here.
 
 <Frame caption="A component, its live preview at every size, and its controls.">
@@ -154,8 +161,8 @@ unoverse login https://your-universe.example
 unoverse deploy studio
 ```
 
-`login` keeps the session and writes the address to `unoverse.yaml`, so the whole team ships
-to the same universe. After that `deploy studio` needs nothing else.
+`login` keeps the session. The first `deploy studio` writes the address to `unoverse.yaml`,
+so the whole team ships to the same universe, and after that it needs nothing else.
 
 The order is the safety. Lint runs locally and blocks on any error, so you see the problem in
 your terminal rather than as a server rejection. Then every item is compared against the
@@ -166,16 +173,13 @@ you answer.
 $ unoverse deploy studio
   ~ design/acme/components/deal-card.yaml   (changed)
   + design/acme/atoms/status-pill.yaml      (new)
-  ~ nodes/hubspot/node.yaml                 (changed, lands PENDING review)
+  ~ nodes/hubspot/node.yaml                 (changed)
 
   3 items -> https://your-universe.example
   Deploy? [y/N]
 ```
 
-A node then waits to be accepted, because it is the only thing you ship that holds a URL and
-a key. Whoever runs the universe sees the hosts it wants to call and the credentials it needs
-before it can run. After that first acceptance you ship freely, and it only pauses again if
-the node reaches for something new.
+Everything in the plan is live in the universe the moment the deploy finishes.
 
 ## Set up your editor
 
@@ -194,8 +198,9 @@ VS Code installs it from the Marketplace; Cursor and Windsurf install it from Op
 Without the extension, YAML files get **no validation at all**. Nothing warns you: they simply stop being checked.
 </Warning>
 
-Each file carries a `$schema` line, which is what the extension follows. To confirm it works,
-open a node's `node.yaml` and delete a required field such as `type`. A red underline should
+Your workspace carries a `.vscode/settings.json` that maps every file to its schema, which
+is what the extension follows. To confirm it works, open a node's `node.yaml` and delete a
+required field such as `type`. A red underline should
 appear within a second. Undo, and it clears.
 
 ## Next steps

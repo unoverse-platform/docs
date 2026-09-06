@@ -69,8 +69,7 @@ for, and standing a second one beside it is waste. On AWS an instance is provisi
 stack by convention, so the universe's database is its own, and bringing existing data in is
 a copy: `pg_dump` into the new instance once, at the start. It also keeps the teardown
 honest, everything the AWS ground builds, `unoverse destroy aws` removes, with nothing
-borrowed left behind. Decided 2026-08-02, and the one place the two grounds deliberately
-differ.
+borrowed left behind. It is the one place the two grounds deliberately differ.
 
 ## The connection budget
 

@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://docs.unoverse.ai/schemas/nodes/test.schema.json",
   "title": "Unoverse node test data",
-  "description": "test.yaml — the fixture behind Studio's \"Load sample, Run\" button and behind `unoverse node test`. Every node must have one: a node nobody can run is a node nobody can trust, and lint enforces it.\n\nTemplate fields are supplied ALREADY RESOLVED, because the bench has no upstream node to resolve them from. See docs/architecture/DECLARATIVE_NODES.md §6.",
+  "description": "test.yaml — the fixture behind Studio's \"Load sample, Run\" button and behind `unoverse node test`. Every node must have one: a node nobody can run is a node nobody can trust, and lint enforces it.\n\nTemplate fields are supplied ALREADY RESOLVED, because the bench has no upstream node to resolve them from. See docs/architecture/authoring/DECLARATIVE_NODES.md §6.",
   "type": "object",
   "required": [
     "testData"

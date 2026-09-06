@@ -3,7 +3,7 @@
 # THE SCHEMA SUPPLIES THE SHAPE, THIS SUPPLIES THE WORDS, and the schema's own `description`
 # is deliberately NOT used. Those descriptions are maintainer notes: `api.run` runs to 244
 # words of rationale, `api.schema.json`'s own description to 195, and several cite
-# `docs/architecture/DECLARATIVE_NODES.md`, a path that is never published. Piping them into
+# `docs/architecture/authoring/DECLARATIVE_NODES.md`, a path that is never published. Piping them into
 # field cards produced pages nobody could scan, and broke the rule in
 # docs/doc-control/DOCS_AND_SKILLS_RULES.md: "Never paraphrase a source comment into copy...
 # Read them to learn what is TRUE, then write what the reader GETS."

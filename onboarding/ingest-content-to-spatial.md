@@ -15,7 +15,7 @@ title: "Ingest Content to Spatial"
 You ingest through the Content Engine, then train the map. After that, both you and your Agents search the same space.
 
 <Tip>
-**Every Canvas has its own Spatial.** The content you ingest, the map you train, and the searches you run all belong to this workflow. A different canvas is a different world, with its own content and its own map.
+**Every canvas has its own spatial.** The content you ingest, the map you train, and the searches you run all belong to this workflow. A different canvas is a different world, with its own content and its own map.
 </Tip>
 
 ## Before you begin
@@ -32,13 +32,15 @@ In **canvas**, click the **spatial** button in the header. The 3D space opens; i
 ![The Spatial button and its neighbors: Content Library, Spatial, Search](../images/onboarding/spatialButton.png)
 
 </Step>
-<Step title="Ground the Content Engine">
+<Step title="Fill the organisation document">
 
-Before you ingest anything, tell the Content Engine who you are. In the **Content Library**, click **Grounding** to open the Domain Prompt: your business name, what you do, your services, and your audience.
+Before you ingest anything, the Content Engine needs to know who you are. That is the
+`organisation` document in your project's identity: what the business does, and the words
+it uses for its products and its customers. Fill it and publish the project.
 
-![The Domain Prompt: business context for content extraction](../images/onboarding/grounding.png)
-
-This text is prepended to every extraction prompt. Every item you ingest is read through it, so grounding first is what makes the Content Engine understand your content as yours, not as generic text.
+Every extraction reads that document first, so every item you ingest is read as yours, not
+as generic text. [Identity](/design/identity) covers the four documents and how your agent
+fills them from your own website.
 
 </Step>
 <Step title="Choose a data source">
@@ -145,7 +147,7 @@ The settings control what the Agent can see: which content types to include, how
 
 Close the loop with your own site and your Challenge 2 Agent:
 
-1. **Ingest your website.** Use the Apify connector with a site crawl of your pages, grounded by your Domain Prompt.
+1. **Ingest your website.** Use the Apify connector with a site crawl of your pages, read through your organisation document.
 2. **Train Spatial**, then check a few points: does the extraction read like your business?
 3. **Wire it into your Agent.** Open your [Create Your First Agent](/onboarding/create-your-first-agent) workflow and connect <span className="node-chip">Spatial Search</span> to <span className="node-chip">OpenAI Stream</span>.
 4. **Update the prompts.** Tell the model in the System Prompt to search your content and answer from what it finds, not from general knowledge.

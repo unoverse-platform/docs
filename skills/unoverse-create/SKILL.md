@@ -48,6 +48,7 @@ the page. It never restates a page, so when the two disagree, the page wins.
 | An app: a chat surface, a shell around components | `references/app.md` |
 | A template: an arrangement with sections a delivery fills | `references/template.md` |
 | A brand: an org pack, a rebrand, a clone for a new client | `references/brand.md` |
+| The org's identity: who it is, its brand, its purpose, its story, filled from its own sources | `references/identity.md` |
 | An Agent skill the platform's Agents follow at run time | `references/agent-skill.md` |
 | A prompt block, a reusable prompt fragment | `references/block.md` |
 | A custom workflow node: an integration, a tool, logic | `references/node.md` |

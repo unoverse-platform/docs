@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://docs.unoverse.ai/schemas/nodes/package.schema.json",
   "title": "Unoverse node package",
-  "description": "package.yaml — the envelope for a folder of nodes. Replaces the `gravity` block in package.json for packages that no longer ship code. See docs/architecture/DECLARATIVE_NODES.md §5.",
+  "description": "package.yaml — the envelope for a folder of nodes. Replaces the `gravity` block in package.json for packages that no longer ship code. See docs/architecture/authoring/DECLARATIVE_NODES.md §5.",
   "type": "object",
   "required": [
     "name",

@@ -29,6 +29,11 @@ The helpers are `eq`, `contains`, `filter` and `toJSON`.
 single most common reason a call arrives with a field missing. Array elements and object
 keys are dot segments, never brackets: `records.0.Name`.
 
+**`identity.<document>` reads the project's identity documents.** The project a run works as
+decides whose documents these are, so one node serves every project. `{{identity.organisation}}`
+renders the whole document as labelled text. `{{identity.brand.promise}}` renders one field.
+`{{#each identity.brand.rules}}` loops a list. [Identity](/design/identity) is the guide.
+
 **`prompt.<blockName>` is why a manifest never hard-codes instruction text.** Blocks live in
 `prompts/blocks/**/*.md` and are camelCased from the filename, so
 `markdown-guidelines.md` becomes `{{prompt.markdownGuidelines}}`. A block's words copied
@@ -99,6 +104,7 @@ What your calls can see, and where each piece comes from.
 | `signal.<nodeId>.<output>.<field>` | An upstream node's output |
 | `services.<connector>` | What is wired at run time, such as `services.mcpService.tools` |
 | `prompt.<blockName>` | A prompt block from the library |
+| `identity.<document>` | One of the project's four identity documents: `organisation`, `brand`, `purpose`, `story`. Whole, it renders as labelled text; `.<field>` renders one value; `{{identity}}` renders all four |
 | `user.email`, `user.id`, `user.name` | The signed-in person |
 | `scope.workflowId`, `scope.userId` | Which run this is |
 | `calls.<name>` | The reply from a call made earlier in this node |

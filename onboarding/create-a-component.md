@@ -38,7 +38,7 @@ The [Design](/design/overview) tab is the full journey.
 ## Build it
 
 <Steps>
-<Step title="Open Studio">
+<Step title="Open studio">
 
 Open **studio**:
 
@@ -207,7 +207,14 @@ Reading it top to bottom:
 </Step>
 <Step title="Check it">
 
-Lint runs when you ship, and blocks on any error, so nothing broken reaches a universe.
+Check it from anywhere in your workspace:
+
+```bash
+unoverse lint
+```
+
+The same check runs when you ship, and blocks on any error, so nothing broken reaches a
+universe.
 
 The linter enforces the design rules with doc-cited messages: token names only (no raw px or hex), every bound field declared in `props`, one home for every piece of state. **studio** and the platform apply the same rules, so a clean lint means it ships.
 
@@ -233,7 +240,8 @@ Step through the workflow and the card renders live in the conversation, in your
 </Steps>
 
 <Note>
-Restarts are only for **new** components, because the platform synthesizes a node per definition at boot. Edits to existing components apply live.
+Nothing restarts. `unoverse deploy studio` sends the component to your universe, and it is
+live there the moment the deploy finishes, new or changed.
 </Note>
 
 ## How far this goes

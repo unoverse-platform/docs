@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://docs.unoverse.ai/schemas/nodes/node.schema.json",
   "title": "Unoverse node",
-  "description": "node.yaml — what this node IS: its identity, its kind, and how it is discovered. The only required file in a node folder.\n\nThe wiring surface lives next door in interface.yaml, so \"what can I connect to this?\" is answered without reading past the node's branding. config/api/test/interface may each be inlined here instead of living in their own file, but never both (that is a lint error, not a merge). See docs/architecture/DECLARATIVE_NODES.md §5.",
+  "description": "node.yaml — what this node IS: its identity, its kind, and how it is discovered. The only required file in a node folder.\n\nThe wiring surface lives next door in interface.yaml, so \"what can I connect to this?\" is answered without reading past the node's branding. config/api/test/interface may each be inlined here instead of living in their own file, but never both (that is a lint error, not a merge). See docs/architecture/authoring/DECLARATIVE_NODES.md §5.",
   "type": "object",
   "required": [
     "type",
@@ -143,7 +143,7 @@
     },
     "auth": {
       "type": "object",
-      "description": "WHO MAY RUN THIS NODE — inbound, about the caller (docs/architecture/DECLARATIVE_NODES.md §9.13). Not to be confused with a call's `credential` in api/run.yaml, which is outbound: how the node proves itself to a vendor. Both were spelled `auth` until 2026-07-28.\n\nCOMPULSORY, which is the point. It was optional (`requires: { role }`) until 2026-07-28, and every node in the tree said nothing — so a node that had been considered and left open looked exactly like a node nobody had thought about. Silence is not an answer to this question.",
+      "description": "WHO MAY RUN THIS NODE — inbound, about the caller (docs/architecture/authoring/DECLARATIVE_NODES.md §9.13). Not to be confused with a call's `credential` in api/run.yaml, which is outbound: how the node proves itself to a vendor. Both were spelled `auth` until 2026-07-28.\n\nCOMPULSORY, which is the point. It was optional (`requires: { role }`) until 2026-07-28, and every node in the tree said nothing — so a node that had been considered and left open looked exactly like a node nobody had thought about. Silence is not an answer to this question.",
       "additionalProperties": false,
       "properties": {
         "required": {

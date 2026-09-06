@@ -10,7 +10,7 @@
  * SHAPE from the schema, WORDS from `node-reference-content.yaml`, and a REFUSAL to write
  * when a field has no copy. The schema's own `description` is deliberately NOT used: those
  * are maintainer notes (`api.run` is 244 words of rationale, and several cite
- * `docs/architecture/DECLARATIVE_NODES.md`, which is never published). Piping them into field
+ * `docs/architecture/authoring/DECLARATIVE_NODES.md`, which is never published). Piping them into field
  * cards produced pages nobody could scan and leaked a private path onto five live pages.
  *
  * Output is opt-in (`--publish`) because every .md under packages/docs becomes a live URL on

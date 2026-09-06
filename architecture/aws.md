@@ -57,8 +57,8 @@ offers three modes because a managed cluster there is something operators alread
 pay for, and standing a second one beside it is waste. On AWS an instance is provisioned per
 stack by convention, so the universe's database is its own, teardown removes everything it
 built with nothing borrowed left behind, and moving existing data in is a copy: `pg_dump`
-into the new instance, once, at the start. Decided 2026-08-02, and the one place the two
-grounds deliberately differ.
+into the new instance, once, at the start. It is the one place the two grounds
+deliberately differ.
 </Note>
 
 ## The trust boundary is the security groups

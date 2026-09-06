@@ -27,7 +27,7 @@ instead, which needs Node and nothing else.
 
 **Before you start, you need a PostgreSQL database and a Redis instance.** Both can be managed services, such as DigitalOcean, Supabase, or AWS RDS, or run locally for development. The platform does not bundle either one: your databases stay under your own management, backups, and policies. PostgreSQL needs the pgvector extension, which managed providers include by default. Local setups are covered in Troubleshooting below.
 
-Setup asks for four credentials. One comes from unoverse; the rest are yours.
+Setup asks for your registry token, your database URL and your Redis details, and whether you are bringing a sign-in provider. Locally you can leave sign-in off.
 
 <CardGroup cols={2}>
 <Card title="unoverse provides" icon="key">
@@ -70,15 +70,16 @@ You'll confirm it's working the first time you author a node ([Create Your First
 One line: the CLI scaffolds your universe:
 
 ```bash Create your universe
-npm create unoverse@latest
+npm install -g unoverse
+unoverse create
 ```
 
-Choose **"A universe"**. The wizard asks for your **registry token** (from your unoverse admin) and validates it against the registry before anything downloads: the platform is licensed through that token, so there is nothing to run without it. It then configures the universe end to end: writes your `.env`, logs into the registry, and sets up the database. There is no separate setup wizard to run afterwards.
+Choose **Universe**. The wizard asks for your **registry token** (from your unoverse admin) and validates it against the registry before anything downloads: the platform is licensed through that token, so there is nothing to run without it. It then configures the universe end to end: writes your `.env`, logs into the registry, and sets up the database. There is no separate setup wizard to run afterwards.
 
-Most people don't need this page at all: authoring happens in a **Studio project** (the wizard's default, see [Studio](/onboarding/studio)). The universe kit is for operators running the full platform.
+Most people don't need this page at all: authoring happens in a **studio** workspace, the wizard's default, see [studio](/onboarding/studio). The universe kit is for operators running the full platform.
 
 <Accordion title="Prefer GitHub?">
-The kit is also a template repo: on [`unoverse-platform/starter`](https://github.com/unoverse-platform/starter), **Use this template → Create a new repository**, then clone your copy. Setup still comes from the CLI: `npm install -g unoverse`, then `unoverse init` in the clone runs the same configuration the wizard does (token, `.env`, database).
+The kit is also a template repo: on [`unoverse-platform/starter`](https://github.com/unoverse-platform/starter), **Use this template → Create a new repository**, then clone your copy. Setup still comes from the CLI: `npm install -g unoverse`, then `unoverse create` in the clone runs the same configuration the wizard does (token, `.env`, database).
 </Accordion>
 
 <Tip>
@@ -104,7 +105,7 @@ unoverse check
 Every line should be green. One command answers the whole question: services up, health endpoints responding, database schema current, and a deeper environment diagnosis if something is off.
 
 </Step>
-<Step title="Open Canvas">
+<Step title="Open canvas">
 
 | Service | URL | What it is |
 | --- | --- | --- |
@@ -121,9 +122,9 @@ runs on :4108 whether or not a platform is up. See [Studio](/onboarding/studio).
 
 Development is local first. The whole platform runs on your machine in Docker, and it is the same platform that runs in production. The loop:
 
-1. **Build your assets in Studio**: components, apps, custom nodes, services, and skills.
-2. **Manage content and availability in Spatial**: ingest your content and control which assets your Agents can find.
-3. **Wire them into Agents in Canvas.**
+1. **Build your assets in **studio****: components, apps, custom nodes, services, and skills.
+2. **Manage content and availability in **spatial****: ingest your content and control which assets your Agents can find.
+3. **Wire them into Agents in **canvas**.**
 4. **Run and test locally**: step through nodes, preview components, talk to your Agent.
 5. **Deploy when you're happy.** `unoverse deploy` runs the [Runbooks](/runbooks/overview) against your server.
 
@@ -131,14 +132,12 @@ Production only enters at step 5. That is also the only point where the second e
 
 ## The two `.env` files
 
-Your project has two environment files, both at the root and both gitignored:
+A universe has two environment files, and you write neither by hand:
 
-| File | Purpose | Used by |
+| File | Purpose | Written by |
 | --- | --- | --- |
-| `.env` | Local development | `docker compose` on your machine |
-| Production configuration | Machine-managed | Rendered by your Terraform ground; `unoverse deploy` places it on your server |
-
-Each file has a template in the repo: copy it and fill in your values. The production file also names the server to deploy to. At deploy time, `unoverse deploy` reads it and runs the platform's Ansible playbooks against that server, following the [Runbooks](/runbooks/overview).
+| `.env` | Local development, read by `docker compose` on your machine | `unoverse create`, from your answers |
+| Production configuration | Your server | Your Terraform ground renders it; `unoverse deploy` places it on the server and runs the playbooks, following the [Runbooks](/runbooks/overview) |
 
 <Warning>
 Don't mix them up. `.env` is local development on your laptop; production configuration comes from your Terraform ground and is never written by hand.
@@ -146,24 +145,23 @@ Don't mix them up. `.env` is local development on your laptop; production config
 
 ## Where your code lives
 
-**Not in this repo.** This repo operates the universe; everything you author lives in a **Studio project**: Studio scaffolds it (`design/`, `prompts/`, `nodes/` in the project folder), validates it as you work, and publishes it to your universe over the API.
+**Not in this repo.** This repo operates the universe; everything you author lives in a **studio** workspace: **studio** scaffolds it (`design/`, `prompts/`, `nodes/` in the workspace), validates it as you work, and `unoverse deploy studio` sends it to your universe over the API.
 
 | You build | In | Guide |
 | --- | --- | --- |
-| **Logic**: custom workflow nodes (YAML manifests) | Studio project `nodes/` | [Create Your First Node](/onboarding/create-your-first-node) |
-| **Design**: components, apps, styles | Studio project `design/` | [Create a component](/onboarding/create-a-component) |
-| **Behavior**: Agent skills and prompt blocks | Studio project `prompts/` | [Create Your First Agent](/onboarding/create-your-first-agent) |
+| **Logic**: custom workflow nodes (YAML manifests) | workspace `nodes/` | [Create Your First Node](/onboarding/create-your-first-node) |
+| **Design**: components, apps, styles | workspace `design/` | [Create a component](/onboarding/create-a-component) |
+| **Behavior**: Agent skills and prompt blocks | workspace `prompts/` | [Create Your First Agent](/onboarding/create-your-first-agent) |
 
 You don't have to build everything yourself. The **marketplace** offers the design system and ready-made nodes and services to install into your universe, per item.
 
 ## Daily workflow
 
 ```bash Daily workflow
-unoverse start                               # start your day
-# edit nodes/, design/, or prompts/
-unoverse build                               # build all + restart
-unoverse build @unoverse-platform/my-node    # or build one package
-unoverse stop                                # end your day
+unoverse start            # start your day
+# author in studio, in your workspace
+unoverse deploy studio    # ship what you built; it is live at once
+unoverse stop             # end your day
 ```
 
 Every command is documented in the [CLI reference](/onboarding/cli).
@@ -210,7 +208,11 @@ brew install pgvector                      # Mac
 sudo apt install postgresql-16-pgvector    # Ubuntu/Debian (match your PG version)
 ```
 
-If you run Postgres in Docker, use the `pgvector/pgvector:pg16` image instead of plain `postgres`. Restart Postgres and re-run `unoverse init`.
+If you run Postgres in Docker, use the `pgvector/pgvector:pg16` image instead of plain `postgres`. Restart Postgres, then run setup again in the folder:
+
+```bash
+unoverse create
+```
 
 </Accordion>
 <Accordion title="Redis connection refused">

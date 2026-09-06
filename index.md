@@ -59,8 +59,8 @@ The customer states what they want, and the brand assembles the answer. A client
 
 | Section | Contents |
 |---|---|
-| [Onboarding](/onboarding/studio) | Set up, then nine challenges in order |
+| [Onboarding](/onboarding/studio) | Set up, then six challenges in order |
 | [Design](/design/overview) | Components, apps, tokens, and the state model |
 | [Nodes](/nodes/overview) | Custom node development: types, patterns, credentials, testing |
-| [Runbooks](/runbooks/overview) | Operations: deployment, database, TLS, hardening |
+| [Runbooks](/runbooks/overview) | Operations: deployment, database, hardening, health |
 | [Architecture](/architecture/overview) | Deployment options, provisioning, networking, data, security |

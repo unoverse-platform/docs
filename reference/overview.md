@@ -5,8 +5,8 @@ title: "Reference"
 
 Every field you can write, generated from the schemas the platform validates against.
 
-These pages are built from those schema files at release time, so they cannot describe a
-field the platform does not accept, and they cannot fall behind one it does.
+These pages are generated from those schema files, so they cannot describe a field the
+platform does not accept. They are regenerated whenever a schema changes.
 
 ## What is here
 

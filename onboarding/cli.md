@@ -56,6 +56,7 @@ Outside a universe, that is the whole surface:
 
   [1mAfter that[0m
     [32mstudio[0m          Design components, nodes and agent skills
+    [32mlint[0m            Check your components, nodes and skills, the same way deploy does
     [32mdeploy[0m          Ship it
       [2mdeploy studio         your components, nodes and skills → your universe[0m
       [2mdeploy aws            your universe → AWS[0m
@@ -90,7 +91,8 @@ Two work wherever you are: `unoverse create` sets up a project, a universe or a 
 | Command | What it does |
 | --- | --- |
 | `unoverse studio` | Launches **studio**, downloading it on first run. |
-| `unoverse login` | Signs in to a universe and remembers it in `unoverse.yaml`. |
+| `unoverse lint` | Checks every component, app, skill, block and node in the workspace. The same check `deploy studio` runs first. |
+| `unoverse login` | Signs in to a universe. `deploy studio` remembers the address in `unoverse.yaml`. |
 
 ### A universe
 
