@@ -1,7 +1,7 @@
 # Playbook: templates
 
-**Read first:** [Templates](https://docs.unoverse.ai/design/templates.md): the three words,
-the director, and how an app places one. Everything in the component playbook applies.
+**Read first:** [Templates](https://docs.unoverse.ai/design/templates.md): the three words
+and how an app places one. Everything in the component playbook applies.
 
 **Exemplars:** `grid-page` and `email-digest` in the base set at
 [marketplace/definitions](https://github.com/unoverse-platform/marketplace/tree/main/definitions).
@@ -15,7 +15,8 @@ the director, and how an app places one. Everything in the component playbook ap
    `components/` holds the template's own parts as flat files with no manifest.
 3. **Every section is one of three words.** `static:` is placed as designed.
    `copywriter:` is written into through its briefs, so the part must carry them.
-   `director:` is decided from what streams in. The Templates page defines each.
+   `director:` holds what streams in, or what its own search finds, in ranked order up to
+   `pick`. No model judges it. The Templates page defines each.
 4. **Never name a component in a director section.** The delivery decides what arrives.
    A base-set template carries no client words.
 5. **`pick` is the one cap word.** Machine-enforced. Any other cap spelling is retired and

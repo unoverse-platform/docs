@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/objects/test.schema.json",
+  "title": "Unoverse object test",
+  "description": "test.yaml: the object under guard (docs/unoverse/data/objects/README.md 4a). One inbox row in, the nodes its function calls faked by call name, the function's returns asserted. What the model writes from the made detail is the platform's one call and is not faked here.",
+  "type": "object",
+  "required": [
+    "testData"
+  ],
+  "properties": {
+    "testData": {
+      "type": "object",
+      "required": [
+        "row"
+      ],
+      "properties": {
+        "row": {
+          "type": "object",
+          "required": [
+            "sourceUrl",
+            "content"
+          ],
+          "properties": {
+            "source": {
+              "type": "string",
+              "description": "The pipeline the row came from."
+            },
+            "sourceUrl": {
+              "type": "string"
+            },
+            "sourceId": {
+              "type": "string"
+            },
+            "suggested": {
+              "type": "string",
+              "description": "The object the first look suggested."
+            },
+            "content": {
+              "type": "object",
+              "description": "The thin content the pipeline put on the row, handler naming the function under test."
+            }
+          },
+          "additionalProperties": false
+        },
+        "fake": {
+          "type": "object",
+          "additionalProperties": {
+            "description": "One node's reply, by the call's name. A call that runs once per item (`for`) is faked by a list: one reply per item, in order.",
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            ]
+          },
+          "description": "Per call name, the node's outputs as if it had run."
+        },
+        "expect": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "description": "A sandboxed `return ...` expression or a {{ }} reference, evaluated by the platform's SafeExpression evaluator."
+          },
+          "description": "Assertions over output, the function's returns."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

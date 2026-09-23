@@ -10,37 +10,41 @@ in the workspace, and the anatomy on the Apps page.
 
 ## The rules that bite
 
-1. **The component drives, the app reacts by name.** A component enters a public state;
-   the app enters its own state of the same name and draws that layout. No match means
-   the component renders inline. Nothing is wired, and after spawn the app never writes a
-   component's state.
-2. **The states tree is the priority ladder.** Base first, reaction states in order. The
-   app is in one state at a time and takes the first its hosted components match. Never
-   author an order separately: the tree is the order.
-3. **Every state declares its layout as a path.** Base moods the app owns itself (a
-   welcome hero on an empty conversation) nest inside the base and never enter the ladder.
-4. **Each layout owns its widths.** `appWidth` is a named size from the project's app
-   sizes, once per panel, never on a layout root, never guarded. Nothing in the manifest
-   sizes the app.
-5. **Surfaces select by `state`.** A reaction layout's slot selects `where: { field:
-   state, eq: <name> }`, never by type or id. Input tools (a composer, a form, a picker)
-   are app chrome and never arrive as a component state.
-6. **Meta is ranked.** A home or fallback app never lists its siblings' jobs.
+1. **An app is a layout with places.** It has ONE state, and its layout declares each
+   `Place` (`name`, `holds: one | many`, `appWidth`, an optional `frame` with a bare
+   `ComponentSlot`). It never matches state names, never orders states, and never decides
+   what is shown. The screen fills the places; an empty place draws nothing.
+2. **Declare every place your project's interfaces name.** A component's state says where
+   it goes (`place: rail`, `place: main`); an app missing that place sends it into the
+   conversation, which a voice app does not draw. `chat`, the conversation, every app has.
+   The lint refuses a missing place by name.
+3. **No slot claims by state.** A `ComponentSlot` with `select.where` on `state` is the
+   retired ladder and a lint error in an app with places, as is a second app state.
+4. **Moods are not states.** A welcome hero on an empty conversation, a call's phases:
+   `visibleWhen` in the one layout.
+5. **Each layout owns its widths.** `appWidth` is a named size from the project's app
+   sizes, once per panel or place, never on a layout root, never guarded. Nothing in the
+   manifest sizes the app, and the manifest carries no `layout:`.
+6. **Input tools are app chrome.** A composer, a form, a picker never arrive as a
+   component state.
+7. **Meta is ranked.** A home or fallback app never lists its siblings' jobs.
    [Node discoverability](https://docs.unoverse.ai/nodes/node-discoverability.md).
 
 ## Workflow
 
 1. Read the Apps page and any app in the workspace.
-2. Write the envelope with its states tree, base first.
-3. Write one layout per state; shared chrome once in `components/`, included by each.
+2. Write the envelope: one state, one layout.
+3. Write the layout: the core (conversation or call), then the places, laid out against
+   each other. Shared chrome goes once in `components/`.
 4. Write the manifest: description, `whenToUse`, category, input schema, and the binding
    to the workflow it owns. Without a real binding the app is not done.
-5. `unoverse lint`, preview in **studio** with the state switcher, `unoverse deploy studio`.
+5. `unoverse lint`, preview in **studio**, `unoverse deploy studio`.
 
 ## Things that go wrong
 
 | Symptom | Cause |
 |---|---|
-| A card never lifts into the app | The app has no state of the name the card writes |
-| The page jumps to a stale lower state | A higher state released; the base should have won. Check the tree order |
+| A card shows in the conversation instead of the rail | Its state's `place:` names a place this app does not declare, or it names none |
+| A voice call shows nothing when a card is opened | The voice app is missing the place that state names |
+| An opened card never leaves the rail | Its `page` state names no place, or names the same one as `grid` |
 | Lint rejects a width | Raw CSS, a guard on it, or a width on a layout root |

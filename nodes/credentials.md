@@ -80,6 +80,33 @@ service open in another tab. `documentationUrl` is the link to where the key com
 **`secret: true` is the field's whole security posture.** Mark anything that grants access.
 A base URL is not secret. A key is.
 
+**A choice, and the fields that follow it.** A field of `type: select` offers `options`, and
+another field may show only for one of them with `ui:dependencies`, the same word and rule a
+node's config schema uses. One credential then asks only what the chosen provider needs:
+
+```yaml credentials/mailboxCredential.yaml
+  - name: provider
+    displayName: Provider
+    type: select
+    required: true
+    secret: false
+    options:
+      - { name: Amazon SES, value: ses }
+      - { name: Gmail, value: gmail }
+      - { name: Microsoft 365, value: outlook }
+
+  - name: refreshToken
+    displayName: Refresh token
+    type: string
+    required: true
+    secret: true
+    "ui:dependencies": { provider: gmail }
+```
+
+A scalar in `ui:dependencies` is equality, a list is membership, and several keys are ANDed.
+A hidden field is not asked for and its `required` is not enforced. A manifest reads the
+choice like any other field: `{{ credentials.mailboxCredential.provider }}`.
+
 ### 2. Ask for it
 
 The node names what it needs in `interface.yaml`.

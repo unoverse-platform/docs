@@ -480,10 +480,17 @@ the CONVERSATION; `chatId` names ONE TURN and every component keys `chatId:nodeI
 channel mints a fresh `chatId` per outbound send, so each exchange is its own turn and
 a re-run yields a NEW component instance instead of merging into the previous one.
 
-**Turn-internal ordering (model semantic):** a turn's components order by latest server
-activity, newest last; a data merge for an overtaken component moves its pointer back
-to the end of its turn. The streaming hot path (component already last) stays a
-data-only merge.
+**Turn-internal ordering (model semantic):** a turn's components order by ARRIVAL, and
+stay there. Placement happens once, when a component is first placed; later data only
+changes its contents. Nothing about a later datum says anything about where the thing
+belongs, so a data merge NEVER moves a component. The streaming hot path stays a
+data-only merge, as it always was.
+
+It read the other way until 2026-09-08 — newest activity last, so fresh data for an
+overtaken component moved it to the end of its turn. That is wrong in front of a person:
+a card already on screen and already being read swapped places with the streaming text
+around the Agent card on every update, mid-run. Ordering that depends on when a thing
+last spoke is ordering that changes under the reader's eyes.
 
 **Which lane:** every message above is run-scoped and arrives on the MCP `/stream`. The
 SDK WS lane carries only audio + global cross-MCP state (two-lane split,
@@ -507,6 +514,20 @@ one SDK path.
 | `collectSurfacedViews(tree)` | the views a layout's surfaces claim | † becomes the ordered claim list |
 | `computeAppWidth(activeLayout, store, appSize)` | state-owned app width | width math survives; its private recency copy † dies |
 | `propDefaults` / `formatRelative` / `cssWidth` | small neutral projections | survive |
+| `placeWidthStyle(declared, appSize)` | THE ONE width law for a place | survives |
+
+**`placeWidthStyle` is one function on purpose (2026-09-07).** A place — a panel, a slot
+frame, a mounted template — declares `appWidth` once: a named size resolves through
+`theme.appSize`, raw CSS passes through, and the place is then that width always
+(`flex: 0 0 auto`). `flex` is the SDK's own word, never a token, and means "fill the space
+remaining beside whatever core is open". Anything else declares nothing and the place's own
+style decides.
+
+It sits in core for the reason `cssWidth` and `computeAppWidth` already do — it is width
+MATH over a declared value, not a UX decision — and it is ONE function because it was
+briefly two: the slot frame kept its own copy without the `flex` word, and the moment an
+org's `flex` token went, that copy rendered a task surface in a zero-width frame and the
+surface came up blank. A law with two implementations is a law that disagrees with itself.
 
 Two guards freeze the portable core (`sdk-core-surface.test.ts`,
 `sdk-core-portable.test.ts`: no React/web imports in `core/`); a platform port

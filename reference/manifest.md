@@ -76,7 +76,7 @@ LEGACY arrival state (STATE MODEL v2). A component declares its arrival as the `
 </ResponseField>
 
 <ResponseField name="states" type="object">
-An app's state tree. Top-level order IS the priority ladder, base first, and nesting is containment. Each state owns the layout that draws it.
+The state tree. Each state owns the layout that draws it, and a component's state may name the `place:` it is shown in. An app with places has one state: its layout declares the places, and the screen fills them.
 </ResponseField>
 
 <ResponseField name="layout" type="string">
@@ -138,5 +138,5 @@ What the manifest sits beside, and how a component is built.
 </Card>
 
 <Card title="Apps" icon="layout-template" href="/design/apps" horizontal>
-The state tree, the priority ladder, and how an app reacts.
+The layout and the places your interfaces are shown in.
 </Card>

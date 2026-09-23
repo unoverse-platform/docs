@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/objects/make.schema.json",
+  "title": "Unoverse object make function",
+  "description": "api/make.yaml: the object's private make function (docs/unoverse/data/objects/README.md 4b, 2026-09-14): one function with no name inside it, the extra reading the pipeline does before it writes the object (a product's whole page, a fund's documents). Only the pipeline runs it. A prop written from it says from: make.<return>. An object the pipeline writes from what it already has (a need, a table, a figure) has no make.yaml.",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string"
+    },
+    "calls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "node"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+            "description": "The call's name; later calls and returns read its outputs as calls.<name>.<output>."
+          },
+          "node": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9]*$",
+            "description": "The node this call runs, by type (S3FileContent). The node carries its credential, hosts and interface; its credential is found by type in the org's store."
+          },
+          "config": {
+            "type": "object",
+            "description": "The node's config, with {{ row.* }}, {{ calls.<name>.* }}, {{ item }} references and return expressions."
+          },
+          "when": {
+            "description": "A sandboxed `return ...` expression or a {{ }} reference, evaluated by the platform's SafeExpression evaluator.",
+            "type": "string"
+          },
+          "for": {
+            "type": "string",
+            "description": "A reference to a list: run the call once per item, item in scope; the outputs are an aligned array."
+          },
+          "optional": {
+            "type": "boolean",
+            "description": "A best-effort call: when it fails the function goes on and its reply is null (under `for`, null in that item's place). A model's second look, never the read itself."
+          },
+          "inputs": {
+            "type": "object",
+            "description": "What the node takes wired on a canvas (a parse's etag), resolved like config. Under `for` the item rides in beside them."
+          },
+          "cacheable": {
+            "type": "object",
+            "description": "REMEMBERED, WHERE THE CALL KNOWS SOMETHING THE NODE CANNOT. A node declares whether its KIND of answer may be reused, and a general model call declares false, rightly: a prompt and a model are the caller's. A CALL is narrower than its node and may fix the prompt, fix the model, and hand it an input that cannot change. Only the call's author is in a position to say so, so a call may declare its own memory. It must name what makes its input the same input: `key` is required, because \"this is repeatable\" is a claim about the INPUT, and a claim with nothing to point at is a hope.",
+            "properties": {
+              "ignore": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Config fields dropped from the fingerprint because they are the input's transport, not its identity (an inlined image, a presigned URL)."
+              },
+              "key": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "description": "Input leaf fields that identify what was asked, matched by dot-suffix against the resolved inputs. A key that collects nothing disables the memory for that run."
+              }
+            },
+            "required": [
+              "key"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "returns": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      ],
+      "description": "The function's outputs: a record of {{ }} references or return expressions over row, calls and item, or one expression for the whole."
+    }
+  },
+  "additionalProperties": false
+}

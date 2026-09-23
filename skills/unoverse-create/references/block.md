@@ -8,7 +8,7 @@ behaviour, a block is an ingredient.
 ## Where it goes
 
 ```
-prompts/blocks/<category>/<block-name>.md
+design/marketplace/blocks/<category>/<block-name>.md
 ```
 
 The folder is the category. The shipped ones are `core`, `formatting` and `media`; add a
@@ -40,4 +40,6 @@ The block's reference name is the filename in camelCase: `markdown-guidelines.md
 
 ## Ship
 
-`unoverse lint`, then `unoverse deploy studio`.
+`unoverse lint <project>`, then `unoverse deploy studio`. Lint checks every block: the
+frontmatter parses (quote a value that holds `: `), `name` and `description` are present,
+the filename is kebab-case, the body is not empty and references no other block.

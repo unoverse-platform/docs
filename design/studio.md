@@ -85,8 +85,8 @@ Live mode proves the things mock cannot:
 
 - Your component's node receives and merges streamed data correctly.
 - App selection picks your app for the intents you wrote `whenToUse` for.
-- The reaction runs end to end: an interface arrives in a public state, the app enters the
-  matching state, its slot frames the interface, and the ✕ releases it back to the base.
+- Showing runs end to end: the model shows an interface, it lands in the place its state
+  names, a tap moves it, and the ✕ puts it back.
 - Turn lifecycle behaves, so thinking indicators derived from `isStreaming` appear and,
   critically, clear.
 

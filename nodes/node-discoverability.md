@@ -107,6 +107,7 @@ catch-all.
 | Restate the description | "Use this node to call the Example API" carries no signal |
 | Write marketing | "A powerful, flexible node for all your needs" |
 | Describe the endpoint | "Calls GET /v2/companies/enrich with retry". Selection is on the job, not the URL |
+| List what it is not for | Every job named in the text pulls messages about that job towards it |
 
 ## Before you ship
 
@@ -121,13 +122,12 @@ catch-all.
 Ranking uses what is published, so deploy the node before expecting new wording to change
 what gets picked.
 
-## The same rule for apps and skills
+## The same rule for tasks: apps, components and skills
 
-Apps and agent skills are discovered the same way, with one difference that matters.
-
-Nodes are matched against a **planner's task**, so "Pick when a step needs…" reads correctly.
-Apps and skills are matched against **what a person actually said**, so write the words
-they would use.
+Apps, components with a manifest, and Agent skills are discovered the same way, with one
+difference that decides everything. Nodes are matched against a **planner's task**, so "Pick
+when a step needs…" reads correctly. Tasks are matched against **what a person actually
+said**. Write the words they would say.
 
 ```yaml
 # Wrong: instructions about the user, in developer vocabulary
@@ -136,6 +136,35 @@ whenToUse: Pick when the user asks to talk or wants a phone-style assistant.
 # Right: the words a person would say
 whenToUse: Talk to the assistant by voice, hands free, instead of typing.
 ```
+
+A task is placed on the map by its `title` and its `whenToUse`, verbatim. A short request
+from a person lands on the task whose text sounds like it. So the opening of `whenToUse`
+does the work, and it should be several phrasings of the same request, not one.
+
+```yaml
+title: Card Finder
+description: A guided chooser that ends in one card the customer wants to apply for.
+whenToUse: >-
+  Help me choose a card. Which one is right for me, I do not know where to start, decide
+  for me. Asks the few things only I can answer, then names one card and why it fits.
+```
+
+Three rules for a task, in order:
+
+1. **Open with the request, three or four ways.** Short, in the first person, the way it is
+   typed or said: "help me choose a card", "which one is right for me", "decide for me".
+   Each phrasing is another way for a real message to land on this task.
+2. **Then one property, stated as what the thing is.** "It moves money." "It starts from a
+   product I have named." One sentence. It is how a near neighbour loses the match without
+   being named.
+3. **Nothing else.** No steps, no list of what it is not for, no sibling's job. Every idea in
+   the text pulls the match towards itself, so naming the jobs you should lose pulls those
+   messages to you.
+
+**Requests and questions are different sentences.** A task is something a person wants
+done: compare, choose, send, apply, speak to someone. A question, "what does this card
+cost", should land on content, not on a task. If a task's `whenToUse` reads like an
+answer to questions, questions will open it. Keep it to requests.
 
 **Beware the generalist trap.** A fallback surface that lists everything its siblings do will
 outrank them for their own jobs. A fallback owns general help and questions, and cedes

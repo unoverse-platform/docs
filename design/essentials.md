@@ -90,13 +90,13 @@ Four rules carry the whole model, and they are the same at every scale:
 
 | Rule | Meaning |
 |---|---|
-| First declared wins | A component arrives there; an app or template rests there |
+| First declared wins | A component arrives there; a template rests there |
 | Every state names its layout | A path, such as `layout: layouts/grid`. Nothing is assumed from the name |
 | Top level is public, nesting is private | The outside world sees the top-level names and nothing else |
-| Reactions are name-matches | A state written on one thing activates the same-named state on whatever holds it |
+| A state may name its place | `place: main` shows the interface in the app's `main` place whenever it is in that state |
 
-So a card writing `state: page` opens a template's `page` state, which draws that state's
-layout. The same sentence describes a component, a template and an app, which is the point.
+So a card writing `state: page` draws its page layout and moves to the place `page` names.
+An app has one state and a layout of places; it never matches names.
 
 <Tip>
 **The order of states matters.** The first declared is where the thing starts, and the

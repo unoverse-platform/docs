@@ -151,8 +151,8 @@ Four things in those files carry the whole model:
 - **Every state names its layout.** `layout: layouts/grid` is a path, so nothing is
   assumed from the state's name.
 - **The card opens itself.** The tile is a `Button` whose action writes `state: page` into
-  the card's own data, and the page writes it back. Whatever holds the card reacts to
-  those names.
+  the card's own data, and the page writes it back. Each state may name its `place:`,
+  so the card moves from the rail to the main panel and back.
 - **Prop defaults are the preview.** **studio** draws the card from them before any
   workflow exists, so write realistic content.
 
@@ -173,9 +173,17 @@ wrong one:
 |---|---|
 | Static content: copy, option lists, images | Hardcoded in the layout |
 | Starting values of keys the component writes, such as `step` | The `values:` block, scalars only |
-| Data a workflow streams in | `props`, marked `input: true` |
+| Data a workflow streams in, or a model fills | `props`, marked `input: true` |
+| A value the component owns, never filled from outside | `props`, marked `input: false` |
+| A body: a document the model composes | A prop typed `unoverse-markdown`, marked `input: true` |
 
-Declare in `props` every field a workflow can fill, and mark each one `input: true`. An
+Declare in `props` every field the outside can fill, and mark each one `input: true`: those
+are the fields on the component's tool. A prop marked `input: false` keeps its default and is
+never on the tool. A
+prop typed `unoverse-markdown` is a body: the platform compiles the document's typed
+components onto that field, from the atoms in the markdown category, so the prop's
+description is the whole instruction for the body. Any prop can take the type,
+whatever fills it. Bind it to a Markdown primitive by name. An
 array, an object or a URL in `values:` is the tell for a mistake. That is content to
 hardcode, or data to declare as a prop. Anything computed is computed in the workflow and
 arrives as a plain field.
@@ -271,6 +279,42 @@ Your `manifest.yaml` carries the four fields that decide whether this is ever ch
 `title`, `description`, `whenToUse` and `category`. The rules are identical for every kind,
 they are enforced by the deploy lint, and
 [Node discoverability](/nodes/node-discoverability) is the contract.
+
+## A component that asks
+
+A form or wizard that hands answers back to the Agent needs two things, and nothing else:
+
+```yaml
+# finder.yaml
+outputs:                       # the answers, by name: what the Agent gets back
+  subject:
+    type: string
+    enum: [ law, finance, technology ]
+  studyMode:
+    type: string
+    enum: [ online, in-centre ]
+```
+
+```yaml
+# the last step's button
+action:
+  type: setValue
+  values:
+    - key: studyMode
+      value: "{{value}}"
+  then:
+    type: submit               # hand the answers back
+```
+
+The platform does the rest. When an Agent calls the component, it waits; the component's
+`submit` sends back exactly the `outputs` keys from its own data, and the Agent carries on with
+them. The component then steps aside to its card in the conversation, where the person can
+reopen it. A ✕ that should stop the
+question writes `type: cancel`, and the Agent hears that the person cancelled.
+
+Steps, tabs and states in between answer nothing. Only `submit` and `cancel` do. This is native
+MCP [elicitation](https://modelcontextprotocol.io/specification/latest/client/elicitation), so a
+host like ChatGPT shows its own form from the same `outputs`.
 
 ## Next steps
 

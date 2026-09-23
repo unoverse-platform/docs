@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/pipelines/interface.schema.json",
+  "title": "Unoverse pipeline interface: the pipeline as a node on a canvas, a node's interface.yaml",
+  "$ref": "../nodes/interface.schema.json"
+}

@@ -1,0 +1,161 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/pipelines/pipeline.schema.json",
+  "title": "Unoverse pipeline",
+  "description": "pipeline.yaml: the source side of ingestion (docs/unoverse/data/pipelines/README.md layer 1). The face as a node's node.yaml, then two keys of its own: collect, the nodes that fetch in order, and make, the objects made in order. Nothing else: no row, no yields (gone 2026-09-10), no HTTP, no credentials, no hosts.",
+  "type": "object",
+  "required": [
+    "type",
+    "name",
+    "title",
+    "description",
+    "whenToUse",
+    "category",
+    "version",
+    "color",
+    "logoUrl",
+    "collect",
+    "make"
+  ],
+  "properties": {
+    "unoverse": {
+      "type": "string"
+    },
+    "type": {
+      "const": "pipeline"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Equals the folder."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "whenToUse": {
+      "type": "string",
+      "minLength": 1,
+      "description": "When to point this pipeline at a source, in the person's words; shown on the Import screen."
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "logoUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "collect": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "node"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+            "description": "A later step and every make entry read this step's outputs as collect.<name>.<output>."
+          },
+          "node": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9]*$",
+            "description": "The node this step runs, by type. It carries its own credential, found by type in the org's store."
+          },
+          "config": {
+            "type": "object",
+            "description": "The node's config, with {{ config.* }} and {{ collect.<earlier>.* }} references."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "make": {
+      "type": "array",
+      "minItems": 1,
+      "description": "What is made, in order (docs/unoverse/data/pipelines/README.md, make). An entry with each makes objects from each item's row; an entry without each makes objects once per pack, from the rows made per item.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "each": {
+            "type": "string",
+            "description": "A list over collect ({{ collect.<step>.<list> }}): one row per item."
+          },
+          "sourceUrl": {
+            "type": "string",
+            "description": "The row's address, over item, when the collect node does not give one (item.address)."
+          },
+          "sourceId": {
+            "type": "string",
+            "description": "The row's identity, over item, when the collect node does not give one (item.universalId)."
+          },
+          "content": {
+            "type": "object",
+            "description": "What the row carries instead of the item as listed, each value over item, index, config and collect."
+          }
+        },
+        "additionalProperties": {
+          "type": "object",
+          "description": "An object made, keyed by its name.",
+          "properties": {
+            "cardinality": {
+              "enum": [
+                "one",
+                "many"
+              ],
+              "description": "How many one row (or one pack) makes."
+            },
+            "any": {
+              "const": true,
+              "description": "The item MAY be one; the model says."
+            },
+            "parts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Rows of their own taken from the object's read, no model call: table: \"{{ detail.tables }}\"."
+            },
+            "index": {
+              "type": "object",
+              "maxProperties": 0,
+              "description": "The object's rows, with their parts, are in the pack's index. index: {}"
+            },
+            "where": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "string",
+                    "number"
+                  ]
+                },
+                "minItems": 1
+              },
+              "description": "Made once per pack: which rows it is made from, per field the values allowed."
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

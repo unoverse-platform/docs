@@ -21,7 +21,7 @@ place to start.
 ## The shape of a node
 
 <Tree>
-  <Tree.Folder name={<><b>nodes/&lt;package&gt;</b> <span className="tree-note">in your studio project workspace</span></>} defaultOpen>
+  <Tree.Folder name={<><b>design/&lt;project&gt;/nodes/&lt;package&gt;</b> <span className="tree-note">in your studio project workspace</span></>} defaultOpen>
     <Tree.File name={<><b>package.yaml</b> <span className="tree-note">what the package is and may call</span></>} />
     <Tree.Folder name={<><b>credentials</b> <span className="tree-note">the credentials its nodes ask for</span></>} />
     <Tree.Folder name={<><b>shared</b> <span className="tree-note">fragments more than one node reuses</span></>} />

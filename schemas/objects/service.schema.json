@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/objects/service.schema.json",
+  "title": "Unoverse object functions",
+  "description": "api/service.yaml: the object's public functions by name (docs/unoverse/data/objects/README.md 4b), each callable from outside: by an Agent in Spatial and by a component. getDetail opens a row, searchDetail answers a question from it. The file is the switch: nothing inside a function says who may call it. The private make function lives in api/make.yaml, never here. A function is calls in the node's own grammar (owner 2026-09-09: keep in line with the core nodes API), never steps; every call names a node. returns maps the outputs by name, or is one expression.",
+  "type": "object",
+  "propertyNames": {
+    "pattern": "^[a-z][A-Za-z0-9]*$",
+    "not": {
+      "enum": [
+        "make",
+        "makeDetail"
+      ]
+    }
+  },
+  "additionalProperties": {
+    "$ref": "#/definitions/function"
+  },
+  "definitions": {
+    "function": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "input": {
+          "type": "object",
+          "description": "What the function takes when it is called from outside (docs/unoverse/data/objects/README.md 4b): a JSON schema of its arguments, the word an Agent's tools use (type: object, properties, required). The call carries the row's universal_id beside them; the function reads them as params.",
+          "properties": {
+            "type": {
+              "const": "object"
+            },
+            "properties": {
+              "type": "object"
+            },
+            "required": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "properties"
+          ]
+        },
+        "calls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "node"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                "description": "The call's name; later calls and returns read its outputs as calls.<name>.<output>."
+              },
+              "node": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Za-z0-9]*$",
+                "description": "The node this call runs, by type (S3FileContent). The node carries its credential, hosts and interface; its credential is found by type in the org's store."
+              },
+              "config": {
+                "type": "object",
+                "description": "The node's config, with {{ row.* }}, {{ calls.<name>.* }}, {{ item }} references and return expressions."
+              },
+              "when": {
+                "description": "A sandboxed `return ...` expression or a {{ }} reference, evaluated by the platform's SafeExpression evaluator.",
+                "type": "string"
+              },
+              "for": {
+                "type": "string",
+                "description": "A reference to a list: run the call once per item, item in scope; the outputs are an aligned array."
+              },
+              "optional": {
+                "type": "boolean",
+                "description": "A best-effort call: when it fails the function goes on and its reply is null (under `for`, null in that item's place). A model's second look, never the read itself."
+              },
+              "inputs": {
+                "type": "object",
+                "description": "What the node takes wired on a canvas (a parse's etag), resolved like config. Under `for` the item rides in beside them."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "returns": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          ],
+          "description": "The function's outputs: a record of {{ }} references or return expressions over row, calls and item, or one expression for the whole."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -7,7 +7,7 @@ The complete set a definition may compose from. It is closed: a renderer meeting
 type would have nothing to draw, so adding to it is a change to every SDK.
 
 <div className="ref-source">
-Generated from <code>definition-1.2.schema.json</code> and the token files, so it
+Generated from <code>definition-1.3.schema.json</code> and the token files, so it
 cannot fall behind what ships.
 </div>
 
@@ -60,14 +60,14 @@ children:
 ```
 </ResponseField>
 
-<ResponseField name="Each" post={["requires template"]}>
+<ResponseField name="Each" post={["requires item"]}>
 Repeats one subtree over a list, either a literal `items` array or a bound field.
 
 ```yaml
 type: Each
 bind: { items: features }
 style: { direction: column, gap: "2" }
-template:
+item:
   type: Text
   bind: { value: label }
 ```
@@ -86,14 +86,37 @@ cases:
 </ResponseField>
 
 <ResponseField name="ComponentSlot">
-Where a component renders inside an app. A bare slot is the conversation flow; one with `select` is a reaction surface.
+Where each interface a Place holds draws, inside the place's frame. It takes no selector: the screen has decided what the place holds.
 
 ```yaml
 type: ComponentSlot
-select: { from: all, where: { field: view, eq: detail }, limit: 1 }
+```
+</ResponseField>
+
+<ResponseField name="Template" post={["added in 1.3"]}>
+Mounts a template inside an app. `template` names what it holds; the template owns its own states and sections.
+
+```yaml
+type: Template
+name: products
+template: grid-page
+appWidth: flex
+```
+</ResponseField>
+
+<ResponseField name="Place" post={["added in 1.3"]}>
+A named place in an app's layout that the screen fills. `holds: one` shows the newest interface shown into it; `many` shows the set. An empty place draws nothing, frame included.
+
+```yaml
+type: Place
+name: main
+holds: one
+appWidth: flex
 frame:
   type: Box
   style: { direction: column, overflow: auto }
+  children:
+    - type: ComponentSlot
 ```
 </ResponseField>
 

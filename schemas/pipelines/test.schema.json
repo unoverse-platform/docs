@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/pipelines/test.schema.json",
+  "title": "Unoverse pipeline test",
+  "description": "test.yaml: the pipeline under guard. The collect steps faked by step name, the config given, the inbox rows each make entry puts in the inbox asserted as output.rows. What an item becomes is the objects' own tests.",
+  "type": "object",
+  "required": [
+    "testData"
+  ],
+  "properties": {
+    "testData": {
+      "type": "object",
+      "required": [
+        "config",
+        "fake"
+      ],
+      "properties": {
+        "config": {
+          "type": "object",
+          "description": "A complete Import form, valid against config.yaml."
+        },
+        "fake": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "description": "Per collect step name, the node's outputs as if it had run."
+        },
+        "expect": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "description": "A sandboxed `return ...` expression or a {{ }} reference, evaluated by the platform's SafeExpression evaluator."
+          },
+          "description": "Assertions over output: rows, the inbox rows collected."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

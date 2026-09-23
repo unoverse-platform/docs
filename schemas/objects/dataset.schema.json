@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/objects/dataset.schema.json",
+  "title": "A dataset's table",
+  "description": "The shape of the table an object owns (docs/unoverse/data/objects/dataset.md). The declaration IS the schema: it generates a migration a person reviews, and nobody edits a database schema by hand.",
+  "type": "object",
+  "required": [
+    "columns"
+  ],
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "What one row of this table is."
+    },
+    "columns": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The columns, in the order they are written. A name the platform puts on every dataset itself (id, org, of, document, created_at, updated_at) may not be declared here.",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "type"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "description": "Lower case letters, digits and underscores, starting with a letter: a plain word that never has to be quoted."
+          },
+          "type": {
+            "enum": [
+              "string",
+              "number",
+              "integer",
+              "date",
+              "datetime",
+              "boolean"
+            ],
+            "description": "`number` is exact decimal and never floating point, so a total that must reconcile against a stated figure does not drift."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "A row without it is refused at the door."
+          },
+          "indexed": {
+            "type": "boolean",
+            "description": "Searched, filtered or grouped by, so the generated table indexes it."
+          },
+          "description": {
+            "type": "string",
+            "description": "What this column holds, in the words a reader of the data would use."
+          },
+          "enum": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            },
+            "description": "The only values this column may hold. The database refuses anything else, so a word that IS the language (a measure, a unit, a side) cannot arrive misspelled and quietly become a second thing that never adds up with the first. Leave it off for a column that carries a document's own words, which are not ours to enumerate."
+          }
+        }
+      }
+    },
+    "uniqueBy": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "The columns that together identify one row, so a read again replaces its rows rather than landing beside them and counting a reading twice."
+    },
+    "subject": {
+      "type": "string",
+      "description": "The column that says WHOSE these rows are. The one row this dataset leaves on the map is titled from it; the platform never guesses the word."
+    },
+    "asOf": {
+      "type": "string",
+      "description": "The column that says when these rows speak as of, so the handle can say it."
+    }
+  },
+  "additionalProperties": false
+}

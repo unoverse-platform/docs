@@ -51,7 +51,6 @@ children:
       width: full
     children:
       - director:
-          rules: The items most relevant to the user, strongest matches first.
           preview: [ card, card, card ]
 ```
 
@@ -95,11 +94,12 @@ small cast of characters:
 |---|---|---|
 | `static:` | Nobody. It renders as designed | A component path |
 | `copywriter:` | The copywriter, through the component's briefs | A component path, and it must carry briefs |
-| `director:` | The director, the judge | With a component: a search place. Without: a delivery band |
+| `director:` | Search, in ranked order | With a component: a search place. Without: a delivery band |
 
-The director works one of two ways, and one sentence covers both: **give the director a
-component and they go find its content; give them nothing and they judge what the
-conversation delivers.**
+A `director:` part works one of two ways, and one sentence covers both: **give it a
+component and the page searches for its content; give it nothing and it holds what the
+conversation delivers.** No model judges what lands. The main model decides what to show,
+and a place takes its results in the search's ranked order, up to `pick`.
 
 `grid-page` needs only the third. A richer template mixes them, like this email digest,
 whose layout links its own parts by path and leaves one band open:
@@ -114,10 +114,9 @@ children:
   - static: components/masthead        # placed as designed
   - copywriter: components/subject     # placed, then written into
   - copywriter: components/body
-  - director:                          # not placed: decided per delivery
+  - director:                          # not placed: filled per delivery
       state: grid
       pick: 3
-      rules: The items most relevant to the reader, strongest matches first.
       preview: [ card, card, card ]
   - static: components/footer
 ```
@@ -154,28 +153,25 @@ Give each field its own brief when the jobs differ. A greeting, a message and a 
 hands off to the items below are three different writing jobs, and one description could
 not govern all three.
 
-## The director
+## Where content lands
 
-The **director** decides what a template holds: the same judge in both of its modes, and
-`pick` is always its signature: how many it keeps.
+A `director:` part says where content lands in a template, and `pick` says how many it keeps.
+Nothing judges what lands: the main model decides what to show, and each place takes its
+results in ranked order.
 
 ### A delivery band
 
-A `director:` part with no component waits for the conversation. When a delivery lands the
-director chooses which of the arriving interfaces deserve the space, in what order, and
-whether the previous set is spent:
+A `director:` part with no component waits for the conversation. When a delivery lands, what
+arrives fills the band in ranked order, up to `pick`, and the next delivery replaces it:
 
 ```yaml
 - director:
     state: grid          # arrivals are switched into this state and held there
-    pick: 3              # how many the director keeps, enforced by the machine
-    rules: >-            # soft guidance, written like a brief
-      The items most relevant to the reader, strongest matches first.
+    pick: 3              # how many it keeps, enforced by the machine
 ```
 
-One director **mind** per template, and it may hold more than one **band**. Several
-`director:` parts are fine as long as each claims a distinct `state:`, which is how one
-verdict says which band each item belongs to: a day told in two halves is a written head
+A template may hold more than one **band**. Several `director:` parts are fine as long as
+each claims a distinct `state:`, and an arrival lands in the band whose state it wears: a day told in two halves is a written head
 and its cards, then a second head and its cards, on one page. Two bands claiming the same
 state is an error, because a state has exactly one surface.
 
@@ -183,19 +179,8 @@ state is an error, because a state has exactly one surface.
 where nothing opens. Omit it and arrivals keep their own state, so the template's states
 react by name and the grid-to-page dance comes free.
 
-The director works under fixed laws:
-
-| Law | What it means |
-|---|---|
-| Selection only | It chooses among what you authored and the delivery supplied. It never invents layout or content |
-| Delivery moments only | It is silent between deliveries, so nothing rearranges while the reader reads |
-| Fails open | A slow or errored call leaves the screen exactly as it is |
-| Empty is a real answer | "Nothing deserves this space" is a legitimate verdict |
-| Your hand outranks it | `pick` is structural, and the guest's own navigation always wins |
-
-A design-system template ships a universal rule like the one above. A project wanting its
-own judgment ships its own template, because the director's brain has one home and that is
-its part in the layout.
+`pick` is structural: the machine enforces it. A band with nothing to hold draws nothing, and
+the guest's own navigation always wins.
 
 ### Preview
 
@@ -220,15 +205,15 @@ appears when an Agent happens to mention its subject.
 - director:
     component: components/nearby   # what draws it, and what makes this a search place
     type: intent                   # which search answers (optional; derived when absent)
-    include: [ services ]          # what kind may answer
-    pick: 2                        # how many the director keeps
+    include: [ products ]          # what kind may answer
+    pick: 2                        # how many it keeps
 ```
 
 Write the component's description as a comma list of things ("theme parks, rides,
 karting"), never prose: each term is searched as its own short angle in one batched
 call, and short terms match content that long sentences miss.
 
-**You never write the question.** The director derives it from the first of four voices
+**You never write the question.** The page derives it from the first of four voices
 that speaks:
 
 1. **The writing.** An `items` place: the writer's headings are the searches.
@@ -245,7 +230,7 @@ An authored question could only duplicate one of these, and a duplicate either a
 how **many** survive, never what to look for.
 
 The search returns more candidates than `pick` (the node's own config owns how many; there
-is no per-place search size), and the director judges them against the page's brief. The
+is no per-place search size), and the place keeps the best-ranked `pick` of them. The
 part keeps both lanes: its content arrives from the search with no model involved, and its
 headings and taglines are the copywriter's afterwards. Nothing declares which prop takes
 the rows, because the schema already says so: the prop whose items require only `ref` is
@@ -255,8 +240,8 @@ the content prop.
 
 A search place may carry `items:`. The part then holds a list: the writer authors each
 item's heading and its search in one call, one batched search runs with every question
-keeping the node's full result budget to itself, and the director places results under
-the heading they answer. Heading and content can never disagree,
+keeping the node's full result budget to itself, and each item's results land under the
+heading that asked for them. Heading and content can never disagree,
 because the heading is the search.
 
 ```yaml
@@ -266,7 +251,7 @@ because the heading is the search.
       min: 3
       max: 5
       type: discovery
-      include: [ services ]
+      include: [ products ]
       pick: 2             # results per item
 ```
 
@@ -362,7 +347,7 @@ block is page arrangement a template composes. If it holds sections, it is a blo
   appWidth: flex             # a place declares its width once
 ```
 
-The placement only places, and the director's rules stay in the template itself.
+The placement only places; everything about how a template fills stays in the template itself.
 
 The delivery owns the parts. Each turn's delivery replaces the last, a delivery that
 confirms nothing clears them, and an empty template collapses, frame included.

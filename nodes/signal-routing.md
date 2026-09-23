@@ -129,6 +129,21 @@ later, and a good name is the difference between `signal.crm1.contact` and
 string, an `object` or `array` field takes a `return` expression.
 [Config schema](/nodes/config-schema) covers both.
 
+## Two inputs never arrive together
+
+A node is ready the moment ONE of its input connectors has everything wired to it. Two
+named inputs are therefore two doors: the node runs when the first is satisfied, again when
+the second is, and neither run sees the other's data. That is right for a node that reacts
+to whichever arrives (a loop's `items` and its `continue`). It is wrong for a call that
+needs two things at once.
+
+So a node whose one call needs two pieces of material takes ONE input, `signal`, and reads
+both pieces through config: a `string` field with `ui:field: template` for the text, an
+`object` field for the shape. Both resolve from the same upstream data before the node
+runs, so they are always in hand together. GPT-5 Structured Output was declared with a
+`content` and a `schema` input and fired twice on a canvas, once per input, each time
+without the other (2026-09-19); it now takes `signal` and holds both in config.
+
 ## Required, and what waiting means
 
 `required: true` means the node waits for that connector before it runs.

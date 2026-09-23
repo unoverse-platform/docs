@@ -14,6 +14,7 @@ These keys are how you say it.
 | `paginate` | the API returns results a page at a time |
 | `chunk` | the API limits how many records you can send at once |
 | `poll` | the work takes a while, so you start it and wait |
+| `repeat` | each turn depends on the answer to the one before, and you go round until a reply says done |
 | `state` | the node needs to remember something between runs |
 | `loop` | the node is one half of a LoopStart and LoopEnd pair |
 | `presign` | you need shareable links to files, minted not fetched |
@@ -130,6 +131,65 @@ handle would fail on exactly the fast case.
 
 `intervalMs` is capped at 60 seconds and `maxAttempts` at 300.
 
+### `repeat`
+
+> Built 2026-09-13. A package whose node goes round in turns declares `requires.repeat: true`
+> in its `package.yaml`, so an executor without it refuses the package instead of settling on
+> nothing.
+
+Go round in turns until a reply says you are done. Use it when each turn is a few ordinary
+calls and each turn is built from the answer to the one before: walking a tree and choosing
+a branch at each fork, narrowing a search, letting a model ask for more before it answers.
+`poll` asks one question until the answer changes; `repeat` asks different questions, each
+one chosen by the last reply.
+
+```yaml
+- name: walk
+  repeat:
+    calls:
+      - name: choices
+        method: GET
+        url: >-
+          return 'https://api.example.com/items/'
+            + (previous ? previous.pick.next : signal.start)
+        transport: json
+      - name: pick
+        method: POST
+        url: https://api.example.com/decide
+        transport: json
+        body: >-
+          return { question: signal.question, options: calls.choices.items }
+    until: "return !!calls.pick.answer"
+    maxTurns: "{{ config.maxTurns }}"
+    stuckAfterRepeats: 3
+```
+
+`calls` is a list in the grammar of `api/run.yaml` itself, and it is the turn: each call is
+made in order, and a later call reads an earlier one as `calls.<name>`, exactly as it does
+at the top level. `previous` is the turn before this one, the same names, and is `null` on
+the first turn, so `previous ? … : …` asks whether there is one.
+
+`until` is asked after every turn, over that turn's `calls`. True ends the walk.
+
+**Two bounds, both borrowed from the agent node's own tool loop.** `maxTurns` is the author's
+limit on turns. `stuckAfterRepeats` stops a walk whose turn is the same as the one before it
+that many times running, the same call with the same arguments, because a loop that keeps
+choosing the same branch is not getting anywhere and `maxTurns` alone would let it spend
+every turn doing so. The platform adds a ceiling of 20 turns whatever `maxTurns` says.
+
+**The reply is `{ last, turns, stopped }`, not the last turn alone.** `last` is the final
+turn's calls, where the answer is. `turns` is every turn's calls in order: the path taken,
+which is the lineage of the answer and must never be thrown away. `stopped` says why it
+ended: `until`, `maxTurns` or `stuck`. Every turn is also a trace, so the path shows in the
+Executions dashboard as it runs.
+
+**A turn cannot itself repeat.** Each walk is bounded, but nested they multiply, twenty turns
+of twenty. A walk that needs a walk inside it is two nodes. Lint refuses it, and so does the
+executor.
+
+`repeat` does not change the node's `kind`. As everywhere else, the last call of the node
+decides it.
+
 ### `state`
 
 Sometimes an entry in the list is not a request at all.
@@ -227,7 +287,7 @@ voice, above all. Three lists cover the whole lifecycle, and each holds messages
 | Key | Sent |
 |---|---|
 | `open` | once, in order, as soon as the socket opens |
-| `send` | in reaction to something that arrived |
+| `send` | in reaction to something that arrived: an event from the service, or a value on a `CONTINUE` input |
 | `close` | once, in order, before the socket closes |
 
 ```yaml
@@ -256,6 +316,25 @@ left holding a session open, and billing for it.
 turn is one model call, which is not an idea that exists on a socket held open for a whole
 conversation. A reactive send covers a tool result going back, a response asked for, or a
 keepalive, without importing the wrong model of time.
+
+**A conversation can also be told things while it runs.** An input declared with
+`signal: CONTINUE` is delivered to the socket that is already open, and the node is not
+started again. A `send` rule with `on: input` reacts to it, with the value in scope as
+`input.value` and the connector's name as `input.handle`. This is how another node on the
+canvas answers a voice call: its output is wired into the voice node's `CONTINUE` input,
+and the rule hands the answer to the service.
+
+```yaml
+  send:
+    - on: input
+      message: >-
+        return { type: 'session.commentary.append', content: String(input.value.text) }
+```
+
+Every `send` rule and every events row also sees two things the conversation has
+accumulated. `seen` holds the latest event of each type, so a reply can name the request
+it answers. `said` holds the text the service has streamed so far, in order, as
+`{ type, text }`.
 
 Audio is separate. `api/audio.yaml` binds a voice node to the platform's audio lane, because
 binary audio cannot travel the same path as everything else. Everything that is not audio

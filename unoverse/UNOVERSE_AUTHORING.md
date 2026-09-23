@@ -189,57 +189,25 @@ A node reads a prop with **`bind`** (`targetProp → dataField`):
 
 ---
 
-## 3a. Spatial discovery: the OPTIONAL component `manifest.json`
+## 3a. Spatial discovery: the switch makes it a task (2026-09-06)
 
 A basic component needs **no manifest**: a workflow **streams** it in (path **D**),
-it renders, it's done. Add a `manifest.json` to the component folder **only when the
-component should be discoverable in Spatial** (indexed into the 3D knowledge map,
-ranked against user intent by findIntent). The manifest's **presence IS the
-capability**: there is no flag inside it, and nothing else grants it.
+it renders, it's done. A component an Agent should be able to **find and pick up** carries a
+`manifest.yaml` with the discovery meta (`title`, `description`, `whenToUse`, `category`),
+exactly as an app or a template does, and is offered to the map by its **Available** switch
+in Studio's Tasks lane (`docs.unoverse.ai/design/tasks`). Switched on, it lands on the map as
+a `task` row; a canvas installs it from the Content Library. The manifest is the single home
+of the meta; nothing is written twice, and the switch lives only in the Tasks lane.
 
-> **What "discoverable" means, precisely (native MCP, see `UNOVERSE_MCP_APP_PROTOCOL.md`
-> §0.1 paths B/C).** A discoverable component is published as a standard **MCP app**: it
-> registers a tool whose `_meta.ui.resourceUri` is a `ui://` shell that renders this
-> component. When findIntent surfaces it, the LLM does an ordinary `tools/call`, the result
-> carries the UI, and **the SDK renders the card into the chat**: *no workflow, no
-> `COMPONENT_INIT` emit, no "the LLM renders a component."* This is **additive to** streaming,
-> not a replacement: a self-contained component (path **B**) carries its own data in its
-> `state` block; a **node-hydrated** card (path **C**) is a shell a spatial data node fills.
-> A component being *streamed by a workflow* (path **D**, e.g. AIResponse) is unchanged and
-> remains the standard runtime paint path. The manifest here is what turns a plain component
-> into a path-B app; a path-C card is a normal component whose data arrives from a node.
+A workflow with no interface has no manifest, so it is the one thing authored for the map
+alone: an Agent, `design/<org>/agents/<name>.yaml`, the meta plus the door (canvas, Input
+Trigger, output node). Its input schema is the trigger's, declared on the canvas.
 
-The manifest carries only discovery meta:
-
-```jsonc
-// design/marketplace/components/planfinder/manifest.json
-{
-  "title": "Plan Finder",                       // display name (falls back to the def name)
-  "description": "A guided plan-finder quiz: a few eligibility and preference questions ending in a best-fit plan recommendation.",
-  "whenToUse": "Find the right plan for me: which plan should I get, what plan is best for my needs, am I eligible? A few quick questions end in one personalised best-fit recommendation with the reasons why it fits.",
-  "category": "Input",
-  "version": "1.0.0"
-}
-```
-
-- **`description`** is what it IS: the listing subtitle, **one short line (≤120 chars,
-  guard-enforced)**. No "use when…" inside it; detail belongs in `whenToUse`.
-- **`whenToUse`** is the **selection text** findIntent ranks against the user's OWN
-  message, so write it **utterance-shaped**, in the words the user would actually say
-  ("Find the right card for me: which card should I get…"), never selector-shaped
-  dev framing ("Pick when the user asks to…", guard-rejected). When present it
-  replaces `description` in the embedded text. Full contract:
-  `packages/docs/nodes/node-discoverability.md` (the apps/skills section
-  applies to components verbatim).
-- The manifest is the **single home** for this meta: the envelope must not
-  duplicate `description`/`whenToUse` (guard-enforced). The server merges the
-  manifest over the def, so every consumer reads one shape.
-- Exposure is **two toggles, both off by default**: the manifest makes the Studio
-  "Spatial" toggle appear on the component (Level 1: workbench eligibility); the
-  Content Engine then opts it onto a specific workflow's map (Level 2: presence),
-  where it's indexed and trained like any skill or app.
-
----
+> **What "discoverable" means, precisely (native MCP, `UNOVERSE_MCP_APP_PROTOCOL.md`
+> §0.1 paths B/C).** A switched-on component is published as a standard **MCP app**: a
+> tool whose `_meta.ui.resourceUri` is a `ui://` shell that renders the component. When
+> findIntent surfaces the task, the LLM does an ordinary `tools/call`, the result carries
+> the UI, and **the SDK renders the card into the chat**. Streaming (path **D**) is unchanged.
 
 ## 3b. Briefs: components an AI fills (July 2026, LOCKED)
 

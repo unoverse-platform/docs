@@ -4,8 +4,8 @@ title: "State"
 ---
 
 Make a card expand into a full page, a wizard walk its steps, or a panel slide out beside
-the conversation, without wiring any of it. Everything on screen reacts to one thing: the
-state an interface is in.
+the conversation, without wiring any of it. An interface's state decides the face it
+wears, and where on screen it is shown.
 
 ## Where state lives
 
@@ -22,85 +22,67 @@ An interface's public state lives under the key `state`, and it is the only thin
 that interface the outside world sees. (`view` and `defaultState` are legacy spellings the
 platform still reads.)
 
-## The one question
+## Faces and places
 
-An interface writes its own `state`. Everything holding it then asks one question:
-
-> **Do I have a state with that name?**
-
-A template asks it and draws that state's shape. An app asks it and draws that state's
-layout. A match activates, and no match means the interface renders inline in the
-conversation.
-
-That is the whole reaction contract, and it runs at every scale. A card writing
-`state: page` opens the `page` state of whatever holds it, and nothing was wired to make
-that happen.
-
-**Nothing writes another thing's state.** An interface writes its own and nothing else's,
-and the app never writes a component's: not to promote it, not to retract it, not to close
-it. A card's own ✕ writes its state back, which is why there is no close logic anywhere.
-
-**One instance, one place.** While an interface's state matches, it lifts out of the flow
-into that place. It is never drawn twice, and there is no trick for hiding a second copy.
-Losing the match releases it back inline.
-
-## Arrival and lifetime
-
-An interface arrives as data, and where it lands is the host's decision.
-
-Its first declared state stands whenever the host has a state of that name. A card
-declaring `grid` first, arriving into an app with a `grid` state, starts there. Only when
-the host has no such state does the scan run: the host walks its own states in declared
-order and takes the first name the interface also declares. With no overlap at all, the
-interface wakes in its own first state, inline.
-
-**A new turn resets the screen.** Every instance returns to its first state, places empty,
-and the app derives its base state again. An interface whose first state suits the flow
-stays in that turn's history. One with no inline face retires: visible while placed,
-invisible afterwards.
-
-The opt-out is `lifetime: conversation` in the manifest, for a durable surface such as a
-cart or a composed page. The platform keys it by the conversation rather than the turn, so
-a repeat arrival merges into the same slice instead of replacing it. It survives the reset
-and cancellation, and stays until it is replaced, closes itself, or the app swaps. An app
-swap is the hard boundary, and a new shell retires every surface, durable ones included.
-
-## Priority
-
-An app is in exactly one state at a time, and its tree declares the order:
+An interface writes its own `state`. The state picks which of its own layouts draws, and
+it may name the place the interface is shown in:
 
 ```yaml
 states:
-  main:                    # the base arrangement, always first
-    layout: layouts/main
-    states:
-      welcome:             # contained: exists only inside main
-        layout: layouts/main-welcome
-  focus:                   # the ladder, in priority order
-    layout: layouts/focus
   grid:
     layout: layouts/grid
+    place: rail            # the tile sits in the app's rail
   page:
     layout: layouts/page
+    place: main            # opened, it moves to the main panel
 ```
 
-The app walks its top-level list top-down and enters the first of its states that any
-hosted interface matches. One card in `focus` and seven in `grid` means the app enters
-`focus`. Ties go to the most recent write. No word is special, and `focus` outranks `grid`
-by list position alone.
+A card writing `state: page` moves to `main` and draws its page; its ✕ writes `grid` and
+it goes back to the rail. Nothing was wired to make that happen, and the app reads none of
+it: an app is a layout with places, and the screen fills them ([Apps](/design/apps)).
 
-The active state is **derived, never stored**. It is a function of what the app currently
-holds, so nothing writes a focus flag anywhere.
+`chat` is the conversation, and every app has it. A state naming no place, or a place the
+app does not declare, shows in the conversation.
 
-**A delivery clears the claims below it. Your own navigation does not.** When an interface
-arrives into a higher-ranked state, interfaces sitting in lower ones release and retract to
-inline, so releasing the higher state lands on the base rather than a stale lower one.
-Closing a finder returns you to the conversation instead of resurrecting the rail that was
-open beforehand. Tapping a rail card into its page enters `page` without touching the
-rail's claims, so closing that page returns you to the rail you opened it from.
+**Nothing writes another thing's state.** An interface writes its own and nothing else's,
+and the app never writes a component's: not to open it, not to close it. A card's own ✕
+writes its state back, which is why there is no close logic anywhere.
 
-Both are the same walk, with one question added: did a delivery put the winner there, or
-did you?
+**One instance, one place.** An interface is in exactly one place at a time. It is never
+drawn twice, and there is no trick for hiding a second copy.
+
+**A step never moves it.** Only a top-level state names a place. A step nested inside a
+state changes what the interface draws, never where it sits.
+
+## Showing
+
+Nothing is shown as a side effect. A search returns data and draws nothing. Three things
+change the screen:
+
+1. **The model shows a list.** The screen becomes that list: an interface already on
+   screen stays as it is, a new one appears where its state says, and anything on screen
+   and not named steps aside. An empty list clears the screen; no list changes nothing.
+2. **The model calls a task.** The task opens where its state says. In a place that holds
+   one, what was there steps aside.
+3. **The guest taps.** The interface writes its own state, and if that state names another
+   place, the interface moves there.
+
+**Stepping aside** puts the interface in the state its design gives the conversation (a
+comparison's chip, whose state names `chat`), or takes it off the screen if it has none. A
+page that steps aside is let go, and the next call to its task builds a new one.
+
+The screen is one document per conversation, held by the server, so every view of the
+conversation, including one that joins late or reloads, draws the same screen.
+
+## Arrival and lifetime
+
+An interface arrives in its first declared state, in the place that state names.
+
+The opt-out from being replaced is `lifetime: conversation` in the manifest, for a
+durable surface such as a cart or a composed page. The platform keys it by the
+conversation rather than the turn, so a repeat arrival merges into the same slice instead
+of replacing it. It stays until it is replaced, closes itself, or the app swaps. An app
+swap is the hard boundary, and a new shell starts a new screen.
 
 ## Writing state
 
@@ -124,26 +106,6 @@ own.
 
 Sending a message is `tools/call`, and answering a waiting wizard is an elicitation. You
 never build transport.
-
-A place selects what it holds by state, never by component type and never by id:
-
-```yaml
-type: ComponentSlot
-select:
-  from: all
-  where:
-    field: state
-    eq: focus
-  limit: 1
-```
-
-Which interface lands there follows from the match, and the most recent write wins a tie.
-Many instances are fine, and the rule holds per instance: three products means three cards,
-and the app decides whether that place is a flow list, one focus or a rail. Private keys
-never cross, and a selector reads `state` only.
-
-App chrome reads the same fact as `surfacedView`, the name of the active reaction state, or
-empty when everything is inline. A header button reacts by name without needing a slot.
 
 ### State you cannot write
 
@@ -195,9 +157,9 @@ is React's own <a href="https://react.dev/learn/choosing-the-state-structure" ta
 ## Next steps
 
 <Card title="Templates" icon="layout-grid" href="/design/templates" horizontal>
-The arrangements that hold your interfaces and react to their states.
+The arrangements that hold many interfaces in one page.
 </Card>
 
 <Card title="Apps" icon="layout-template" href="/design/apps" horizontal>
-The shell your templates and components render inside.
+The layout and the places your interfaces are shown in.
 </Card>

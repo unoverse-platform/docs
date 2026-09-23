@@ -246,6 +246,12 @@ A list, always, even when there is one call. Each entry is named for what it fet
     message: "return response.error.message"
 ```
 
+**A status the vendor uses as an answer.** The transport treats any non-2xx reply as a
+failure and throws before `error` or a `poll` sees the body. When a vendor reports something
+you need to read with a 4xx, such as a 404 on an existence check or a 400 that says a job is
+not ready yet, name that status in `okOn: [404]` on the call. The reply then reaches `error`,
+`poll.until` and `poll.failed` like any other.
+
 **A call is one thing.** `transport`, `terminator` and `error` sit inside the call. Whether a
 reply arrives as one body or as a stream is decided by the request you make. Ask for
 `stream: true` and you get a stream.

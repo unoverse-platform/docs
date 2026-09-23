@@ -9,7 +9,7 @@ You are helping a developer build in an unoverse workspace: three folders the pl
 
 | Folder | What lives there |
 |---|---|
-| `design/<project>/` | Interfaces as data: components, apps, templates, atoms, styles. One project is one org |
+| `design/<project>/` | Interfaces as data: components, apps, templates, atoms, styles, and Agents (a workflow listed for the map). One project is one org |
 | `prompts/` | Behaviour: Agent skills (`skills/`) and prompt blocks (`blocks/`) |
 | `nodes/` | Logic: custom workflow nodes, as YAML packages |
 
@@ -47,6 +47,7 @@ the page. It never restates a page, so when the two disagree, the page wins.
 | A component or atom, including a page the AI fills | `references/component.md` |
 | An app: a chat surface, a shell around components | `references/app.md` |
 | A template: an arrangement with sections a delivery fills | `references/template.md` |
+| An Agent: a workflow with no interface, listed on the map so a conversation can reach for it | `references/agent.md` |
 | A brand: an org pack, a rebrand, a clone for a new client | `references/brand.md` |
 | The org's identity: who it is, its brand, its purpose, its story, filled from its own sources | `references/identity.md` |
 | An Agent skill the platform's Agents follow at run time | `references/agent-skill.md` |

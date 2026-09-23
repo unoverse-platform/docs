@@ -35,7 +35,7 @@ renders the whole document as labelled text. `{{identity.brand.promise}}` render
 `{{#each identity.brand.rules}}` loops a list. [Identity](/design/identity) is the guide.
 
 **`prompt.<blockName>` is why a manifest never hard-codes instruction text.** Blocks live in
-`prompts/blocks/**/*.md` and are camelCased from the filename, so
+`design/marketplace/blocks/**/*.md` and are camelCased from the filename, so
 `markdown-guidelines.md` becomes `{{prompt.markdownGuidelines}}`. A block's words copied
 into a node is a fork that stops tracking the block.
 
@@ -53,6 +53,11 @@ ternaries, arrow callbacks, and `JSON`, `Math`, `Number`, `String`, `Boolean`, `
 `parseFloat`, `encodeURIComponent`, `Object.*` and `Array.*`. The platform adds three more,
 because without them a node could not be a manifest at all:
 
+- **Every model call carries today's date.** A model has no clock: asked for "the latest" or
+  "the next six months" it guesses a today from the documents it was shown. A node that calls a
+  model puts `'Today is ' + Date.iso(Date.now()).split('T')[0] + '.'` at the end of its
+  instructions, after the role and anything cached, so the prefix stays cached and only the tail
+  changes, once a day.
 - **`Date.now()` and `Date.iso(ms)`.** Half the APIs a node calls take a date range and
   want an ISO string, so `Date.iso(Date.now() - 30 * 86400000).split('T')[0]` is thirty
   days ago as `YYYY-MM-DD`. There is no `new Date(...)`.
@@ -107,9 +112,15 @@ What your calls can see, and where each piece comes from.
 | `identity.<document>` | One of the project's four identity documents: `organisation`, `brand`, `purpose`, `story`. Whole, it renders as labelled text; `.<field>` renders one value; `{{identity}}` renders all four |
 | `user.email`, `user.id`, `user.name` | The signed-in person |
 | `scope.workflowId`, `scope.userId` | Which run this is |
+| `scope.debug` | True when the run is a canvas test (Run or Debug on the canvas), false in a real conversation |
 | `calls.<name>` | The reply from a call made earlier in this node |
 | `params.<name>` | Arguments a caller passed, for a service method |
 | `token.instanceUrl` | Where an OAuth2 exchange said to talk, when an API returns one |
+
+**`scope.debug` keeps tests from piling up.** A canvas test is not a conversation: every test
+on one canvas would otherwise join one thread that never ends, re-read in full on every question.
+A node that keeps anything between runs checks it, and keeps nothing for a test run: the OpenAI
+Agent's conversation memory is off on the canvas whatever its toggle says (2026-09-14).
 
 **`user` is identity, and nothing that authenticates as them.** Email, id and name, never
 the caller's access token. A token is the user against our own services, so a node holding

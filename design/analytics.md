@@ -73,6 +73,24 @@ which an ad-blocker can silence, and rather than on the workflow finishing. The 
 arrived, and that is the fact it reports. A button whose action stays on the page keeps its
 `analytics` key on the node.
 
+The platform already knows what opening something means: an app is done the moment it
+loads, and a component with a submit is started when it opens and finished when the
+submit arrives. You can name those moments yourself, or override them, with an entry
+keyed `open`:
+
+```yaml
+analytics:
+  - open: true
+    event: application_started
+  - action: apply
+    event: application_submitted
+```
+
+An `open` entry fires when your universe opens the app for the person, before they have
+typed anything. `done: true` says the open is itself the finish. Without any entry the
+defaults apply: `loaded` for an app, `started` for a component with a submit, nothing for
+a component without one.
+
 ## Naming events
 
 Use the analytics tool's own vocabulary wherever it has a word for what happened. GA4

@@ -8,7 +8,7 @@ renderer and is always a typo or a web-ism that would not port. Each entry names
 property it maps to, for when you know the CSS name and not ours.
 
 <div className="ref-source">
-Generated from <code>definition-1.2.schema.json</code> and the token files, so it
+Generated from <code>definition-1.3.schema.json</code> and the token files, so it
 cannot fall behind what ships.
 </div>
 

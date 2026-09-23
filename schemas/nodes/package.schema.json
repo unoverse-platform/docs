@@ -135,6 +135,10 @@
           "type": "boolean",
           "description": "True when a node waits on an asynchronous JOB: start it, then ask until it is done. On an executor without it the node settles on the START reply, which is a receipt carrying a job id, and emits that as its answer — every downstream field reads empty and nothing errors."
         },
+        "repeat": {
+          "type": "boolean",
+          "description": "True when a node goes round in turns (`repeat`): calls whose next turn is built from the last reply, until a reply says done. On an executor without it the call would make no request at all and settle on nothing."
+        },
         "encoding": {
           "type": "array",
           "items": {

@@ -105,6 +105,7 @@
               "design/state",
               "design/templates",
               "design/apps",
+              "design/tasks",
               "design/identity",
               "design/styles-and-tokens",
               "design/lifecycle-hooks",

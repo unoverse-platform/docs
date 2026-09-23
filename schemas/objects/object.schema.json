@@ -1,0 +1,266 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/objects/object.schema.json",
+  "title": "Unoverse object",
+  "description": "<name>.yaml: the envelope of an object, as a node's node.yaml (docs/unoverse/data/objects/README.md 4a). What this is and when an Agent reaches for it, the row keys, and the props by $include. No credentials, no hosts, no lifecycle: a node is the only way an object touches the world (4b).",
+  "type": "object",
+  "required": [
+    "type",
+    "name",
+    "title",
+    "description",
+    "whenToUse",
+    "category",
+    "version"
+  ],
+  "properties": {
+    "unoverse": {
+      "type": "string",
+      "description": "The grammar version, \"1.0\"."
+    },
+    "type": {
+      "const": "object"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "The object type, as a row's object_type names it. Equals the folder and the file."
+    },
+    "icon": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "The glyph every row of this object is drawn with: a lucide icon name (file-text). The base's when unsaid."
+    },
+    "element": {
+      "type": "string",
+      "enum": [
+        "purpose",
+        "story",
+        "content",
+        "capability",
+        "process",
+        "asset",
+        "task",
+        "journey",
+        "channel",
+        "organisation",
+        "people",
+        "product",
+        "brand",
+        "document"
+      ],
+      "description": "Which of the twelve elements of the vocabulary this object IS (docs/unoverse/data/objects/README.md, the table of kinds and elements): a classification, never a shape. The Spatial view's filters and the search toggles read it. Not inherited; the need declares none."
+    },
+    "extends": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "The object whose fields this one carries under its own. Every positioned object extends need, the atom (README 5)."
+    },
+    "uniqueBy": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "minItems": 1
+        }
+      ],
+      "description": "Which fields make two rows the same one: one key (a list of fields), or several keys tried in order (a list of lists). Absent on an object that is never a row."
+    },
+    "embed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "The fields whose text makes the vector. Absent on an object that is never a row (README 7)."
+    },
+    "search": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        {
+          "const": "all"
+        }
+      ],
+      "description": "What a search hit carries, universal_id first; the rest comes with getDetail."
+    },
+    "storedAs": {
+      "type": "string",
+      "pattern": "^[a-z_]+$",
+      "description": "The stored object_type when it differs from the name (interface rows are stored as mcp). One word."
+    },
+    "app": {
+      "type": "string",
+      "pattern": "^unoverse://components/[^/#]+/[^/#]+(#[a-z0-9-]+)?$",
+      "description": "The interface every row wears, stamped at save: unoverse://components/<org>/<name>, the hash naming the state it opens in (State Model 5.3)."
+    },
+    "meta": {
+      "const": "open",
+      "description": "Anything else a writer puts in metadata rides along, undeclared."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What this object is and how it is written, the brief the one model call reads. May name the org's identity: {{ identity.<document>.<field> }}."
+    },
+    "whenToUse": {
+      "type": "string",
+      "minLength": 1,
+      "description": "When an Agent reaches for this object, in the customer's words."
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "props": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "$include"
+          ],
+          "properties": {
+            "$include": {
+              "const": "props"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "$ref": "props.schema.json"
+        }
+      ],
+      "description": "The object's own props: { $include: props } for props.yaml beside this file, or the record inline."
+    },
+    "links": {
+      "type": "object",
+      "description": "The lines this object draws between its own rows, by name (docs/unoverse/data/objects/relationships-and-labels.md): rows of one folder whose `between` fields are equal are ordered by `order`, and each draws the line to the one just before it when `when` holds.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "enum": [
+              "link",
+              "flow",
+              "tree"
+            ]
+          },
+          "between": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "order": {
+            "type": "string"
+          },
+          "when": {
+            "type": "string"
+          },
+          "alike": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Fields of between whose values may name one thing several ways; one model question per folder says which are the same."
+          },
+          "to": {
+            "type": "string",
+            "description": "A line to another object: the object it points at, by name."
+          },
+          "match": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "minProperties": 1,
+            "maxProperties": 1,
+            "description": "One pair: this row's field naming that row's ({ manager: legalName })."
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "type",
+              "between",
+              "order"
+            ]
+          },
+          {
+            "required": [
+              "type",
+              "to",
+              "match"
+            ]
+          }
+        ]
+      }
+    },
+    "dataset": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "$include"
+          ],
+          "properties": {
+            "$include": {
+              "const": "dataset"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "$ref": "dataset.schema.json"
+        }
+      ],
+      "description": "THE TABLE THIS OBJECT OWNS (docs/unoverse/data/objects/dataset.md): { $include: dataset } for dataset.yaml beside this file, or the declaration inline. Absent on every ordinary object, which is a row and not a dataset."
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "not": {
+          "required": [
+            "dataset"
+          ]
+        }
+      },
+      "then": {
+        "required": [
+          "props"
+        ]
+      },
+      "description": "An object is a row and declares its props. An object that owns a table may be that table alone (dataset.md, ruled 2026-09-18): its rows are the table's, never the map's, so it declares no props."
+    }
+  ]
+}

@@ -12,15 +12,18 @@ Copy the closest one's folder shape.
 
 ## The rules that bite
 
-1. **A component is data plus a state tree.** Public states are the top level of
-   `states:` and are the app's whole vocabulary. Steps nest privately. The gate before
-   adding any public state: would a hosting app rearrange the page for it? No means it
-   nests. [State](https://docs.unoverse.ai/design/state.md) has the model.
+1. **A component is data plus a state tree.** Top-level states are its faces, and each
+   may name the `place:` it is shown in (`grid` → `rail`, `page` → `main`, a chip →
+   `chat`). Steps nest as substates and never move it. The gate before adding a top-level
+   state: does it need a different place, or a face of its own? No means it nests.
+   A task that can step aside declares a state naming `chat` for its chip.
+   [State](https://docs.unoverse.ai/design/state.md) has the model.
 2. **Each state declares its layout as a path.** `layout: layouts/<file>`, always. No
    root unless it is real chrome: the compiler synthesises the state switch.
 3. **Three homes for what it shows.** Static content is a literal in the layout. Starting
-   values of keys it writes go in `values:`, scalars only. Workflow data is a prop with
-   `input: true`. Prop names are the data contract: never invent one; use the writer
+   values of keys it writes go in `values:`, scalars only. Workflow data, or data the model
+   fills, is a prop with `input: true`: those props are the fields on the component's tool.
+   A prop the component owns is `input: false` and is never on the tool. Prop names are the data contract: never invent one; use the writer
    vocabulary in [Interface data](https://docs.unoverse.ai/design/interface-data.md).
 4. **Start flat.** A simple card is one file with a `root`. Structure is earned: a
    manifest when something discovers it, `layouts/` when states own arrangements.
@@ -31,7 +34,10 @@ Copy the closest one's folder shape.
    never in code. [Lifecycle hooks](https://docs.unoverse.ai/design/lifecycle-hooks.md).
 7. **Tokens only.** A raw value or an invented space step is a lint error.
    [Styles and tokens](https://docs.unoverse.ai/design/styles-and-tokens.md).
-8. **Meta is ranked.** `whenToUse` in the user's own words, outcome first, disqualify by
+8. **A component that asks declares `outputs:`** (the answer names and types) and ends with
+   `then: { type: submit }`; an optional ✕ writes `type: cancel`. Nothing else answers, and the
+   platform steps it aside to its chat card once answered. [Components: a component that asks](https://docs.unoverse.ai/design/components.md).
+9. **Meta is ranked.** `whenToUse` in the user's own words, outcome first, disqualify by
    property, never name a sibling.
    [Node discoverability](https://docs.unoverse.ai/nodes/node-discoverability.md).
 

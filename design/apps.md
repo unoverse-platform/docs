@@ -3,20 +3,20 @@ sidebarTitle: "Apps"
 title: "Apps"
 ---
 
-An app is the surface your interfaces arrive into: a chat layout, a voice screen, a
-dashboard. It arranges templates and slots, and decides how the screen rearranges around
-whatever arrives.
+An app is the surface your interfaces are shown in: a chat layout, a voice screen, a
+dashboard. It is a layout with named places, and the screen fills those places.
 
 An app owns nothing. Conversation and interface data live in the store, so apps are
-swappable mid-conversation.
+swappable mid-conversation. It never decides what is shown or where: the model shows
+things, an interface's state says where it goes, and the app only draws the places.
 
 The folder grammar is the same as every other artifact, and
 [Essentials](/design/essentials) covers it. This page is what makes an app an app.
 
 ## A complete app
 
-A chat that holds the conversation, and gives a mounted grid the rest of the screen when
-cards arrive.
+A chat that holds the conversation, with a rail beside it for a set of cards and a main
+panel laid over the rail for the one thing opened.
 
 <CodeGroup>
 
@@ -25,15 +25,12 @@ unoverse: "1.0"
 type: app
 name: acme-chat
 states:
-  standard:                  # first declared = the base
-    layout: layouts/standard
-  products:
-    layout: layouts/products
-    preview: [ product-card, product-card, product-card ]
+  main:                      # an app with places has ONE state
+    layout: layouts/main
 ```
 
-```yaml layouts/standard.yaml
-# The base: the conversation, whole screen.
+```yaml layouts/main.yaml
+# The conversation, and beside it the places the screen fills.
 type: Box
 style:
   direction: row
@@ -42,22 +39,37 @@ style:
   overflow: hidden
 children:
   - $include: components/core
-```
-
-```yaml layouts/products.yaml
-# The conversation, beside a mounted template taking all remaining space.
-type: Box
-style:
-  direction: row
-  width: full
-  height: full
-  overflow: hidden
-children:
-  - $include: components/core
-  - type: Template
-    name: products           # the state entry this place belongs to
-    template: grid-page      # what it holds
-    appWidth: flex           # all remaining space, beside the core's own width
+  - type: Box
+    style:
+      flex: 1
+      minWidth: 0
+      height: full
+      position: relative
+    children:
+      - type: Place
+        name: rail             # a set of cards
+        holds: many
+        appWidth: flex
+        frame:
+          type: Box
+          style:
+            height: full
+            overflow: auto
+          children:
+            - type: ComponentSlot
+      - type: Place
+        name: main             # the one thing opened, over the rail
+        holds: one
+        appWidth: flex
+        frame:
+          type: Box
+          style:
+            position: absolute
+            inset: "0"
+            overflow: auto
+            background: surface.base
+          children:
+            - type: ComponentSlot
 ```
 
 ```yaml manifest.yaml
@@ -80,62 +92,66 @@ inputSchema:
 
 </CodeGroup>
 
-Three things carry the model:
+Four things carry the model:
 
-- **The envelope is the tree, and the manifest is the face.** States and their layouts say
-  what the app is. `whenToUse`, `binding` and `inputSchema` say how the outside finds and
-  calls it.
-- **The binding belongs to the app.** The composer sends through the app's own workflow,
-  and the states react to whatever comes back.
-- **The app enters `products` because the grid holds cards.** It releases back to
-  `standard` when the grid empties, and nothing writes a flag to make either happen.
+- **The envelope is the tree, and the manifest is the face.** The one state and its layout
+  say what the app is. `whenToUse`, `binding` and `inputSchema` say how the outside finds
+  and calls it.
+- **The manifest is the single home of the app's meta and its binding.** Its Available
+  switch lives in the Tasks lane ([Tasks](/design/tasks)); switched on, the app is a task
+  on the map, an Agent with an interface in front.
+- **The binding belongs to the app.** The composer sends through the app's own workflow.
+- **The places open and close as the screen fills them.** A card whose `grid` state names
+  `rail` lands in the rail; tapped, it writes `page`, which names `main`, and moves there.
+  An empty place draws nothing, frame included, and nothing writes a flag to make any of
+  it happen.
 
-## The tree
+## Places
 
-```yaml
-states:
-  main:                      # the base, always first
-    layout: layouts/main
-    states:
-      welcome:               # contained: exists only inside main
-        layout: layouts/main-welcome
-  focus:                     # the ladder, in priority order
-    layout: layouts/focus
-  grid:
-    layout: layouts/grid
-  page:
-    layout: layouts/page
-```
+A `Place` is a named spot in the layout where interfaces are shown.
 
-Every state names its own drawing as a path relative to the app folder. Nothing is assumed
-from the state's name, `layouts/` is only the conventional home, and subfolders are fine
-for a complicated app.
+| Key | Meaning |
+|---|---|
+| `name` | The place's name. Interfaces name it in their states' `place:` |
+| `holds` | `one` shows the newest interface shown into it, and a new one replaces it. `many` shows the set the last show named, in its order |
+| `appWidth` | The place's width, as for any panel (see Width) |
+| `frame` | Optional chrome around what it holds. Its `ComponentSlot` is where each interface draws |
 
-**Top-level order is the priority ladder.** The base comes first, then the reaction states
-in the order they should win. [State](/design/state) covers the walk that uses it.
+How places sit against each other is the layout's business. Lay `main` over the `rail` and
+an opened card covers the cards, and closing it shows them again. Lay a `focus` over
+everything for a guided flow.
 
-**Nesting is containment.** `welcome` exists only inside `main`. The compiler strips a
-declared base substate out of every other arrangement, so no hand-written guard has to
-police it, and the first substate declared is the landing default.
+**The conversation is also a place, named `chat`,** and every app has it. An interface
+shown into `chat` renders in the conversation under the turn that showed it, and anything
+whose state names no place lands there.
 
-**The shell is not declared.** The conversation timeline is `main`'s own content, drawn
-beside the rail and the page and under focus. Declaring a state contains it, so declare
-only what should exist in the base alone.
+**An app declares every place its project's interfaces name.** Otherwise those interfaces
+land in the conversation, which a voice app does not draw. The lint refuses it, naming
+the missing place.
 
-### States or moods
+### Where an interface goes
 
-The rearrange rule sorts these too.
+The first of these that speaks wins:
 
-> **If an interface makes the app rearrange, it is a top-level state. If the app already
-> knows and would not move, it is a mood nested in the base.**
+1. **The model's show names a place.**
+2. **The interface's current state names one**, with `place:` in the component
+   ([State](/design/state)).
+3. Otherwise, `chat`.
 
-A welcome hero on an empty conversation is a mood. A voice layout's call phases are moods.
-Put them on the ladder and you break it twice: they outrank real reactions, and they draw
-inside them.
+The model sets the screen with a list: what it names stays or appears, and what is on
+screen and not named steps aside, to its chip in the conversation or off the screen.
+Calling a task shows it. A search never draws anything. [State](/design/state) covers the
+rule.
+
+### Welcome and other moods
+
+A welcome hero on an empty conversation, or a voice layout's call phases, are moods of
+the one layout, drawn with `visibleWhen` on the conversation's derived flags or the
+projected `callState`. They are never states.
 
 ## Width
 
-> **The app is always the active state's layout total. Nothing else, ever.**
+> **The app is always the total of its open places. Nothing else, ever.**
 
 Widths are declared with `appWidth` on a panel inside a layout, normally a named size from
 your `styles/semantic/app-sizes.yaml`, so the whole project stays on one scale.
@@ -146,18 +162,19 @@ type: Box
 appWidth: chat
 ```
 
-So the width is one of a small known set by construction. The base is the core alone, a
-rail layout is core plus rail, and the host animates between the totals. Nothing inside
-resizes.
+So the width is one of a small known set by construction. With every place empty the app
+is the core alone; with the rail open it is core plus rail, and the host animates between
+the totals. Nothing inside resizes.
 
 The rules, all enforced by lint:
 
 | Rule | Why |
 |---|---|
-| A bare name must exist in your app sizes | Raw CSS and `flex` are valid too. A name is simply easier to retune |
+| A bare name must exist in your app sizes | Raw CSS is valid too. A name is simply easier to retune |
+| `flex` is the SDK's own word, never a token | It means "fill the space remaining beside whatever core is open", on a slot and on a mounted template alike. A token named `flex` hard-codes one core's width and is short beside every other core: a 680px chat token left a 200px gap beside a 480px voice core |
 | One declaration per panel | The panel's `appWidth` sizes its box and grows the app, so its frame declares no width |
 | Never on a layout root | The root is the arrangement, and panels inside it carry the widths |
-| Never `visibleWhen`-guarded | A conditional arrangement is a state with its own layout, not a guarded pane |
+| Never `visibleWhen`-guarded | A panel that comes and goes is a place, which opens and closes as the screen fills it |
 | An overlay declares nothing | A surface over the core never changes the app's size |
 
 Give every layout root `overflow: hidden`, so a panel mid-slide clips at the edge rather
@@ -165,60 +182,29 @@ than scrolling.
 
 ## Three primitives only apps use
 
-**`Timeline`** renders the conversation. You supply the user and assistant turn subtrees,
-and the stream fills them.
+**`Timeline`** renders the conversation, which is the place `chat`. You supply the user
+and assistant turn subtrees, and the stream fills them.
 
-**`Template`** mounts a template. The place says what it holds and how wide it is, and may
-wrap it in a `frame` for sizing:
+**`Place`** is a place the screen fills (see Places above).
 
-```yaml
-- type: Template
-  name: products
-  template: grid-page
-  appWidth: flex
-```
+**`ComponentSlot`** is where each interface draws inside a place's `frame`. It takes no
+selector: the screen has already decided what the place holds. A slot holding one
+occupant gives it the frame's full height automatically, while a place holding many keeps
+its instances content-sized.
 
-The place only places. Everything about how the template fills, including the director's
-judgment, lives in the template itself ([Templates](/design/templates)). The place claims
-what the template holds, so a held interface never renders twice, and an empty template
-collapses, frame included.
-
-**`ComponentSlot`** is where individual components render, in two forms:
-
-```yaml
-# the flow slot: components render inline, the default home
-- type: ComponentSlot
-  select: {}
-
-# a reaction slot: renders whichever component put the app in this state
-- type: ComponentSlot
-  select:
-    from: all
-    where:
-      field: state
-      eq: page
-    limit: 1
-```
-
-A state's layout must contain a slot selecting that state, and a guard enforces the pair.
-A slot holding one occupant gives it the frame's full height automatically, while
-multi-occupant slots such as a rail keep their instances content-sized.
+A slot that claims interfaces by state (`select.where` on `state`) is the retired
+arrangement, and the lint refuses it in an app with places.
 
 Never size or restyle a component from the app. A component owns its states and its size,
 and the app owns only the framing.
 
-An overlay is still normal. A wizard floating over the chat lives inside the core, claims
-its state, and changes no width. Reach for a top-level state when the arrangement changes,
-and keep an overlay in-core when only a layer appears.
-
 ## Voice
 
 Declare `service: voice` in the manifest and the channel instantiates the native service,
-which projects `callState` into scope. The call phases branch inside the base layouts,
-typically a wide core in the base and a slim one beside a card slot.
+which projects `callState` into scope. The call phases branch inside the layout, as moods.
 
-Cards streaming in during a call are placed by the ladder exactly as in chat. Audio is
-never wired in a definition.
+Lay the places beside the call core, so the call never leaves the screen. Interfaces are
+placed exactly as in chat. Audio is never wired in a definition.
 
 ## How an Agent finds your app
 

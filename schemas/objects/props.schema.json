@@ -1,0 +1,243 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/objects/props.schema.json",
+  "title": "Unoverse object props",
+  "description": "props.yaml: the object's OWN fields, one prop per key, every prop a brief (docs/unoverse/data/objects/README.md 4c). The prop grammar of UNOVERSE_AUTHORING.md 3b: description, type, input, limits as numbers, items on an array (the element's type, or its fields by name), enum; plus the object's one word, from. A field the base already declares appears here only to be re-briefed: description alone. No default, no preview: an object is a kind, never an instance.",
+  "type": "object",
+  "propertyNames": {
+    "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+  },
+  "additionalProperties": {
+    "$ref": "#/definitions/prop"
+  },
+  "definitions": {
+    "prop": {
+      "type": "object",
+      "required": [
+        "description"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "array",
+            "object",
+            "unoverse-markdown"
+          ],
+          "description": "JSON Schema's word, or unoverse-markdown for a body (UNOVERSE_AUTHORING 3b). Omitted on a re-brief of an inherited field."
+        },
+        "input": {
+          "type": "boolean",
+          "description": "true: the model writes it from the source. false: the engine or the function writes it (from: names which). Explicit on every prop the object declares itself."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "THE BRIEF. The whole instruction for this field; a stranger could fill it from this alone. May name the org's identity: {{ identity.<document>.<field> }}."
+        },
+        "from": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9]*\\.[A-Za-z_][A-Za-z0-9_]*$",
+          "description": "<function>.<return> of api/service.yaml: the made detail this prop is written from (README 4b). Absent: written from the thin item."
+        },
+        "hydrate": {
+          "type": "string",
+          "description": "How a component fills this field from the row (UNOVERSE_AUTHORING 3b): image, link, icon."
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "minItems": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxItems": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "items": {
+          "$ref": "#/definitions/items"
+        },
+        "reuse": {
+          "type": "boolean",
+          "description": "true: the read is shown the values this field already holds on the object's rows in the org, and gives one of them, spelled exactly, when it names the same thing. For a name many rows share: a subject, a series."
+        },
+        "oneOf": {
+          "type": "array",
+          "minItems": 1,
+          "description": "A choice's options, each its stored word, what a person reads and how the model tells it apart (docs/unoverse/data/objects/README.md 4c). Never with enum.",
+          "items": {
+            "type": "object",
+            "required": [
+              "const",
+              "description"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "const": {
+                "type": "string",
+                "minLength": 1
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "field": {
+      "type": "object",
+      "required": [
+        "description"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "array",
+            "object",
+            "unoverse-markdown"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The brief for this field of the element."
+        },
+        "hydrate": {
+          "type": "string"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "minItems": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxItems": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "items": {
+          "$ref": "#/definitions/items"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One field of an element, in the prop grammar one level down: no input (the array's says who writes it), no from."
+    },
+    "scalar": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "array",
+            "object",
+            "unoverse-markdown"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The brief for this field of the element."
+        },
+        "hydrate": {
+          "type": "string"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "minItems": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxItems": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false,
+      "description": "An array of scalars: the element's type and its limits."
+    },
+    "items": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/scalar"
+        },
+        {
+          "type": "object",
+          "not": {
+            "required": [
+              "type"
+            ]
+          },
+          "propertyNames": {
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/field"
+          },
+          "minProperties": 1
+        }
+      ],
+      "description": "The shape of one element (README 4c: the same grammar one level down): { type: string, maxLength } for a scalar, or the element's fields by name, each a brief."
+    }
+  }
+}

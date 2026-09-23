@@ -136,7 +136,7 @@ Include it when:
 4. **Show sequences.** The value is in the choreography, not the inventory.
 5. **Keep it short.** Under a hundred lines, because it is in the prompt on every turn.
 
-Agent skills are a different thing, authored in `prompts/skills/` and discovered at run time.
+Agent skills are a different thing, authored in `design/marketplace/skills/` and discovered at run time.
 `instructions` is part of the MCP schema and travels with the tools.
 
 ## When it goes wrong

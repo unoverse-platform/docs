@@ -7,7 +7,7 @@ Agent, not code. Do not confuse it with this skill, which is for Claude Code.
 ## Where it goes
 
 ```
-prompts/skills/<skill-name>/
+design/marketplace/skills/<skill-name>/
   SKILL.md                 required: frontmatter plus the instructions
   references/              optional files the Agent may be handed
 ```
@@ -30,7 +30,10 @@ triggers: [keyword, phrase]
 ```
 
 `name` and `description` are required; a file missing either does not load. The body is
-required too: frontmatter alone is invalid.
+required too: frontmatter alone is invalid. The frontmatter is YAML: a value that holds a
+colon followed by a space must be quoted (`description: "Guide for X: when and how"`), or
+the whole block fails to parse and the skill silently does not exist. Lint reports it at
+the line.
 
 ## The rules that bite
 
@@ -39,9 +42,12 @@ required too: frontmatter alone is invalid.
    [Node discoverability](https://docs.unoverse.ai/nodes/node-discoverability.md) applies
    verbatim.
 2. **One skill, one behaviour.** "And also" means a second skill.
-3. **Study a skill already in `prompts/skills/`** and match its voice: short sections,
+3. **Study a skill already in `design/marketplace/skills/`** and match its voice: short sections,
    do and don't bullets, explicit stop conditions, example lines the Agent can say.
 
 ## Ship
 
-`unoverse lint`, then `unoverse deploy studio`. The universe rescans skills on deploy.
+`unoverse lint <project>` (or `unoverse lint marketplace` for the universal tier), then
+`unoverse deploy studio`. Lint checks every skill: the frontmatter parses, `name` matches
+the folder, `description` is one line, `whenToUse` exists and does not repeat the
+description, the body is not empty. The universe rescans skills on deploy.

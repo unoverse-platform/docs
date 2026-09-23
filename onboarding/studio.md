@@ -105,14 +105,14 @@ Lives in `design/<project>/styles/`. [Tokens in full](/design/styles-and-tokens)
 Tell an Agent how to behave, in plain markdown. What it should do, how it should answer,
 and what it must never say.
 
-Lives in `prompts/skills/`.
+Lives in `design/marketplace/skills/`.
 </Accordion>
 
 <Accordion title="Prompt Blocks" icon="text-quote">
 Write a piece of a prompt once, then reference it wherever it is needed. The same wording
 stops drifting across a dozen Agents.
 
-Lives in `prompts/blocks/`.
+Lives in `design/marketplace/blocks/`.
 </Accordion>
 
 <Accordion title="Nodes" icon="boxes">

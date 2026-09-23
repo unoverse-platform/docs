@@ -53,6 +53,63 @@
         "additionalProperties": false
       }
     },
+    "attaches": {
+      "type": "object",
+      "description": "ATTACHMENT NODES ONLY (kind: Attachment). What this attachment does to the node it is clipped onto.\n\nAn attachment is configuration that arrives from outside a node and LOCKS what it owns. It never runs, so it has no inputs, no outputs and no api/run.yaml; declaring any of those alongside `attaches` is a lint error. The host reads `config` exactly as it always has and never learns an attachment existed.\n\nCOMPATIBILITY IS THE FIELDS, not a vocabulary. A node accepts this attachment when its configSchema declares every property in `sets`. There is no `accepts:` list on the host to keep in sync and no enum of kinds to widen, which is the whole reason the mechanism generalises past its first two cases (a phone line on a voice node, a guardrail on an LLM node).\n\nSee docs/architecture/authoring/DECLARATIVE_NODES.md §14.",
+      "required": [
+        "sets"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "sets": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "The host config fields this attachment OWNS while it is clipped on, as literal values.\n\nONE OWNER PER VALUE. These go read-only on the host's Configuration tab, attributed to this attachment, so there is no way to clip a phone line on and then quietly set the sample rate back. Peel the attachment off and they unlock at their own defaults.\n\nEvery field named here must exist in the host's configSchema, which is also what decides whether the two can clip together at all. Values are literals on purpose: anything variable belongs in this attachment's own config.yaml, which reaches the run under `attachments.<type>` and stays out of the lock."
+        },
+        "credentials": {
+          "type": "array",
+          "description": "Credential TYPES contributed to the HOST's run, alongside the host's own. Same shape as `credentials` above, and the same rule: the type is declared once per package in credentials/<name>.yaml and values never appear here.\n\nSo a voice node with a phone line clipped on runs holding two credentials, its own vendor key and the carrier key it inherited, and neither node writes into the other. The picker for this one lives on the tab this attachment contributes.",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Must match a credential declared in this package's credentials/ folder. Lint enforces it."
+              },
+              "type": {
+                "type": "string",
+                "description": "Credential type id, when it differs from `name`."
+              },
+              "required": {
+                "type": "boolean",
+                "default": true
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Engine-level behaviour the HOST takes on while this is clipped to it. Same meaning as a node's own `capabilities`, contributed the way `credentials` are.\n\nIt exists for one case, and the case is the argument. A voice node in a browser emits nothing outside the platform, so it rightly declares no `emitsExternally`. Clip a phone line onto it and the very same node dials a real human being — and a build loop re-runs a workflow after every stage, so that is a real call to a real person once per attempt.\n\n`emitsExternally` is read off the node TYPE's definition, so it cannot vary per instance, and `sets` cannot reach it because it is a capability rather than a config field. This is the channel for it: the host is treated as emitting externally for as long as the attachment is clipped on, and a test run traces the call instead of placing it.\n\nIt only ever TIGHTENS. An attachment cannot turn a host's capability off, because an attachment is a thing someone added and removing a protection is not something adding a thing should be able to do.",
+          "properties": {
+            "emitsExternally": {
+              "const": true,
+              "description": "While clipped on, the host EMITS outside the platform and a test run must withhold it. Only ever true: absent says nothing, and false would be a claim this cannot make (the host may emit for its own reasons)."
+            }
+          }
+        }
+      }
+    },
     "serviceConnectors": {
       "type": "array",
       "description": "Service wiring between nodes in a workflow, drawn as the node's top and bottom handles. `isService: true` means this node PROVIDES a capability to others; false means it CONSUMES one granted by an upstream provider.\n\nA provider node has TWO INDEPENDENT CHANNELS that do not cross: service calls answer an agent and do NOT fire the node's outputs, while a graph trigger fires the outputs and does not answer an agent (mcp-services.md).\n\nUnrelated to api.yaml, which describes this node's own upstream HTTP call.",
