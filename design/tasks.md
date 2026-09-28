@@ -3,15 +3,18 @@ sidebarTitle: "Tasks"
 title: "Tasks"
 ---
 
-A task is something an Agent reaches for in a conversation to get an outcome. On the map it
-is one kind of row, whatever it was authored as. Off the map nothing is called a task: a
-component is a component, a template a template, an app an app, and each keeps its own
-manifest as the single home of what it is for.
+A task is a unit of interaction for a person: a form they fill, a deck they go through.
+A component, a template, an app or an Agent file IS the task. There is no separate task
+file: each keeps its own manifest as the single home of what it is for.
 
 **The switch makes it a task.** Every asset with a manifest carries an Available switch on
 its own lane in Studio. Switched on, it is offered to every canvas in the org and lands on
-the map as a `task` row. Nothing is written twice: the task reads its title, description and
-selection text from the asset's own manifest.
+the map in the `task` category. Nothing is written twice: the task reads its title,
+description and selection text from the asset's own manifest.
+
+**A task is named by its own URI**, everywhere: on the map, in the task table, in every
+hand-off. `unoverse://templates/unoverse/about-you` is the about-you task. "Task" is a
+category on the map, never part of an address.
 
 ## Every task has the same shape
 
@@ -32,47 +35,189 @@ a person through a form are handed the same thing: the step on screen and its pr
 presenter's skill says what is on them; the application's skill asks for each `input: true`
 prop still empty. Nothing about the task itself says which it is.
 
-**A task can be saved and loaded.** Its state (the step it is on and the values it holds) is
-saved to the task table as it moves, and a task already started is loaded back by its id,
-carrying on where it stopped. A task's URI starts it fresh from its first step.
+**An Agent is a task that runs its own steps.** It is loaded the same ways and takes the
+standard input (its Input Trigger's schema). Its steps are the nodes of its workflow: nobody
+else fills or moves them, and it reports its progress node by node on its card. It finishes
+as every task does, handing back its output. Its run is its state: it is not saved to the
+task table, so an Agent task cannot yet be picked up again.
+
+## Where it shows
+
+A task shows wherever it is needed, and it is the same task in each place:
+
+| Where | How it gets there |
+|---|---|
+| **A web page** | Served in the page's context: the page chose it and draws it in place |
+| **An app** | One of the app's parts |
+| **The unoverse experience** (chat, voice, the screen) | Found by a Spatial search and presented by an Agent |
+
+## How it is loaded
+
+| Loaded | From | Starts |
+|---|---|---|
+| **From Spatial** | An Agent finds it and opens it as an MCP tool | Where the person left it, else its first step |
+| **By URI** | A page, or a node's config (`unoverse://templates/<org>/<name>`) | Where the person left it, else its first step |
+| **By id** | An attempt already started, read back from the task table | Where it stopped |
+
+## One state
+
+**While a task is active it has one state**: the step it is on and the values it holds.
+Everything connected to it reads and writes that one state: the screen, a voice, a chat, an
+LLM, the node running it. A value typed on screen is the value the voice hears; a value the
+voice fills shows on screen; a step moved anywhere moves everywhere. Nothing keeps its own
+copy.
+
+**A task with a finish line is saved, however it was loaded.** Each attempt at it is one row
+in the task table, owned by the person and naming the task's URI. The person is who is
+signed in, or the guest the runtime issued; a guest's rows become theirs when they sign in.
+Opening a task finds the person's open attempt at that URI, or starts a new one, so a form
+half filled on a page carries on in an app, after a reload, or after a dropped call, and a
+task finished once can be done again. Every step handed out carries the attempt's id as its
+`ref`, and every hand-off and submit sends it back, so a call always names the attempt it
+belongs to.
+
+**A task with no finish line is never saved.** A presentation carries its position in each
+call, the step marker, and the screen holds it.
+
+| | Role |
+|---|---|
+| **The saved row** | The truth: one per attempt |
+| **The screen** | The view of it, plus whatever is being typed right now |
+
+Each confirmed step saves the screen's state to the row. A change made anywhere else (a
+voice, a node, an Agent) is published to the screen. The submit carries the screen's answers
+and they win over what was saved, so nothing typed is lost. The submit completes the row, and
+a completed row is kept, marked completed, never deleted: a call that names a completed
+attempt does nothing, rather than finding no row and starting the task again.
+
+## What can be done to it
+
+Every task offers the same features, however it is worked:
+
+| Feature | Does |
+|---|---|
+| **Read** | The step it is on, that step's props, and the values so far |
+| **Fill** | Sets a field on the step: an `input: true` prop (what an Agent writes, described by the prop) or an answer the task collects (its `outputs`). A filled field is `held`, not locked: the person can still change it, and the last change is saved. An `input: false` prop is fixed content and is never filled |
+| **Move** | To the next step or back, never past a step with a required field still empty |
+| **Save** | Writes the state to its row |
+| **Submit** | Finishes it, only when every required field is filled, handing back its `outputs` |
+
+A field is required unless the task marks it optional (`required` on its `outputs`, and on an
+`input: true` prop). Only a required field holds back a step or the submit.
+
+Two different ways reach them, with the same features and the same rules:
+
+| | Loaded as MCP | Run by a node |
+|---|---|---|
+| **Who works it** | An Agent that found the task in Spatial | Nodes on a canvas: GPT-Live, a ChatGPT node, any LLM node, the page's submit |
+| **How** | The Agent calls the task's tools | A node hands values to the Task Runner, which hands back the next step |
+| **Step by step** | The Agent reads the step and fills it | The Task Runner hands out one step at a time: its empty fields, what is held, what the task is for |
+
+An LLM may fill many fields in one go, from whatever it can reach: Spatial, the
+conversation, memory. What it fills is `held`, not final: the person sees it and may change
+it, and only their submit makes it the answer.
+
+Connecting a node is a choice made on the canvas: a task with no voice or LLM wired to it is
+worked by typing alone. Either way nothing skips an empty field and nothing finishes a task
+short, and every fill is saved to the row and shown on the screen.
 
 ## Run by a node
 
-A task a workflow runs with no model in the loop behaves exactly as one an Agent opened. The
-Task Runner is that workflow's node, and it loads a task one of two ways:
+The Task Runner is the node that runs a task in a workflow. It is a `PromiseNode`: each call
+is one step of the state machine. It reads the task and its state, applies what arrived,
+saves it, publishes where the task now is, and answers. It holds nothing between calls; the
+task's row is the memory.
 
-| Loaded | From | Starts | Its answers live |
-|---|---|---|---|
-| **By URI** | A page that shows the task, or the node's own config (`unoverse://templates/<org>/<name>`) | Fresh, at its first step | On the screen and in each hand-off: nothing is saved |
-| **By id** | A task already started, read back from the task table with the state it was paused in | Where it stopped | In its paused run, saved at every answer, cleared when it finishes |
-
-Either way it is worked the same:
-
-- An **interface** task is worked a step at a time and finishes when the person submits it,
-  the same submit that answers an Agent. Until every field it collects is filled, it never
-  moves past the step that asks for them.
-- An **Agent** task (`unoverse://agents/<org>/<name>`) is run with the same MCP call an Agent
-  makes when it finds the task in Spatial: its card shows the run's progress, and its result
-  comes back.
-
-The node then fires `done`, and `result` carries what the task finished with: the answers, or
-the Agent's result. Wire `result` into the next Task Runner to start the next task with it.
+Each call publishes the task's position to the person's screen as app state,
+`tasks.<ref>` = `{ step, stepNumber, stepsTotal }`, so whatever shows that task follows it.
+The call that finds nothing outstanding fires `done`, and `result` carries what the task
+finished with: its `outputs`, or an Agent's result. Wire `result` into the next Task Runner to
+start the next task with it.
 
 **Nothing but the task decides when it is finished.** A voice, a chat or the person typing
 are only ways of filling it; the task runs without any of them, and none of them can finish
-it short. That is what keeps both ways of loading it safe:
+it short.
 
-- **By URI**, nothing is saved, so every hand-off carries every answer given so far, and a
-  page that is reloaded starts the task again from its first step.
-- **By id**, every answer is written to the paused run as it arrives, so a dropped call or a
-  closed page loses nothing: opening the task again carries on from the saved state, and the
-  submit completes the run.
+## Its events
+
+A task reports its own start and finish, however it was called, like any node. Its
+`analytics` only names them. See [Analytics](/design/analytics), "The node reports its own
+events".
+
+## The submit
+
+The submit is the standard one, the same as any form's, and it is just the last call:
+
+1. The person presses Enter. The page sends `submit` with the task's URI and every answer.
+2. The submit goes to whoever opened the task. An Agent that opened it from Spatial gets the
+   answers as its tool call's result. A task with a `binding` has its own workflow called at
+   its trigger, with the task's URI and the answers, as the person.
+3. The Task Runner in that call lays the answers over the saved row. If nothing is
+   outstanding, it completes the row and fires `done` and `result`; if a field is still
+   empty, it holds the step back and publishes it, and the page shows what is short.
+
+Nothing waits for the submit. Every call reads and writes the row, so a task is carried
+across as many calls, and runs, as it takes. Five rules keep that safe:
+
+| Rule | Why |
+|---|---|
+| **Only the call that completes the row fires `result`.** The row moves from open to completed once, in the database; any other call sees it completed and does nothing | A double Enter, or Enter while a voice hands off, would otherwise start the next task twice |
+| **A completed row is kept, marked completed, and every call names its attempt** | A late call would otherwise find no row and start the task again |
+| **Every call loads the task's definition from the URI on its row** | Without the definition a call cannot check the steps or the `outputs`, and would finish a task short |
+| **A submit counts only for an attempt the person holds, and calls only that task's own `binding`**, under their sign-in or guest id | Otherwise a forged submit could start any workflow as anyone |
+| **What runs once per task hangs off the Task Runner's outputs, never the trigger** | The submit calls the workflow at its trigger again, so anything wired to the trigger runs again |
+
+A voice still on the call hears the task is `done` and ends. One task may span several runs;
+the timeline links them through the row.
 
 **A page that leaves stops its runs.** When the last connection of a page's conversation
 closes and does not come back within ten seconds, every run on that conversation stops: its
 Task Runners, its voice, all of it. The run is marked `failed` with the reason "the page
 closed", and nothing fires `done` or `result`, so no next task starts from a page nobody is
-on. Ten seconds rides out a reconnect; a task loaded by id keeps what it saved.
+on. Ten seconds rides out a reconnect, and the task's saved row keeps what it held.
+
+## Not built yet
+
+The standard above is ruled. These parts of it are not yet true in the code:
+
+- **One name.** The page saves a task under its short name (`unoverse/about-you`), the Task
+  Runner under what it was given, and map rows carry a `unoverse://tasks/` address. All
+  become the task's URI.
+- **Saved by URI.** A task loaded by URI is not saved today.
+- **Analytics decides saving.** The page saves a task, and its submit completes it, only when
+  the manifest has an `analytics` action. The finish line (`outputs` and a submit) decides
+  both; an analytics event on submit stays optional and changes neither.
+- **Attempts.** A row is found by workflow, person and task today, and a finished task
+  cannot be started again for the same person. It becomes one row per attempt, found by the
+  person's open attempt at the task's URI, and every step carries the attempt's id.
+- **Optional fields.** Whether a prop can be marked `required` is not checked; today every
+  collected answer holds the step back.
+- **Agent tasks saved.** An Agent's run is not saved, so an Agent task cannot be resumed.
+- **Its own events.** Today the start and finish events are written only when a task is
+  opened inside a conversation, and the finish only when the manifest has an `analytics`
+  action. A task run by the Task Runner on a page writes neither, so Signal never sees it.
+- **Guest rows linked on sign-in.** Designed, not checked.
+- **The submit calling the binding.** Built for a page's template (2026-09-28): its submit
+  calls the template's binding with the answers, and the Task Runner in that call finishes it;
+  the wait is gone. Seen live on about-you: typed, no voice, Enter fired `done` and
+  `result`. Not built for a task in an app or on the map.
+- **Completing once.** Completing a row today clears it, and nothing stops two calls both
+  firing `result`.
+- **The definition on every call.** A Task Runner loaded by id reads the saved answers but not
+  the task's definition.
+- **Who may submit.** How a guest's submit passes the check for starting a workflow
+  (`/api/executions` needs `workflow:author`) is not checked.
+- **The trigger rule.** Nothing checks that once-per-task nodes hang off the Task Runner.
+- **The voice ending on `done`.** Not built.
+- **Props handed out.** A step should carry its empty `input: true` props as fields to fill
+  (each with its description), its filled ones as `held` with the value from the row, and
+  never an `input: false` prop, which is fixed content. Today the Task Runner hands out only
+  empty `outputs` as fields, and passes every prop on the step as `held`, `input: false`
+  included, valued with its Studio `preview` or `default`: a mock that looks filled, so an
+  `input: true` prop is never asked for.
+- **Update Task is not saved.** What the Update Task node fills is published to the screen
+  but never written to the row.
+- **The MCP tools.** Which tools an LLM uses to read, fill, move and submit is not checked.
 
 ## Doors
 
