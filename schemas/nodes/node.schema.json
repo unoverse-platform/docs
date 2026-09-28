@@ -185,8 +185,11 @@
       "items": {
         "type": "object",
         "required": [
-          "label",
-          "component"
+          "label"
+        ],
+        "oneOf": [
+          { "required": ["component"], "not": { "required": ["service"] } },
+          { "required": ["service"], "not": { "required": ["component"] } }
         ],
         "additionalProperties": false,
         "properties": {
@@ -194,6 +197,11 @@
             "type": "string",
             "minLength": 1,
             "description": "The tab, as a person reads it."
+          },
+          "service": {
+            "type": "string",
+            "enum": ["voice"],
+            "description": "A native service the tab opens instead of drawing a component. `voice` is a live call: the tab starts this workflow from the trigger upstream of this node, with that trigger's Testing inputs, and carries the person's microphone and speakers on the browser lane for as long as the tab is open. For a voice node on the browser lane."
           },
           "component": {
             "type": "string",

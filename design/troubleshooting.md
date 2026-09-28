@@ -36,7 +36,7 @@ order: the stream log, then the state inspector, then the definition
 | A panel shows a stale interface | The slot selects with no `where`, and a bare `from: all` is oldest-first | Select on the public state, with `limit: 1`, so the most recent write wins ([Apps](/design/apps)) |
 | A template holds nothing | Nothing was delivered into it, or the delivery confirmed empty and cleared it | Check the stream log for the delivery. An empty template collapsing is correct behaviour ([Templates](/design/templates)) |
 | A card arrives but the template does not rearrange | The card's state name and the template's state names do not match | Use the standard `grid` and `page` names on both sides, because reactions are name-matches |
-| A copywriter part stays blank | The linked component carries no brief, so there is nothing to write to | Put a `brief` on the element that binds the field ([Components](/design/components)) |
+| A template part stays blank | Its props are marked `input: false`, or carry no description, so there is nothing for an Agent to write | Mark the props an Agent writes `input: true` and describe each one ([Components](/design/components)) |
 | An Agent never picks your app | `whenToUse` is layout-first, selector-shaped or missing | Rewrite it outcome-first, in the words a user would say ([Apps](/design/apps)) |
 | A component is squashed or stretched | The app is imposing a size on it | Delete the app rule. A component declares its own size |
 

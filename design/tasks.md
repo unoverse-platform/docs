@@ -13,6 +13,69 @@ its own lane in Studio. Switched on, it is offered to every canvas in the org an
 the map as a `task` row. Nothing is written twice: the task reads its title, description and
 selection text from the asset's own manifest.
 
+## Every task has the same shape
+
+A presentation, an application form and a chooser are built the same way. Four things make
+a task, whatever it is for:
+
+| Part | What it is | Where it lives |
+|---|---|---|
+| **Steps** | The state tree: public states, with the steps nested inside them | `<name>.yaml`, `states:` |
+| **Props** | What is on each step. `input: true` means an Agent or a workflow fills it; `input: false` means it is drawn from its `default` | On the component, or on a template's parts, linked with `static:` |
+| **Input** | The workflow that works it | The meta: `binding: { workflow, trigger }` on a component, template or app manifest; `workflow`, `trigger` and `output` on an Agent file |
+| **Output** | What it hands back, when it hands anything back | `outputs:` on the envelope, sent by a button whose action ends in `type: submit` |
+
+Every task also carries the same discovery meta: `title`, `description` and `whenToUse`.
+
+**The skill is the only thing that changes.** An Agent presenting a deck and an Agent taking
+a person through a form are handed the same thing: the step on screen and its props. The
+presenter's skill says what is on them; the application's skill asks for each `input: true`
+prop still empty. Nothing about the task itself says which it is.
+
+**A task can be saved and loaded.** Its state (the step it is on and the values it holds) is
+saved to the task table as it moves, and a task already started is loaded back by its id,
+carrying on where it stopped. A task's URI starts it fresh from its first step.
+
+## Run by a node
+
+A task a workflow runs with no model in the loop behaves exactly as one an Agent opened. The
+Task Runner is that workflow's node, and it loads a task one of two ways:
+
+| Loaded | From | Starts | Its answers live |
+|---|---|---|---|
+| **By URI** | A page that shows the task, or the node's own config (`unoverse://templates/<org>/<name>`) | Fresh, at its first step | On the screen and in each hand-off: nothing is saved |
+| **By id** | A task already started, read back from the task table with the state it was paused in | Where it stopped | In its paused run, saved at every answer, cleared when it finishes |
+
+Either way it is worked the same:
+
+- An **interface** task is worked a step at a time and finishes when the person submits it,
+  the same submit that answers an Agent. Until every field it collects is filled, it never
+  moves past the step that asks for them.
+- An **Agent** task (`unoverse://agents/<org>/<name>`) is run with the same MCP call an Agent
+  makes when it finds the task in Spatial: its card shows the run's progress, and its result
+  comes back.
+
+The node then fires `done`, and `result` carries what the task finished with: the answers, or
+the Agent's result. Wire `result` into the next Task Runner to start the next task with it.
+
+**Nothing but the task decides when it is finished.** A voice, a chat or the person typing
+are only ways of filling it; the task runs without any of them, and none of them can finish
+it short. That is what keeps both ways of loading it safe:
+
+- **By URI**, nothing is saved, so every hand-off carries every answer given so far, and a
+  page that is reloaded starts the task again from its first step.
+- **By id**, every answer is written to the paused run as it arrives, so a dropped call or a
+  closed page loses nothing: opening the task again carries on from the saved state, and the
+  submit completes the run.
+
+**A page that leaves stops its runs.** When the last connection of a page's conversation
+closes and does not come back within ten seconds, every run on that conversation stops: its
+Task Runners, its voice, all of it. The run is marked `failed` with the reason "the page
+closed", and nothing fires `done` or `result`, so no next task starts from a page nobody is
+on. Ten seconds rides out a reconnect; a task loaded by id keeps what it saved.
+
+## Doors
+
 A task opens onto one of three doors:
 
 - **Interface.** A component or a template the customer completes on screen: a chooser, a
@@ -64,8 +127,10 @@ single `message`.
 2. The caller calls it. The server creates an MCP task, pushes the face into the
    conversation with the Agent's name and message, and fires the workflow at its trigger
    with the caller's own identity.
-3. As the run moves, the face shows the current node and the steps done. A step that
-   waits on the person shows as waiting, and the person answers in the same conversation.
+3. As the run moves, the face shows the latest four steps: the one running now and the
+   ones just before it. An older step drops off the top as a new one starts, and the count
+   (`12 of 40`) keeps the whole run. A step that waits on the person shows as waiting, and
+   the person answers in the same conversation.
 4. When the run completes, the output node's text lands in the face and returns to the
    caller as the tool's result. The caller carries on with it in the same turn.
 

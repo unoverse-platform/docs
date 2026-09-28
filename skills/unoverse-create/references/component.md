@@ -27,9 +27,10 @@ Copy the closest one's folder shape.
    vocabulary in [Interface data](https://docs.unoverse.ai/design/interface-data.md).
 4. **Start flat.** A simple card is one file with a `root`. Structure is earned: a
    manifest when something discovers it, `layouts/` when states own arrangements.
-5. **A field the AI fills carries a `brief`** on the element that renders it, beside its
-   `bind`. Never in the manifest, never a separate file.
-   [Components: briefing descriptions](https://docs.unoverse.ai/design/components.md).
+5. **A field the AI fills is a prop marked `input: true` with a `description`**, and its
+   limits (`maxLength`, `minItems`, `maxItems`) beside it. Never an element `brief:` (retired),
+   never in the manifest, never a separate file.
+   [Components: describing a field](https://docs.unoverse.ai/design/components.md).
 6. **A component fetches its own data through lifecycle hooks**, declared in the manifest,
    never in code. [Lifecycle hooks](https://docs.unoverse.ai/design/lifecycle-hooks.md).
 7. **Tokens only.** A raw value or an invented space step is a lint error.

@@ -94,11 +94,11 @@ You bring the provider, with one exception.
 | Ground | Identity |
 | --- | --- |
 | AWS | Terraform creates a Cognito user pool, one group per role, and the first administrator |
-| DigitalOcean | You bring an OIDC issuer. Auth0 is the common choice, and any compliant provider works |
+| DigitalOcean | You bring an OIDC issuer. WorkOS is the common choice, and any compliant provider works |
 | Your own VM | The same. Set `AUTH_ISSUER` and `AUTH_AUDIENCE`, and the platform verifies against your provider's JWKS |
 
 AWS is the one ground that creates a provider for you. Everywhere else the issuer is a
-variable, so swapping Auth0 for Entra is configuration rather than a code change.
+variable, so swapping WorkOS for Entra is configuration rather than a code change.
 
 <Note>
 **Auth can be turned off for local testing, and only for local testing.** `AUTH_ENABLED=false`

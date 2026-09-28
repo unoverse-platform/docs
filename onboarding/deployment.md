@@ -67,7 +67,7 @@ REDIS_TLS=true
 DOMAIN=yourdomain.com
 ```
 
-Everything else (DATABASE_URL, Auth0, OpenAI) stays the same as your local `.env`.
+Everything else (DATABASE_URL, WorkOS, OpenAI) stays the same as your local `.env`.
 
 ## Runbooks
 
@@ -96,7 +96,7 @@ The swap:
 
 1. Change `domain` in `infra/<cloud>/terraform.tfvars`.
 2. Run `unoverse deploy <cloud>` again. It plans the ground change, creates a new certificate and DNS records, and ships. The VM, database, Redis and everything in them are untouched.
-3. Update your IdP: add the new origins and callback URLs in Auth0 or Cognito. This is the only manual step, and the one people forget.
+3. Update your IdP: add the new origins and callback URLs in WorkOS or Cognito. This is the only manual step, and the one people forget.
 
 Swap before handing URLs to real users: browser sessions and shared links reference the old hostname, and that is the entire cost of the move.
 

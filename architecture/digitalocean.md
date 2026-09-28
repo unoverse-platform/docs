@@ -48,7 +48,7 @@ infrastructure that still satisfies an enterprise review.
 | Secrets | A generated credential encryption key |
 
 Identity is not on that list. DigitalOcean universes bring their own OIDC issuer, which today
-means an existing Auth0 tenant.
+means an existing WorkOS environment.
 
 ## Building it
 

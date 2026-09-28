@@ -236,40 +236,50 @@ so it nests.
 [State](/design/state) is the full model: what writes a state, how everything else reacts,
 and how to model a tree well.
 
-## Briefing descriptions
+## Describing a field
 
-Describe what a field is, the same way you would document any parameter. The description
-is a `brief`, and it sits on the element that renders the field:
+Describe what a field is on its prop, the same way you would document any parameter. The
+prop is the field's whole contract: what it is, whether the outside fills it, and its limits.
 
 ```yaml
-- type: Text
-  brief:
+props:
+  headline:
+    type: string
+    input: true
     description: Name the day in the guest's own words, never a generic label.
     maxLength: 60
-  bind:
-    value: headline
+    default: A day on the island
 ```
+
+`input` decides who fills it. `input: true` puts the field on the component's tool, so an
+Agent or a workflow writes it. `input: false` keeps it the component's own, drawn from its
+`default`. That is the only switch: there is no separate writer role and nothing on the
+layout grants it.
 
 Two things come from writing that description well:
 
 - **Any Agent using the component knows what belongs in the field.**
-- **unoverse can fill the field for you.** A copywriter Agent writes the content from your
+- **unoverse can fill the field for you.** An Agent writes the content from your
   description, drawing on search results rather than inventing anything.
 
-Constraints sit beside the description. Text takes `maxLength`. A list carries its brief on
-the `Each`, with the count it should hold:
+Constraints sit beside the description. Text takes `maxLength`. A list says the count it
+should hold, and describes its items the same way:
 
 ```yaml
-- type: Each
-  brief:
+props:
+  highlights:
+    type: array
+    input: true
     description: The three moments this guest will remember.
     minItems: 3
     maxItems: 3
-  bind:
-    items: highlights
+    items:
+      title:
+        type: string
+        description: The moment, in five words or fewer.
 ```
 
-The platform compiles every brief into the component's tool schema, so there is no prompt
+The platform compiles every prop into the component's tool schema, so there is no prompt
 to maintain anywhere. Change a description or a count, and behaviour changes on the next
 render.
 

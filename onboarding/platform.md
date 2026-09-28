@@ -34,7 +34,7 @@ Setup asks for your registry token, your database URL and your Redis details, an
 Your registry token, issued with your licence. It authorizes downloading the platform images and activates your installation.
 </Card>
 <Card title="You provide" icon="database">
-Your PostgreSQL connection string, your Redis credentials, and your auth provider's issuer, client ID, and audience. Any OIDC-compatible provider works: Auth0, Okta, Microsoft Entra ID.
+Your PostgreSQL connection string, your Redis credentials, and your auth provider's issuer, client ID, and audience. Any OIDC-compatible provider works: WorkOS, Okta, Microsoft Entra ID.
 </Card>
 </CardGroup>
 

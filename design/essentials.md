@@ -22,7 +22,7 @@ A component, a template and an app are each a folder with the same files in it:
 | File | Carries |
 |---|---|
 | `<name>.yaml` | The envelope: what the thing is. `unoverse`, `type`, `name`, the `states:` tree, `props`, `values:` |
-| `manifest.yaml` | The face: how the outside finds it. `description`, `whenToUse`, `category`; an app adds `binding` and `inputSchema` |
+| `manifest.yaml` | The face: how the outside finds it. `title`, `description`, `whenToUse`, `category`; an app, a template or a component that a workflow works adds `binding`, and an app adds `inputSchema` |
 | `layouts/` | One file per state, each a complete arrangement |
 | `components/` | Partials the folder owns. Never discovered, addressed only from inside |
 

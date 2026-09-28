@@ -1,43 +1,51 @@
 # Playbook: templates
 
-**Read first:** [Templates](https://docs.unoverse.ai/design/templates.md): the three words
-and how an app places one. Everything in the component playbook applies.
+**Read first:** [Templates](https://docs.unoverse.ai/design/templates.md): how a layout places
+its parts, how a part's props decide what an Agent writes, and how an app places a template.
+Everything in the component playbook applies.
 
-**Exemplars:** `grid-page` and `email-digest` in the base set at
+**Exemplar:** `email-digest` in the base set at
 [marketplace/definitions](https://github.com/unoverse-platform/marketplace/tree/main/definitions).
 
 ## The rules that bite
 
-1. **A template arranges sections a delivery fills.** A component presents one thing; a
-   template arranges many. If it presents one thing, it is a component.
+1. **A template arranges parts.** A component presents one thing; a template arranges many.
+   If it presents one thing, it is a component.
 2. **One folder grammar.** `<name>.yaml` is `type: template` plus `states:`, each state
-   naming its layout path, first is the base. `manifest.yaml` is discovery meta only.
+   naming its layout path, first is the base. `manifest.yaml` is the discovery meta, plus `binding: { workflow, trigger }` when a workflow works it.
    `components/` holds the template's own parts as flat files with no manifest.
-3. **Every section is one of three words.** `static:` is placed as designed.
-   `copywriter:` is written into through its briefs, so the part must carry them.
-   `director:` holds what streams in, or what its own search finds, in ranked order up to
-   `pick`. No model judges it. The Templates page defines each.
-4. **Never name a component in a director section.** The delivery decides what arrives.
-   A base-set template carries no client words.
-5. **`pick` is the one cap word.** Machine-enforced. Any other cap spelling is retired and
-   a lint error.
-6. **Never author the wire primitives.** No slot, select or where in a template: the three
-   words compile to them at serve time.
-7. **Standard state names `grid` and `page`.** Every card declares both, so any card matches
-   any template with no mapping.
-8. **Meta is ranked.** [Node discoverability](https://docs.unoverse.ai/nodes/node-discoverability.md).
+3. **A layout places a part with a `Ref`.** `type: Ref` + `ref: components/<name>`, the
+   same element that places anything else. The part's file name is its name on the page.
+   `static:` and `director:` are retired and fail lint and load.
+4. **`input` decides what an Agent writes.** In a placed part, a prop marked `input: true`
+   is filled by an Agent or a workflow; `input: false` is drawn from its `default`. No
+   layout element grants or withholds writing.
+5. **Found things are hydrated refs.** A list of products, places or pictures is an array
+   prop whose item fields all carry `hydrate:`, so each item is one `ref` the Agent picks
+   and its words and picture arrive with the result. `maxItems` is the cap. A base-set
+   template carries no client words.
+6. **Never author the wire primitives.** No `ComponentSlot`, `select` or `where` in a
+   template: a placed part compiles to them at serve time.
+7. **Preview every part.** Each prop carries a realistic `preview:` (or `default:`), array
+   props a list of mock items, so **studio** draws the arrangement finished.
+8. **Every task has the same shape.** Steps, props (`input: true` or `false`), an input
+   (the `binding`) and, when it hands answers back, an output (`outputs:` plus a button
+   ending in `type: submit`). A presentation and a form differ only in the skill the Agent
+   carries. [Tasks](https://docs.unoverse.ai/design/tasks.md).
+9. **Meta is ranked.** [Node discoverability](https://docs.unoverse.ai/nodes/node-discoverability.md).
 
 ## Workflow
 
-1. Read the Templates page and one exemplar.
-2. Write the envelope and states, then one layout per state using the three words.
-3. Put template-only parts in `components/`, flat, unprefixed.
-4. Write the manifest: description, `whenToUse`, category, version. Nothing else. Quote
-   any string holding a colon.
+1. Read the Templates page and the exemplar.
+2. Write the envelope and states, then one layout per state, placing parts with `Ref`.
+3. Put template-only parts in `components/`, flat, unprefixed. Mark each prop `input: true`
+   (an Agent writes it) or `input: false` (drawn as designed), and describe every one.
+4. Write the manifest: title, description, `whenToUse`, category, version, and `binding`
+   when a workflow works it. Nothing else. Quote any string holding a colon.
 5. `unoverse lint`, preview in **studio** at several widths, `unoverse deploy studio`.
 
 ## Done means
 
-- Every section is one of the three words, and no component is named under a director
+- Every part is placed with `type: Ref` + `ref: components/<name>`; no `static:` or `director:`
 - No client words, no retired spellings
-- Copywriter sections link parts that carry briefs
+- Every prop in a placed part says `input: true` or `input: false`, and carries a description

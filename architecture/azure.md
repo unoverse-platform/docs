@@ -28,7 +28,7 @@ a TLS terminator and a rendered environment file. Everything above that line is 
 because the images, the CLI and every runbook are cloud-blind by design.
 
 Identity is the part that usually makes a port expensive, and it is already solved here.
-Entra is an OIDC issuer, so it arrives through the `byo-oidc` input that Auth0 uses today.
+Entra is an OIDC issuer, so it arrives through the `byo-oidc` input that WorkOS uses today.
 The platform never names a provider, and the swap is configuration.
 
 ## Using Azure before the module exists

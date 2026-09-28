@@ -66,7 +66,7 @@ command. Wiring those into CI is a decision a customer makes later, on their own
 Two seams exist for real, and they are worth knowing about because they answer most
 "what if" questions in a review.
 
-**The identity provider is a variable.** Auth0 today, Entra or Cognito tomorrow, without a
+**The identity provider is a variable.** WorkOS today, Entra or Cognito tomorrow, without a
 code change. See [Provisioning](/architecture/terraform).
 
 **Postgres can be yours, on DigitalOcean.** An existing managed cluster, or a database

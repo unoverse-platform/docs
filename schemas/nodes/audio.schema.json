@@ -108,6 +108,13 @@
         "endWhen": {
           "$ref": "_defs.schema.json#/definitions/expression",
           "description": "THE MODEL ENDING THE CALL ITSELF, tested against every vendor event with it in scope as `response`. True ends the session exactly as a hang-up does.\n\n`endOn` above is the LANE's list and every entry on it means the PERSON left: a carrier's stop frame, a browser tab closing. Nothing there can say the ASSISTANT is finished, and a live voice model may send no end-of-call event of its own, so a call whose business was done stayed open: it said goodbye, stopped talking, and held the line until the idle timer fired minutes later. The caller hears silence and the session bills for it.\n\nWhat counts is the node's to decide. For a vendor with function calling the natural answer is a tool the model may call, so the expression tests for that name. Absent, nothing changes: only the lane ends a call."
+        },
+        "speech": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The vendor events that mean someone actually SPOKE, the person or the assistant. A call with none of them for 60 seconds ends (docs/VOICE_STREAMING_GUIDE.md, \"Every Call Ends\"), so a call nobody hangs up is not billed for ever.\n\nName them when the defaults are wrong for the vendor. Absent, speech is the person's speech event (`userSpeaking`) and the assistant's audio (`out.match`), which is wrong for a vendor that streams silent audio: GPT-Live names its transcript deltas instead."
         }
       },
       "additionalProperties": false

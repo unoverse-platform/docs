@@ -60,7 +60,7 @@ That one noun is what makes this design system different. Other systems route be
 screens. Here, interfaces move, and everything on screen reacts to them:
 
 - Agents **stream** interfaces into the conversation as they answer.
-- Templates **query** interfaces, or hold the ones each delivery brings.
+- Templates **place** their own parts, and an Agent fills the props each part marks `input: true`.
 - A template **reacts to the state** an interface arrives in. Six cards arriving compact
   draw a grid. One arriving as a full page draws the hero.
 - Apps **arrange** templates into the experience.
@@ -79,7 +79,7 @@ You author five kinds, top to bottom, each with its own section ahead:
 | | What it is |
 |---|---|
 | **App** | Arranges templates into an experience: the shell, the navigation, which templates exist |
-| **Template** | An authored arrangement with open sections that deliveries fill: a grid, a rail, an email frame |
+| **Template** | An authored arrangement of parts an Agent fills: a comparison, a composed page, an email frame |
 | **Component** | Presents one thing an Agent sends into a conversation: a card showing a product, a form, a chart |
 | **Atom** | A shape components share, composed in rather than copied: a button, a badge, a card frame |
 | **Styles** | Your brand: the colour, type and spacing values every definition resolves against |

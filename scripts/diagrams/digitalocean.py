@@ -60,7 +60,7 @@ b.append(fitbox(RDX,DATA_Y,"Managed Redis 7",["one node · TLS","no snapshots by
 b.append(text(VX+16,DATA_GY+134,"each database firewall admits the droplet and nothing else",11.5,400,MUTE))
 
 SX = X + RW + 40
-side,side_w,sbx = column(SX,R_ENGINE-30,[("Your OIDC issuer",["Auth0 today · you bring it"],None)],gap=24)
+side,side_w,sbx = column(SX,R_ENGINE-30,[("Your OIDC issuer",["WorkOS today · you bring it"],None)],gap=24)
 b.append(side)
 
 # Every line is straight or one right angle.
