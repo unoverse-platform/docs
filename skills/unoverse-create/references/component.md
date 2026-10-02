@@ -12,9 +12,10 @@ Copy the closest one's folder shape.
 
 ## The rules that bite
 
-1. **A component is data plus a state tree.** Top-level states are its faces, and each
-   may name the `place:` it is shown in (`grid` → `rail`, `page` → `main`, a chip →
-   `chat`). Steps nest as substates and never move it. The gate before adding a top-level
+1. **A component is data plus a state tree.** Top-level states are its external state,
+   its faces, and each may name the `place:` it is shown in (`grid` → `rail`, `page` →
+   `main`, a chip → `chat`). Steps nest as internal state and never move it. It writes
+   only its own state, never its template's. The gate before adding a top-level
    state: does it need a different place, or a face of its own? No means it nests.
    A task that can step aside declares a state naming `chat` for its chip.
    [State](https://docs.unoverse.ai/design/state.md) has the model.
@@ -45,10 +46,10 @@ Copy the closest one's folder shape.
 ## Workflow
 
 1. Read the exemplar and the two pages above.
-2. Declare the state tree: public states on top, steps nested, each with its layout path.
+2. Declare the state tree: external states on top, steps nested, each with its layout path.
 3. Write the envelope, the manifest if it is discovered, the layouts.
 4. `unoverse lint`, zero errors. Preview in **studio**: the state switcher reads your
-   tree, and a non-initial public state previews full-bleed. If a step you meant as an
+   tree, and a non-initial external state previews full-bleed. If a step you meant as an
    in-place swap renders edge to edge, you promoted it. Nest it.
 5. `unoverse deploy studio`.
 
@@ -59,6 +60,6 @@ Copy the closest one's folder shape.
 | A bound field renders the mock in the preview and nothing live | The prop name is not one the source carries |
 | A projected field renders nothing in the preview | Declare it as a prop with a preview default too |
 | Lint says the root restates the tree | Delete the root; the switch is synthesised |
-| A state you meant as a step previews full-bleed | It is public. Nest it under the state it belongs to |
+| A state you meant as a step previews full-bleed | It is external. Nest it under the state it belongs to |
 
 [Troubleshooting](https://docs.unoverse.ai/design/troubleshooting.md) has the rest.

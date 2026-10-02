@@ -3,12 +3,24 @@ sidebarTitle: "Analytics"
 title: "Analytics"
 ---
 
-Add one key to a node and that interaction is reported to the page's analytics. You choose
-the moments: beyond a task's open and submit, nothing is measured unless you say so.
+Add one key to a node and that interaction is reported to the page's analytics tool, such as
+Google Analytics. You choose the moments, and nothing is sent unless you declare it.
 
-Analytics here means what a person did in your experience: which items they opened, what
-they clicked, where they stopped. It is separate from platform monitoring, which measures
-whether the machinery is healthy.
+## Analytics is not events
+
+Nodes send two different things, and they never mix:
+
+| | Events | Analytics |
+|---|---|---|
+| What | What happened: a task opened, stepped or finished; a search moved the person to an area | A report for the customer's own analytics tool |
+| When | Always | Only when the node declares `analytics` |
+| Where | Your universe: the task's saved state and the person's journey, which Signal shows | The page's analytics tool only |
+
+Events are covered in [Tasks](/design/tasks). This page is about analytics. Declaring
+`analytics` never decides whether an event is written, and an analytics event never reaches
+Signal. The one report not sent by a node is `unoverse_experience_opened`, which the embed
+sends when the whole experience loads. Platform monitoring, whether the machinery is healthy,
+is a third thing again.
 
 ## The one key
 
@@ -73,10 +85,8 @@ which an ad-blocker can silence, and rather than on the workflow finishing. The 
 arrived, and that is the fact it reports. A button whose action stays on the page keeps its
 `analytics` key on the node.
 
-The platform already knows what opening something means: an app is done the moment it
-loads, and a component with a submit is started when it opens and finished when the
-submit arrives. You can name those moments yourself, or override them, with an entry
-keyed `open`:
+An entry keyed `open` reports the node being opened for the person, before they have typed
+anything:
 
 ```yaml
 analytics:
@@ -86,27 +96,12 @@ analytics:
     event: application_submitted
 ```
 
-An `open` entry fires when your universe opens the app for the person, before they have
-typed anything. `done: true` says the open is itself the finish. Without any entry the
-defaults apply: `loaded` for an app, `started` for a component with a submit, nothing for
-a component without one.
+A function called on an object, such as getting an item's details, is reported the same way
+when you declare it. It is analytics only: it is not an event.
 
-## The node reports its own events
-
-Events belong to the node, not to the way it was called. A page, an app, a conversation or a
-workflow can open the same component or template, and it reports the same events each time.
-
-Where each one goes:
-
-| Moment | The page's analytics tool | The person's journey, shown in Signal |
-|---|---|---|
-| Open | | yes |
-| Submit (an `action`) | yes | yes |
-| View (a `phase`), or a click on a node | yes | |
-
-**Not yet true everywhere.** Today opens and submits reach the journey only when the node is
-opened inside a conversation, and a submit only when the manifest declares its `action`. A
-page's template run by a workflow reports neither.
+**Not yet true everywhere.** Today a declared `action` entry also writes the task's finish
+event, and events are written only when a task is opened inside a conversation. Both change
+to the rule above.
 
 ## Naming events
 

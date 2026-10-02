@@ -23,8 +23,8 @@ a task, whatever it is for:
 
 | Part | What it is | Where it lives |
 |---|---|---|
-| **Steps** | The state tree: public states, with the steps nested inside them | `<name>.yaml`, `states:` |
-| **Props** | What is on each step. `input: true` means an Agent or a workflow fills it; `input: false` means it is drawn from its `default` | On the component, or on a template's parts, linked with `static:` |
+| **Steps** | The state tree: external states, with the steps nested inside them as internal state | `<name>.yaml`, `states:` |
+| **Props** | What is on each step. `input: true` means an Agent or a workflow fills it; `input: false` means it is drawn from its `default` | On the component, or on the parts a template holds |
 | **Input** | The workflow that works it | The meta: `binding: { workflow, trigger }` on a component, template or app manifest; `workflow`, `trigger` and `output` on an Agent file |
 | **Output** | What it hands back, when it hands anything back | `outputs:` on the envelope, sent by a button whose action ends in `type: submit` |
 
@@ -140,9 +140,17 @@ it short.
 
 ## Its events
 
-A task reports its own start and finish, however it was called, like any node. Its
-`analytics` only names them. See [Analytics](/design/analytics), "The node reports its own
-events".
+A task is a node, and it sends its own events at the moments it saves, however it was run:
+
+| Moment | Saved to the task table | Sent to the journey (Signal) |
+|---|---|---|
+| **Opened** | the attempt opens | `opened` |
+| **Step** | the step and the answers | `step` |
+| **Finished** | the attempt completes | `finished` |
+
+Nothing else sends a task's events. `analytics` is separate: it only reports to the page's
+analytics tool, when declared, and never decides whether an event is written
+([Analytics](/design/analytics)).
 
 ## The submit
 
@@ -193,9 +201,12 @@ The standard above is ruled. These parts of it are not yet true in the code:
 - **Optional fields.** Whether a prop can be marked `required` is not checked; today every
   collected answer holds the step back.
 - **Agent tasks saved.** An Agent's run is not saved, so an Agent task cannot be resumed.
-- **Its own events.** Today the start and finish events are written only when a task is
-  opened inside a conversation, and the finish only when the manifest has an `analytics`
-  action. A task run by the Task Runner on a page writes neither, so Signal never sees it.
+- **Its own events.** Today seven places in the conversation code send a task's events, the
+  finish only when the manifest declares an `analytics` action, and memory keeps its own task
+  rows beside the journey. A task run by the Task Runner on a page sends none, so Signal never
+  sees it. All of it moves into the task's node. Built so far (2026-09-28): the Task Runner
+  sends `opened` and `finished` itself. Not yet: `step` (it needs the saved attempt to know
+  the step changed), and removing the old senders.
 - **Guest rows linked on sign-in.** Designed, not checked.
 - **The submit calling the binding.** Built for a page's template (2026-09-28): its submit
   calls the template's binding with the answers, and the Task Runner in that call finishes it;

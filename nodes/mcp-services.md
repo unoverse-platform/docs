@@ -139,6 +139,16 @@ Include it when:
 Agent skills are a different thing, authored in `design/marketplace/skills/` and discovered at run time.
 `instructions` is part of the MCP schema and travels with the tools.
 
+## Who records a call
+
+A tool records its own call. When a method runs, it writes one row on the run's trace, nested
+under the node that called it, with what it was asked and what it answered. The caller
+records nothing about the call, so a tool reads the same on the trace whoever called it: an
+Agent on the canvas, a voice Agent, or an outside host such as ChatGPT. That holds for every
+kind of tool: a node's methods, the functions a found row offers (`getDetail`, `readSkill`),
+the platform's own tools (the screen, apps and tasks, memory). A node that runs as a step
+records its own run the same way, and stops there.
+
 ## When it goes wrong
 
 | What you see | Why |

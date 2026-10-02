@@ -92,11 +92,11 @@ Four rules carry the whole model, and they are the same at every scale:
 |---|---|
 | First declared wins | A component arrives there; a template rests there |
 | Every state names its layout | A path, such as `layout: layouts/grid`. Nothing is assumed from the name |
-| Top level is public, nesting is private | The outside world sees the top-level names and nothing else |
+| Top level is external, nesting is internal | The outside world sees the top-level names and nothing else |
 | A state may name its place | `place: main` shows the interface in the app's `main` place whenever it is in that state |
 
 So a card writing `state: page` draws its page layout and moves to the place `page` names.
-An app has one state and a layout of places; it never matches names.
+An app has one external state, its layout of places, and it never matches names.
 
 <Tip>
 **The order of states matters.** The first declared is where the thing starts, and the
@@ -104,21 +104,22 @@ list is walked top-down as a priority order. [State](/design/state) covers the w
 full.
 </Tip>
 
-Preview every state in **studio** without any setup. Each public state you declare appears
-as a pill, and clicking one shows that state's layout, driven by the same state write a
+Preview every state in **studio** without any setup. Each external state appears as a pill
+on the top, and clicking one shows that state's layout, driven by the same state write a
 real interaction makes.
 
-<Frame caption="The declared states, as studio shows them: one pill per public state.">
+<Frame caption="The declared states, as studio shows them: one pill per external state.">
   <img src="/images/design/states_tabs.png" alt="studio previewing a grid-page template, with Grid and Page state pills in the header" />
 </Frame>
 
-### Substates
+### Internal state
 
-**States and substates are different things.** A state is a face the outside world can ask
-for. A component can be fetched, delivered or streamed in any of its declared states, and
-the templates around it react to them by name. A substate is local to the component. It
-nests inside one state, and nothing outside ever sees it. Only the component moves it,
-through its own buttons or a value a service projects.
+**External and internal state are different things.** An external state is a face the
+outside world can ask for. A component or a template can be fetched, delivered or streamed
+in any of its external states, and each one names where it shows. An internal state, a
+substate, is local to the thing. It nests inside one state, and nothing outside ever sees
+it. Only the thing itself moves it, through its own buttons or a value a service projects.
+**studio** lists it on the left.
 
 <Frame caption="A voice component in studio: its substates, Idle through Thinking, are its own business.">
   <img src="/images/design/states_substate.png" alt="studio listing the voice-chat component with its substates Idle, Active, Listening, Speaking and Thinking" />
@@ -131,9 +132,9 @@ like any other:
 states:
   idle:
     layout: layouts/idle
-  call:                          # the public face a delivery opens
+  call:                          # the external face a delivery opens
     layout: layouts/call         # the state's own shell, always on
-    on: callState                # the private axis the substates switch on
+    on: callState                # the internal axis the substates switch on
     states:
       listening:
         layout: layouts/callState-listening
@@ -156,7 +157,7 @@ Three checks and a workbench, each catching mistakes at a different moment:
 | **The schema** | As you type, through the [`redhat.vscode-yaml` extension](/onboarding/platform) | An unknown primitive, a missing field, an illegal condition |
 | **The lint** | At publish: `unoverse deploy studio` | Raw values, invented style keys, broken paths, tree violations. Zero errors to ship |
 | **The guards** | In the platform's own CI | The same rules, enforced again where you cannot drift past them |
-| **studio** | While you build | Renders every definition from its defaults, with one pill per public state |
+| **studio** | While you build | Renders every definition from its defaults, with one pill per external state |
 
 Two commands run the loop. **studio** draws whatever you are building from its own
 defaults, with one pill per public state:

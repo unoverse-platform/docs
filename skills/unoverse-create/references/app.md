@@ -10,7 +10,9 @@ in the workspace, and the anatomy on the Apps page.
 
 ## The rules that bite
 
-1. **An app is a layout with places.** It has ONE state, and its layout declares each
+1. **An app is a layout with places.** It has ONE state, its external state, and no steps.
+   Components and templates are streamed in, and each opens the place its own external
+   state names. Its layout declares each
    `Place` (`name`, `holds: one | many`, `appWidth`, an optional `frame` with a bare
    `ComponentSlot`). It never matches state names, never orders states, and never decides
    what is shown. The screen fills the places; an empty place draws nothing.

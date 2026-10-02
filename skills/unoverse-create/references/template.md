@@ -9,30 +9,38 @@ Everything in the component playbook applies.
 
 ## The rules that bite
 
-1. **A template arranges parts.** A component presents one thing; a template arranges many.
-   If it presents one thing, it is a component.
-2. **One folder grammar.** `<name>.yaml` is `type: template` plus `states:`, each state
+1. **A template is a component that holds components.** Same shape: external states that
+   name where it shows (`focus`, `inline`), internal steps, props, and it can be a task.
+   If it holds nothing, it is a component.
+2. **A held component keeps its own state.** Hold one with a plain `Ref` to the project
+   component inside an `Each`; each item is its own instance, keyed by its id, and carries
+   the component's own prop names. Its first state is its spot in the template; its detail
+   is its own `page`, opened over the template. Never hold its fields in the template's `values:`, never give it a step of the
+   template's, never react to its state. Not built yet: today a held component draws flat,
+   so a set of things that each open goes into a place as top-level components.
+   [State: inside a template](https://docs.unoverse.ai/design/state.md).
+3. **One folder grammar.** `<name>.yaml` is `type: template` plus `states:`, each state
    naming its layout path, first is the base. `manifest.yaml` is the discovery meta, plus `binding: { workflow, trigger }` when a workflow works it.
    `components/` holds the template's own parts as flat files with no manifest.
-3. **A layout places a part with a `Ref`.** `type: Ref` + `ref: components/<name>`, the
+4. **A layout places a part with a `Ref`.** `type: Ref` + `ref: components/<name>`, the
    same element that places anything else. The part's file name is its name on the page.
    `static:` and `director:` are retired and fail lint and load.
-4. **`input` decides what an Agent writes.** In a placed part, a prop marked `input: true`
+5. **`input` decides what an Agent writes.** In a placed part, a prop marked `input: true`
    is filled by an Agent or a workflow; `input: false` is drawn from its `default`. No
    layout element grants or withholds writing.
-5. **Found things are hydrated refs.** A list of products, places or pictures is an array
+6. **Found things are hydrated refs.** A list of products, places or pictures is an array
    prop whose item fields all carry `hydrate:`, so each item is one `ref` the Agent picks
    and its words and picture arrive with the result. `maxItems` is the cap. A base-set
    template carries no client words.
-6. **Never author the wire primitives.** No `ComponentSlot`, `select` or `where` in a
+7. **Never author the wire primitives.** No `ComponentSlot`, `select` or `where` in a
    template: a placed part compiles to them at serve time.
-7. **Preview every part.** Each prop carries a realistic `preview:` (or `default:`), array
+8. **Preview every part.** Each prop carries a realistic `preview:` (or `default:`), array
    props a list of mock items, so **studio** draws the arrangement finished.
-8. **Every task has the same shape.** Steps, props (`input: true` or `false`), an input
+9. **Every task has the same shape.** Steps, props (`input: true` or `false`), an input
    (the `binding`) and, when it hands answers back, an output (`outputs:` plus a button
    ending in `type: submit`). A presentation and a form differ only in the skill the Agent
    carries. [Tasks](https://docs.unoverse.ai/design/tasks.md).
-9. **Meta is ranked.** [Node discoverability](https://docs.unoverse.ai/nodes/node-discoverability.md).
+10. **Meta is ranked.** [Node discoverability](https://docs.unoverse.ai/nodes/node-discoverability.md).
 
 ## Workflow
 

@@ -59,33 +59,31 @@ simply a new delivery, and the templates on screen react to it.
 That one noun is what makes this design system different. Other systems route between
 screens. Here, interfaces move, and everything on screen reacts to them:
 
-- Agents **stream** interfaces into the conversation as they answer.
-- Templates **place** their own parts, and an Agent fills the props each part marks `input: true`.
-- A template **reacts to the state** an interface arrives in. Six cards arriving compact
-  draw a grid. One arriving as a full page draws the hero.
-- Apps **arrange** templates into the experience.
+- Agents **stream** components and templates into the app as they answer.
+- A template **holds** components, and an Agent fills the props each one marks `input: true`.
+- Each one's **external state** names the place it shows in, and the app opens that place.
 
-<Frame caption="Interfaces arrive in a state; templates react; the app arranges.">
+<Frame caption="Interfaces arrive in a state, and the app opens the place it names.">
   <img src="/images/design/interface-flow.svg" alt="Interfaces streaming and being queried into templates, arranged by an app" />
 </Frame>
 
-Nothing wires any of this together. An interface owns its own state, a template reacts to
-the states it recognises by name, and an app holds only the arrangement. When a card opens
-itself into its full page, the template showing it reacts. The app did nothing, because
-there is nothing for it to do.
+Nothing wires any of this together. An interface owns its own state and writes nothing
+else's, and an app holds only its places. When a card opens itself into its full page, its
+external state names a place, and the app opens it there. The template holding it is never
+told.
 
 You author five kinds, top to bottom, each with its own section ahead:
 
 | | What it is |
 |---|---|
-| **App** | Arranges templates into an experience: the shell, the navigation, which templates exist |
-| **Template** | An authored arrangement of parts an Agent fills: a comparison, a composed page, an email frame |
+| **App** | The screen: a layout of places that components and templates are streamed into |
+| **Template** | A component that holds components: a menu, a comparison, an email |
 | **Component** | Presents one thing an Agent sends into a conversation: a card showing a product, a form, a chart |
 | **Atom** | A shape components share, composed in rather than copied: a button, a badge, a card frame |
 | **Styles** | Your brand: the colour, type and spacing values every definition resolves against |
 
-The line between a template and a component is one question: does it arrange many sections, or
-present one thing?
+The line between a template and a component is one question: does it hold other components,
+or present one thing? Otherwise they are the same shape.
 
 **You start with a design system, not a blank folder.** The platform ships one as a
 marketplace package: generic components, templates and atoms, plus the token foundation,

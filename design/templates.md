@@ -3,12 +3,13 @@ sidebarTitle: "Templates"
 title: "Templates"
 ---
 
-A template is an authored arrangement with open parts: a grid of cards, a comparison pair,
-an email, a landing page. It owns its region of the screen, so nothing else has to manage
-what appears there.
+A template is a component that holds components: a menu, a comparison pair, an email, a
+landing page. It has the same shape as a component: external states that say where it shows,
+internal steps, props, and it can be a task. The one difference is that it holds components,
+and each one it holds manages its own state.
 
 <Tip>
-**Does it arrange many parts, or present one thing?** Many parts is a template. One thing
+**Does it hold other components, or present one thing?** Holding is a template. One thing
 is a component.
 </Tip>
 
@@ -87,6 +88,43 @@ reader. The layout only arranges.
 
 You never author `ComponentSlot`, `select` or `where` in a template. A placed part
 compiles to those primitives when the template is served, so the renderer stays dumb.
+
+## Holding a component
+
+A template holds one of the project's own components with the same `Ref`, inside an `Each`
+over the things it shows. Each item becomes its own instance of that component:
+
+```yaml
+# layouts/options.yaml: the courses, each with its dishes
+- type: Each
+  bind: { items: courses }
+  item:
+    type: Box
+    children:
+      - type: Text
+        bind: { value: name }
+      - type: Each
+        bind: { items: dishes }
+        item:
+          type: Ref
+          ref: menu-item           # each dish is its own menu-item, with its own state
+```
+
+A `Ref` to a component whose states name places, inside an `Each`, is held rather than
+drawn flat. Each item's fields fill the component's props by name, so the item carries the
+component's own prop names. Each held instance is keyed by its item's id.
+
+The held component keeps its own state ([State: inside a template](/design/state)). It
+arrives in its first state, in its spot in the template. Tapped, it writes its own `page` and
+opens in the place that state names, laid over the template. Its ✕ writes `grid` and it is
+back in its spot. The template never holds the component's fields in its `values:`, and
+never gives it a step of its own to open into.
+
+<Warning>
+**Not built yet.** Today a component placed in a template is drawn flat, with no state of its
+own. Until it is built, a set of things that each open is shown as top-level components in a
+place that holds many.
+</Warning>
 
 ## Writing into a part
 
@@ -185,6 +223,23 @@ action:
     type: submit
 ```
 
+## Slides
+
+A template whose steps are slides says so with `arrows: true` on the state that holds them,
+and the arrow keys step it. Only a state marked so answers the keys: a form whose last step
+is its thanks leaves it out, so the keys never skip the form.
+
+```yaml
+states:
+  presentation:
+    layout: layouts/presentation
+    place: main
+    arrows: true
+    states:
+      welcome:
+        layout: layouts/welcome
+```
+
 ## Preview
 
 **studio** seeds every part from each prop's `preview:` (falling back to `default:`), so
@@ -245,16 +300,22 @@ they read against the canvas.
 The sorting test against an atom: an atom is leaf vocabulary a component composes, while a
 block is page arrangement a template composes. If it holds parts, it is a block.
 
-## Placing one in an app
+## Arriving in an app
+
+A template is streamed into an app exactly as a component is. Its external state names the
+place it shows in, and the app opens that place. The app never names a template:
 
 ```yaml
-- type: Template
-  name: products             # the app state this place belongs to
-  template: grid-page        # what it holds
-  appWidth: flex             # a place declares its width once
+states:
+  task:                      # the whole comparison
+    layout: layouts/page
+    place: main
+  inline:                    # the chip it steps aside to
+    layout: layouts/inline
+    place: chat
 ```
 
-The placement only places; everything about how a template fills stays in the template itself.
+Everything about how a template fills stays in the template itself.
 
 The delivery owns the parts. Each turn's delivery replaces the last, a delivery that
 confirms nothing clears them, and an empty template collapses, frame included.

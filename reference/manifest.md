@@ -120,7 +120,7 @@ Legacy. Org scoping is the boundary now, so this no longer does anything.
 </ResponseField>
 
 <ResponseField name="allowedHosts" type="string[]">
-The outbound hosts this folder may reach. Part of the manifest's content hash.
+The outbound hosts this folder may reach: a lifecycle hook's server-side calls, and the pictures its content loads in an outside host such as ChatGPT or Claude, whose window blocks images from any host not listed. Bare hosts in the node package grammar: "www.example.com", "*.example.com" (one level), "**.example.com" (any depth). Part of the manifest's content hash.
 </ResponseField>
 
 <ResponseField name="credentials" type="string[]">

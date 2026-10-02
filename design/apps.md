@@ -94,15 +94,16 @@ inputSchema:
 
 Four things carry the model:
 
-- **The envelope is the tree, and the manifest is the face.** The one state and its layout
-  say what the app is. `whenToUse`, `binding` and `inputSchema` say how the outside finds
+- **The envelope is the tree, and the manifest is the face.** The one state, its external
+  state, and its layout say what the app is. An app has no steps. `whenToUse`, `binding` and `inputSchema` say how the outside finds
   and calls it.
 - **The manifest is the single home of the app's meta and its binding.** Its Available
   switch lives in the Tasks lane ([Tasks](/design/tasks)); switched on, the app is a task
   on the map, an Agent with an interface in front.
 - **The binding belongs to the app.** The composer sends through the app's own workflow.
-- **The places open and close as the screen fills them.** A card whose `grid` state names
-  `rail` lands in the rail; tapped, it writes `page`, which names `main`, and moves there.
+- **The places open and close as the screen fills them.** A component or a template lands
+  in the place its external state names. A card whose `grid` state names `rail` lands in
+  the rail; tapped, it writes `page`, which names `main`, and moves there.
   An empty place draws nothing, frame included, and nothing writes a flag to make any of
   it happen.
 

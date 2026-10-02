@@ -3,9 +3,9 @@ sidebarTitle: "Components"
 title: "Components"
 ---
 
-A component presents one thing: a card showing a product, a form, a chart. Templates
-arrange components, apps arrange templates, and an Agent can send a single component
-straight into a conversation.
+A component presents one thing: a card showing a product, a form, a chart. A template
+holds components, and both are streamed into an app, which opens the place each one's
+external state names.
 
 Folders, manifests and the toolchain work the same way for every artifact, and
 [Essentials](/design/essentials) covers them. This page is what makes a component a
@@ -203,8 +203,8 @@ when it opens. [Lifecycle hooks](/design/lifecycle-hooks) is the one code carve-
 
 ## States
 
-A component with more than one arrangement declares a state tree. Public states sit at the
-top level, and private steps nest inside them:
+A component with more than one arrangement declares a state tree. External states sit at
+the top level, and internal steps nest inside them:
 
 ```yaml
 states:
@@ -212,7 +212,7 @@ states:
     layout: layouts/grid
   page:
     layout: layouts/page
-    on: step                # the private axis
+    on: step                # the internal axis
     states:
       detail:
         layout: layouts/step-detail
@@ -220,17 +220,17 @@ states:
         layout: layouts/step-apply
 ```
 
-Two decisions are yours. **Which states are public**, since those are the component's
-entire interface to the templates and app around it. And **what to call them**: `grid` for
+Two decisions are yours. **Which states are external**, since those are all the app
+ever sees. And **what to call them**: `grid` for
 the compact face and `page` for the full detail face are the standard names, so a card
 using them matches any template, in any org, with no mapping.
 
 One question settles the first decision:
 
-> **If the screen must rearrange to show it, make it public. If nothing would move, nest it.**
+> **If the screen must rearrange to show it, make it external. If nothing would move, nest it.**
 
 The same product is a compact tile in `grid` and a full page in `page`. Both move the
-screen, so both are public. Stepping from detail to apply inside that page moves nothing,
+screen, so both are external. Stepping from detail to apply inside that page moves nothing,
 so it nests.
 
 [State](/design/state) is the full model: what writes a state, how everything else reacts,
