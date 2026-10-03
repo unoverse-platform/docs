@@ -151,8 +151,8 @@ Lint runs first and blocks on any error, so nothing broken reaches a universe. O
 lands, your card is a node any workflow can use: open it in **studio**, click **Copy for
 Canvas**, and paste it onto a workflow with `Cmd+V`.
 
-Edits to a component that already shipped apply live. Publishing a brand new component adds
-it to the set the platform loads at boot.
+Edits to a component that already shipped apply live, and so does a brand new one: no
+restart.
 
 ## Next steps
 

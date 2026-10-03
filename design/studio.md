@@ -122,10 +122,10 @@ unoverse deploy studio
 Layouts, styles and copy refresh in the preview as you save, carried by the resource
 subscription, and nothing restarts.
 
-Publishing is what a new definition needs, or one whose node contract changed through new
-props, a new name or changed discovery meta. The platform loads the set of definitions at
-boot and builds one node from them, so a definition it has never seen has to arrive first.
-There is no code generation at any point.
+Deploying is what a new definition needs, or one whose node contract changed through new
+props, a new name or changed discovery meta. The platform builds one node from each
+definition it holds, so a definition it has never seen has to arrive first. It goes live as
+it lands, with no restart and no code generation.
 
 ## Next steps
 

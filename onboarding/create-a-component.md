@@ -86,10 +86,10 @@ acme/
       components/      one piece of interface
       apps/            whole surfaces
       styles/          colour, type, spacing
-  prompts/
-    skills/            behaviour an Agent follows
-    blocks/            reusable prompt fragments
-  nodes/               your own integrations
+      skills/          behaviour an Agent follows
+      blocks/          reusable prompt fragments
+      nodes/           your own integrations
+      identity/        who the organisation is
 ```
 
 A worked example lands in each, so no folder starts empty: a welcome component, a chat app,

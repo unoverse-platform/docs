@@ -130,10 +130,11 @@ undeclared destination.
 hash is checked when the definition is loaded, so a definition that changed after it was
 accepted does not quietly run.
 
-Publishing a node reaches a universe as pending rather than live. Whoever runs that universe
-sees the hosts it wants to call, the credentials it needs and the access it demands, and
-accepts it before it can run. After that first acceptance, iteration is not gated. A node
-that reaches for something new pauses again.
+**Not built yet: review before a node runs.** Today a deployed node is live at once. The
+design is that a node reaches a universe as pending. Whoever runs that universe sees the
+hosts it wants to call, the credentials it needs and the access it demands. They accept it
+before it can run. Until then, control which nodes reach production through your own
+pipeline's review and approval.
 
 ## Network posture
 

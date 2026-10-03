@@ -145,13 +145,13 @@ Don't mix them up. `.env` is local development on your laptop; production config
 
 ## Where your code lives
 
-**Not in this repo.** This repo operates the universe; everything you author lives in a **studio** workspace: **studio** scaffolds it (`design/`, `prompts/`, `nodes/` in the workspace), validates it as you work, and `unoverse deploy studio` sends it to your universe over the API.
+**Not in this repo.** This repo operates the universe; everything you author lives in a **studio** workspace: **studio** scaffolds it (one project folder, `design/<project>/`), validates it as you work, and `unoverse deploy studio` sends it to your universe over the API.
 
 | You build | In | Guide |
 | --- | --- | --- |
-| **Logic**: custom workflow nodes (YAML manifests) | workspace `nodes/` | [Create Your First Node](/onboarding/create-your-first-node) |
+| **Logic**: custom workflow nodes (YAML manifests) | `design/<project>/nodes/` | [Create Your First Node](/onboarding/create-your-first-node) |
 | **Design**: components, apps, styles | workspace `design/` | [Create a component](/onboarding/create-a-component) |
-| **Behavior**: Agent skills and prompt blocks | workspace `prompts/` | [Create Your First Agent](/onboarding/create-your-first-agent) |
+| **Behavior**: Agent skills and prompt blocks | `design/<project>/skills/` and `blocks/` | [Create Your First Agent](/onboarding/create-your-first-agent) |
 
 You don't have to build everything yourself. The **marketplace** offers the design system and ready-made nodes and services to install into your universe, per item.
 

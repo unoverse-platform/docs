@@ -1,17 +1,17 @@
 ---
 name: unoverse-create
-description: "Create or edit anything a developer authors on unoverse: components, apps, templates, atoms and styles (design/), brands and org packs, Agent skills and prompt blocks (prompts/), custom workflow nodes (nodes/), and workflows built live on the canvas. Use whenever the user wants to create, add, build or change a component, app, card, page, theme, brand, org pack, Agent skill, prompt block, custom node or workflow in an unoverse workspace, even when they do not say unoverse (they describe a card with a button, a page the AI fills in, a node that calls an API)."
+description: "Create or edit anything a developer authors on unoverse: components, apps, templates, atoms and styles, brands and org packs, Agent skills and prompt blocks, custom workflow nodes (all under design/<project>/), and workflows built live on the canvas. Use whenever the user wants to create, add, build or change a component, app, card, page, theme, brand, org pack, Agent skill, prompt block, custom node or workflow in an unoverse workspace, even when they do not say unoverse (they describe a card with a button, a page the AI fills in, a node that calls an API)."
 ---
 
 # Creating on unoverse
 
-You are helping a developer build in an unoverse workspace: three folders the platform reads.
+You are helping a developer build in an unoverse workspace. Everything the platform reads lives in one project folder.
 
 | Folder | What lives there |
 |---|---|
 | `design/<project>/` | Interfaces as data: components, apps, templates, atoms, styles, and Agents (a workflow listed for the map). One project is one org |
-| `prompts/` | Behaviour: Agent skills (`skills/`) and prompt blocks (`blocks/`) |
-| `nodes/` | Logic: custom workflow nodes, as YAML packages |
+| `design/<project>/skills/`, `blocks/` | Behaviour: Agent skills and prompt blocks |
+| `design/<project>/nodes/` | Logic: custom workflow nodes, as YAML packages |
 
 Paths here are relative to the workspace root. In the platform monorepo the root is
 `apps/unoverse/`.

@@ -7,13 +7,13 @@ Agent, not code. Do not confuse it with this skill, which is for Claude Code.
 ## Where it goes
 
 ```
-design/marketplace/skills/<skill-name>/
+design/<org>/skills/<skill-name>/
   SKILL.md                 required: frontmatter plus the instructions
   references/              optional files the Agent may be handed
 ```
 
-An org-private skill lives at `design/<org>/skills/<skill-name>/` instead and is addressed
-`<org>/<skill-name>`.
+It is addressed `<org>/<skill-name>`. Only the platform's own universal skills live in
+`design/marketplace/skills/`, in the platform monorepo.
 
 ## Frontmatter the platform reads
 
@@ -42,7 +42,7 @@ the line.
    [Node discoverability](https://docs.unoverse.ai/nodes/node-discoverability.md) applies
    verbatim.
 2. **One skill, one behaviour.** "And also" means a second skill.
-3. **Study a skill already in `design/marketplace/skills/`** and match its voice: short sections,
+3. **Study an existing skill** and match its voice: short sections,
    do and don't bullets, explicit stop conditions, example lines the Agent can say.
 
 ## Ship

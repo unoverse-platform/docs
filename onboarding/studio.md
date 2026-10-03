@@ -19,7 +19,7 @@ on the universe you are shipping to.
 
   [36m⬡ What are you building?[0m
 
-  [36m❯[0m 1  [1mStudio[0m     Components, agents and workflows
+  [36m❯[0m 1  [1mStudio[0m     Components, apps, agents and nodes
                   [2mMost people start here[0m
     2  Universe   [2mRun the platform yourself, on your own infrastructure[0m
     3  Client     [2mA client accelerator that talks to unoverse[0m
@@ -27,12 +27,10 @@ on the universe you are shipping to.
   [2m↑↓ to move, Enter to choose[0m
 
   [2mLaunching Unoverse Studio. It creates and manages your projects.[0m
-
-  [2mCreated design/acme/, prompts/ and nodes/ in /Users/you/acme[0m
 ```
 
 **studio** opens on **http://localhost:4108**, and it has made you a project. Everything you
-author lives in one of three folders:
+author lives in that project's folder:
 
 ```
 acme/
@@ -41,10 +39,10 @@ acme/
       components/      one piece of interface
       apps/            whole surfaces
       styles/          colour, type, spacing
-  prompts/
-    skills/            behaviour an Agent follows
-    blocks/            reusable prompt fragments
-  nodes/               your own integrations
+      skills/          behaviour an Agent follows
+      blocks/          reusable prompt fragments
+      nodes/           your own integrations
+      identity/        who the organisation is
 ```
 
 **It is all YAML.** Components, apps, styles, skills and nodes are written in one language,
@@ -59,8 +57,7 @@ version. There is nothing to update.
 
 ## What you can author
 
-Eight kinds of asset, in the order the tabs appear. Every one is a file in your own
-repository.
+The main kinds of asset. Every one is a file in your own repository.
 
 <AccordionGroup>
 
@@ -105,14 +102,14 @@ Lives in `design/<project>/styles/`. [Tokens in full](/design/styles-and-tokens)
 Tell an Agent how to behave, in plain markdown. What it should do, how it should answer,
 and what it must never say.
 
-Lives in `design/marketplace/skills/`.
+Lives in `design/<project>/skills/`.
 </Accordion>
 
 <Accordion title="Prompt Blocks" icon="text-quote">
 Write a piece of a prompt once, then reference it wherever it is needed. The same wording
 stops drifting across a dozen Agents.
 
-Lives in `design/marketplace/blocks/`.
+Lives in `design/<project>/blocks/`.
 </Accordion>
 
 <Accordion title="Nodes" icon="boxes">
@@ -123,13 +120,15 @@ The **Nodes** tab runs one against the real service with no platform running. Fi
 settings, press **Run**, and the output appears beside them. Keys come from your own `.env`
 and are stored nowhere.
 
-Lives in `nodes/`. [Building a node](/nodes/overview), and [testing one](/nodes/testing-nodes).
+Lives in `design/<project>/nodes/`. [Building a node](/nodes/overview), and [testing one](/nodes/testing-nodes).
 </Accordion>
 
 </AccordionGroup>
 
-There is a ninth kind, the **recipe**, which is a workflow graph copied onto a canvas
-rather than authored here.
+Studio also has **Agents** and **Identity** tabs, and two kinds have no tab yet: **objects**
+and **pipelines**. All four are files under `design/<project>/` and ship the same way.
+
+Workflows are not authored here. They are built on the **canvas**.
 
 <Frame caption="A component, its live preview at every size, and its controls.">
   <img src="/images/onboarding/studio2.png" alt="unoverse studio editing a card component" />

@@ -35,7 +35,7 @@ renders the whole document as labelled text. `{{identity.brand.promise}}` render
 `{{#each identity.brand.rules}}` loops a list. [Identity](/design/identity) is the guide.
 
 **`prompt.<blockName>` is why a manifest never hard-codes instruction text.** Blocks live in
-`design/marketplace/blocks/**/*.md` and are camelCased from the filename, so
+`design/<project>/blocks/**/*.md` and are camelCased from the filename, so
 `markdown-guidelines.md` becomes `{{prompt.markdownGuidelines}}`. A block's words copied
 into a node is a fork that stops tracking the block.
 

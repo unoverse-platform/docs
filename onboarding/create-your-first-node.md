@@ -10,7 +10,7 @@ There is nothing to compile and no package to install. You write the files, run 
 | | |
 | --- | --- |
 | **What you'll build** | <span className="node-chip">Quote</span>, a node that fetches a famous quote |
-| **Where it lives** | `nodes/quote/` in your **studio** workspace |
+| **Where it lives** | `design/<project>/nodes/quote/` in your **studio** workspace |
 | **What it outputs** | Two connectors: `quote` and `author` |
 | **Why this API** | It needs no key, so you can build and run it in under a minute |
 
@@ -56,14 +56,14 @@ Four small files, and none of them is code.
 
 [Anatomy of a node](/nodes/manifest-nodes) covers each of those in full.
 
-**Read a working one first.** Your project ships with sample nodes in `nodes/samples`, and
+**Read a working one first.** Your project ships with sample nodes in `design/<project>/nodes/samples`, and
 **studio** lists them beside your own. Open one to see the same files you are about to write,
 already filled in.
 
 <Steps>
 <Step title="Create the package">
 
-A package holds one or more nodes and declares which hosts they may call. In your **studio** workspace, create `nodes/quote/` with one file in it:
+A package holds one or more nodes and declares which hosts they may call. In your **studio** workspace, create `design/<project>/nodes/quote/` with one file in it:
 
 ```yaml package.yaml
 name: quote

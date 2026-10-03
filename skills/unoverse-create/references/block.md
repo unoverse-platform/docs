@@ -8,8 +8,11 @@ behaviour, a block is an ingredient.
 ## Where it goes
 
 ```
-design/marketplace/blocks/<category>/<block-name>.md
+design/<org>/blocks/<category>/<block-name>.md
 ```
+
+Only the platform's own universal blocks live in `design/marketplace/blocks/`, in the
+platform monorepo.
 
 The folder is the category. The shipped ones are `core`, `formatting` and `media`; add a
 folder only for a genuinely new family.

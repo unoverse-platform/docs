@@ -72,8 +72,7 @@ fork it, and it never writes to your folders.
 | | Ships as | Updated by |
 | --- | --- | --- |
 | The platform | Docker images from the registry | Pulling a new tag |
-| Your interfaces, skills and prompts | Rows in your universe's database | Publishing from **studio** |
-| Your nodes | Rows, plus npm packages installed at run time | Publishing, then acceptance |
+| Your interfaces, skills, prompts and nodes | Rows in your universe's database | `unoverse deploy studio`, from your Git repo through CI ([Environments](/architecture/environments)) |
 | Your workflows | Rows | Building them on the **canvas** |
 
 Nothing you author rides inside an image. An image carries code and only code, which is why

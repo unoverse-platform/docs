@@ -16,6 +16,9 @@ You ingest through the Content Engine, then train the map. After that, both you 
 
 <Tip>
 **Every canvas has its own spatial.** The content you ingest, the map you train, and the searches you run all belong to this workflow. A different canvas is a different world, with its own content and its own map.
+
+It also lives only in this universe. If you run more than one (a UAT and a production, say),
+each ingests its own content and builds its own map. Nothing is copied between them.
 </Tip>
 
 ## Before you begin
