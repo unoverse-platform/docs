@@ -159,8 +159,9 @@ Four things in those files carry the whole model:
 A component that draws one thing needs none of this. One file with a `root:` tree, no
 states and no manifest, is a complete component.
 
-**Two tiers.** Your components live in `design/<org>/components/` and belong to that org
-alone. The design system's are shared by every org. Yours may reference a design-system
+**Two tiers.** Your components live in `components/` at the root of your org repo and
+belong to that org alone. Two orgs may each have a component of the same name, because the
+org is part of what an item is. The design system's are shared by every org. Yours may reference a design-system
 component, never the reverse, and may never take a design-system name. Both are lint
 errors.
 

@@ -30,18 +30,21 @@ and that is the bug. A brand changes tokens. It never changes components.
 5. **Take values from the live site's computed styles**, never from a screenshot by eye.
    Where you must invent, derive from an observed value and say so in the `$description`.
 
-## An org is a folder
+## An org is a repo
+
+An org is its own Git repo, with its folders at the root. `unoverse.yaml` there declares
+`org: <slug>`, and the org's name comes from that line, never from the folder name.
 
 ```
-design/<org>/
-  styles/
-    base/color.yaml          brand ingredients
-    base/typography.yaml     font families only
-    themes/light.yaml        roles assigned to ingredients
-    themes/dark.yaml
-    semantic/*.yaml          deltas only
-  components/                org-private components, optional
-  apps/                      the org's apps, optional
+unoverse.yaml               org: <slug>
+styles/
+  base/color.yaml           brand ingredients
+  base/typography.yaml      font families only
+  themes/light.yaml         roles assigned to ingredients
+  themes/dark.yaml
+  semantic/*.yaml           deltas only
+components/                 org-private components, optional
+apps/                       the org's apps, optional
 ```
 
 There is no registry. The theme is served at `unoverse://theme/<org>/<name>` and an app
@@ -49,7 +52,8 @@ points at it.
 
 ## Cloning an org for a new client
 
-1. Copy `design/<source>/` to `design/<new>/`.
+1. Run `unoverse create` in a new folder, then copy the source repo's `styles/`, `components/`
+   and `apps/` into it. A new org is a new repo.
 2. Rename the apps: the folder and the id inside each envelope. App ids are org-qualified.
 3. Component names stay. They are unique within an org, and the publish lint refuses one
    that shadows a base-set name.

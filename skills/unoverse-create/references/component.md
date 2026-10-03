@@ -51,7 +51,7 @@ Copy the closest one's folder shape.
 4. `unoverse lint`, zero errors. Preview in **studio**: the state switcher reads your
    tree, and a non-initial external state previews full-bleed. If a step you meant as an
    in-place swap renders edge to edge, you promoted it. Nest it.
-5. `unoverse deploy studio`.
+5. Commit and push to your org repo: every universe pulls it. `unoverse deploy studio` still reaches your own universe until your universe runs a release with the Git sync.
 
 ## Things that go wrong
 

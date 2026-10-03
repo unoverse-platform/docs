@@ -7,37 +7,36 @@ Build a price card, see it render in **studio**, and publish it to your universe
 
 You need **studio** running. [Studio](/onboarding/studio) covers the install.
 
-## Make a project
+## Make your org
 
-Your work lives in an org. The folder you run in becomes its name, and that name travels
-with everything the org publishes.
+Your work lives in an org, and one org is one Git repo. `unoverse create` asks for the
+org's name, suggesting the folder's, and that name travels with everything the org
+publishes.
 
 ```bash
 mkdir acme && cd acme
 unoverse create
 ```
 
-Choose **Studio** at the prompt. You get three folders, and your org sits inside `design/`:
+Choose **Studio** at the prompt and give the org a name. The folder becomes the org's repo,
+with a first commit, and the org's folders sit at its root:
 
 <Tree>
   <Tree.Folder name="acme" defaultOpen>
-    <Tree.Folder name="design" defaultOpen>
-      <Tree.Folder name={<><b>acme</b> <span className="tree-note">your org</span></>} defaultOpen>
-        <Tree.File name={<><b>components</b> <span className="tree-note">one piece of interface</span></>} />
-        <Tree.File name={<><b>apps</b> <span className="tree-note">whole surfaces</span></>} />
-        <Tree.File name={<><b>styles</b> <span className="tree-note">colour, type, spacing</span></>} />
-      </Tree.Folder>
-    </Tree.Folder>
-    <Tree.Folder name={<><b>prompts</b> <span className="tree-note">skills and prompt blocks</span></>} defaultOpen />
-    <Tree.Folder name={<><b>nodes</b> <span className="tree-note">your own integrations</span></>} defaultOpen />
+    <Tree.File name={<><b>unoverse.yaml</b> <span className="tree-note">org: acme, the org's name</span></>} />
+    <Tree.Folder name={<><b>styles</b> <span className="tree-note">colour, type, spacing</span></>} defaultOpen />
+    <Tree.Folder name={<><b>identity</b> <span className="tree-note">who the organisation is</span></>} defaultOpen />
+    <Tree.Folder name={<><b>.github/workflows</b> <span className="tree-note">a pull-request check that runs unoverse lint</span></>} defaultOpen />
   </Tree.Folder>
 </Tree>
 
-A worked example lands in each, so no folder starts empty.
+That is the baseline. Add `components/`, `apps/`, `skills/`, `blocks/` and `nodes/` as you
+need them. Worked examples live in the public demo org repo,
+[org-acme](https://github.com/unoverse-platform/org-acme), to read and copy.
 
 ## Write the definition
 
-Create `design/acme/components/pricecard/pricecard.yaml`. The file name is the component's
+Create `components/pricecard/pricecard.yaml` in your org repo. The file name is the component's
 name, and the lint enforces the match.
 
 ```yaml
@@ -141,6 +140,10 @@ A component with a state tree gets one pill per public state, taken straight fro
 This card has none, so it shows none.
 
 ## Ship it
+
+Commit and push to your org repo. Every universe connected to the repo pulls it
+([Environments](/architecture/environments)). Until your universe runs a release with the Git sync, you can still
+send it to your own universe from the terminal:
 
 ```bash
 unoverse login

@@ -85,7 +85,7 @@ For detailed step-by-step guides, see the [Runbooks](/runbooks/overview):
 Content does not ride `unoverse deploy`, which moves platform images only. Your work reaches
 the server two ways, and neither needs a deploy or a restart:
 
-- **Your own work**: `unoverse deploy studio` from your project, which lints it, shows a plan, and writes it into the universe's database over the API.
+- **Your own work**: the universe pulls your org's Git repo. Connect it on the org page's **Source** tab: the repo, a branch or release tags, the universe's read-only deploy key, and a webhook. A push arrives by webhook within seconds, by polling within five minutes, or with **Sync now**. Nothing is pushed in. Until your universe runs a release with the Git sync, `unoverse deploy studio` from your org repo still lints your work and writes it into your own universe. [Environments](/architecture/environments) covers it in full.
 - **Marketplace items**: installed one at a time in your universe. Open **studio**, then **Marketplace**.
 
 ## Start on a Test Domain, Swap Later

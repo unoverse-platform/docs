@@ -12,7 +12,7 @@ Everything in the component playbook applies.
 1. **A template is a component that holds components.** Same shape: external states that
    name where it shows (`focus`, `inline`), internal steps, props, and it can be a task.
    If it holds nothing, it is a component.
-2. **A held component keeps its own state.** Hold one with a plain `Ref` to the project
+2. **A held component keeps its own state.** Hold one with a plain `Ref` to the org's
    component inside an `Each`; each item is its own instance, keyed by its id, and carries
    the component's own prop names. Its first state is its spot in the template; its detail
    is its own `page`, opened over the template. Never hold its fields in the template's `values:`, never give it a step of the
@@ -50,7 +50,7 @@ Everything in the component playbook applies.
    (an Agent writes it) or `input: false` (drawn as designed), and describe every one.
 4. Write the manifest: title, description, `whenToUse`, category, version, and `binding`
    when a workflow works it. Nothing else. Quote any string holding a colon.
-5. `unoverse lint`, preview in **studio** at several widths, `unoverse deploy studio`.
+5. `unoverse lint`, preview in **studio** at several widths, then commit and push to your org repo: every universe pulls it. `unoverse deploy studio` still reaches your own universe until your universe runs a release with the Git sync.
 
 ## Done means
 

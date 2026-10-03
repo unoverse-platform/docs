@@ -4,68 +4,67 @@ title: "Environments and Promotion"
 mode: "wide"
 ---
 
-How many environments you have depends on how you run unoverse.
+Your work reaches every universe the same way: **you push to Git, and the universe pulls.**
+Nothing is pushed into a universe from outside. Reviews, approvals and protected branches all
+stay in your Git, where you already run them.
 
 | | Hosted (most businesses) | Enterprise or bank |
 | --- | --- | --- |
 | Universes | **One**, at `your-business.unoverse.ai` | **Dev, UAT and production**, in your own Kubernetes or hosted by us |
-| Where you work | In that one universe | Build in dev and UAT, promote to production |
-| What keeps changes safe | Version history and rollback | Your pipeline's review and approval, plus version history |
-| Git | Optional | The source of everything you build |
+| The universe follows | `main` | Dev: your dev branch. UAT: `main`. Production: release tags only |
+| What keeps changes safe | Git review, plus version history | Your Git approvals, plus version history |
 
 Version history covers workflows today: every save is kept, and the **History** panel on the
-**canvas** restores any version. History for **studio** work and for your Spatial map is
-coming.
+**canvas** restores any version. Your **studio** work's history is your Git history.
 
-## One universe
+## One org, one repo
 
-Build in **studio**, then send your work to your universe:
+Each org is its own Git repo, and the repo IS the org: its folders sit at the root.
 
-```bash
-unoverse deploy studio
+```text
+acme/
+  unoverse.yaml     org: acme   (the org's name, declared)
+  styles/  identity/  components/  apps/  skills/  blocks/  nodes/ ...
 ```
 
-It goes live as it lands, with no restart. Build workflows on the **canvas**, ingest your
-content and train your map, all in the same universe.
+Make one in an empty folder. It asks for the org's name and gives you the baseline: your
+tokens, your identity, Git and a pull-request check.
 
-## Dev, UAT and production
+```bash
+unoverse create
+```
 
-Each environment is its own universe: its own database, keys and address, from the same
-release. Your work reaches them from your Git repo, through your own pipeline.
+For examples to read and
+copy, clone the demo org, [Acme](https://github.com/unoverse-platform/org-acme).
+
+A universe can hold several orgs, each pulled from its own repo. Two orgs may each have an app
+called `chat`. A node type is one per platform, so give a node you copy your own type.
+
+## Connecting a universe to your repo
+
+An admin connects the org once, on its **Source** tab in the universe. They set the repo, the
+branch or tags to follow, and a read-only key. Then they add the webhook it shows to your Git host. A push then reaches the universe
+in seconds. Without the webhook, the universe checks every five minutes, and **Sync now** pulls
+at once. Before applying anything it runs the same checks your pull request
+ran, and if anything fails it applies nothing and keeps serving the last good version.
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"fontFamily":"Inter, ui-sans-serif, system-ui","fontSize":"14px","primaryColor":"#EFECFE","primaryBorderColor":"#6D5DF6","primaryTextColor":"#1B1C2A","secondaryColor":"#F4F4F7","tertiaryColor":"#F4F4F7","lineColor":"#8E94A4","clusterBkg":"#FBFBFD","clusterBorder":"#E4E5EC","edgeLabelBackground":"#FFFFFF","nodeBorder":"#6D5DF6"}}}%%
 flowchart LR
-  R["Your Git repo"]
-  U["UAT"]
-  P["Production"]
-  R -->|"merge to main"| U
-  R -->|"release tag, after approval"| P
+  D["studio"] -->|"git push"| R["Your org's repo"]
+  U["UAT"] -->|"pulls main"| R
+  P["Production"] -->|"pulls release tags"| R
 ```
 
-Three things move, each its own way:
+To roll back, revert in Git, or point production at the previous tag.
 
-- **Platform version.** An image tag. UAT runs a tag first and production follows it, which
-  needs pinned tags rather than a floating latest.
-- **Your work.** Components, apps, skills, nodes and every other **studio** kind are files in
-  your repo. Your pipeline runs `unoverse deploy studio --env uat` on a merge to main, and
-  `--env production` on a release tag. Production only ever receives a tagged commit.
-- **Infrastructure.** Nothing moves. Each environment is its own apply of the same Terraform,
-  with its own variables and identity provider client.
+<Note>
+The Git sync is built but not yet released. Until your universe runs a release that has it,
+`unoverse deploy studio` sends your work to the universe directly.
+</Note>
 
-Name your environments once, in `unoverse.yaml` at the root of your repo:
-
-```yaml
-environments:
-  uat: https://uat.your-business.example
-  production: https://ai.your-business.example
-```
-
-A deploy removes anything that is no longer in the repo, so point production only at release
-tags, never at a branch.
-
-**Workflows are not on this route yet.** Moving one from UAT to production today means
-rebuilding it on the production **canvas**. Publishing a workflow to your repo is planned.
+**Workflows are not in Git yet.** Moving one from UAT to production today means rebuilding it
+on the production **canvas**. Publishing a workflow to your repo is planned.
 
 ## What never moves
 
@@ -92,9 +91,15 @@ Once a universe is running, the routine work is small and each piece has a runbo
 | Publish keys | Issued on the box, for CI and for first connection |
 | Resizing | Change the size variable, apply, redeploy |
 
-Your work is not in that list. It reaches a universe by `unoverse deploy studio` and needs no
-platform deployment.
+Your work is not in that list. It reaches a universe from your repo and needs no platform
+deployment.
 
----
+## Next steps
 
-**Next**: [Runbooks](/runbooks/overview)
+<Card title="Runbooks" icon="book-open" href="/runbooks/overview" horizontal>
+Upgrade, migrate, back up and roll back a running universe.
+</Card>
+
+<Card title="studio" icon="palette" href="/onboarding/studio" horizontal>
+Make an org repo and build what your universe pulls.
+</Card>

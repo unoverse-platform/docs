@@ -21,7 +21,7 @@ place to start.
 ## The shape of a node
 
 <Tree>
-  <Tree.Folder name={<><b>design/&lt;project&gt;/nodes/&lt;package&gt;</b> <span className="tree-note">in your studio project workspace</span></>} defaultOpen>
+  <Tree.Folder name={<><b>nodes/&lt;package&gt;</b> <span className="tree-note">at the root of your org repo</span></>} defaultOpen>
     <Tree.File name={<><b>package.yaml</b> <span className="tree-note">what the package is and may call</span></>} />
     <Tree.Folder name={<><b>credentials</b> <span className="tree-note">the credentials its nodes ask for</span></>} />
     <Tree.Folder name={<><b>shared</b> <span className="tree-note">fragments more than one node reuses</span></>} />
@@ -102,14 +102,18 @@ Every node's package carries `package.yaml` with the hosts its nodes may call.
    unoverse lint
    ```
 
-`unoverse deploy studio` runs the same check first, then ships every node in the workspace
-alongside your components and skills.
+Then commit and push. Every universe connected to your org repo pulls every node in it,
+alongside your components and skills. A node type is one per platform: a type another org
+already holds is refused, so a copied node gets your own type.
 
 ## Nodes to learn from
 
 Every published node is public. Find the one closest to what you are building and mirror it.
 
 **[marketplace/definitions/nodes](https://github.com/unoverse-platform/marketplace/tree/main/definitions/nodes)**
+
+The public demo org repo, [org-acme](https://github.com/unoverse-platform/org-acme), holds
+two more to read and copy: `AcmeWeather` and `AcmeChatStream`.
 
 | Read it for | Node |
 |---|---|

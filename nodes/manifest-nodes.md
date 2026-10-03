@@ -20,14 +20,16 @@ There is no server to start and no database to connect to, so it works offline.
 |---|---|
 | Write the node | **studio**, on your own files |
 | Run it against the real service | the **Nodes** screen in **studio** |
-| Check it | `unoverse lint`, the same check `unoverse deploy studio` runs before it sends |
-| Ship it | `unoverse deploy studio`, which carries every node in the workspace with your components and skills |
+| Check it | `unoverse lint`, the same check every pull request runs |
+| Ship it | Commit and push to your org repo. Every universe connected to it pulls every node with your components and skills |
 
-A deployed node is live in that universe's node library as soon as the deploy finishes.
+A node is live in a universe's node library as soon as that universe's pull lands. Until the
+Git sync replaces it, `unoverse deploy studio` still sends your work to your own universe.
+A node type is one per platform, so a type another org already holds is refused.
 
 ## Editor help
 
-A **studio** workspace carries a `.vscode/settings.json` that maps every node file to its
+An org repo carries a `.vscode/settings.json` that maps every node file to its
 schema on this site. With the YAML extension installed, your editor autocompletes every
 field and marks errors as you type, in every file of every node, with nothing written in
 the file itself. The same schemas are what `unoverse lint` validates against, so the two

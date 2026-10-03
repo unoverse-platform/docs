@@ -36,7 +36,7 @@ Look these up while you write. Each row is a code habit and the move that replac
 | `onClick={() => setStep("confirm")}` | `action: { type: setValue, values: [{ key: step, value: confirm }] }` | [State](/design/state) |
 | A shared `<Button/>` | An atom, composed with `Ref`. `props` remaps fields, `with` passes literals | [Components](/design/components) |
 | Splitting a big component up | `$include` of a sibling file, but extraction is earned rather than automatic | [Components](/design/components) |
-| CSS, styled-components, Tailwind | Semantic token names only. The values live in `design/<org>/styles/` | [Styles and tokens](/design/styles-and-tokens) |
+| CSS, styled-components, Tailwind | Semantic token names only. The values live in your org repo's `styles/` | [Styles and tokens](/design/styles-and-tokens) |
 | `className="hover:shadow-md"` | `style: { hover: { shadow: md } }` | [Styles and tokens](/design/styles-and-tokens) |
 | Conditional classNames | `style.when`, a list of conditions each applying its own style patch | [State](/design/state) |
 | `const total = items.reduce(…)` | Computed in the workflow node and streamed in as a plain field | [Components](/design/components) |

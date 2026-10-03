@@ -155,7 +155,7 @@ Three checks and a workbench, each catching mistakes at a different moment:
 | Tool | When it runs | What it catches |
 |---|---|---|
 | **The schema** | As you type, through the [`redhat.vscode-yaml` extension](/onboarding/platform) | An unknown primitive, a missing field, an illegal condition |
-| **The lint** | At publish: `unoverse deploy studio` | Raw values, invented style keys, broken paths, tree violations. Zero errors to ship |
+| **The lint** | At publish: `unoverse lint`, the pull-request check and `unoverse deploy studio` | Raw values, invented style keys, broken paths, tree violations. Zero errors to ship |
 | **The guards** | In the platform's own CI | The same rules, enforced again where you cannot drift past them |
 | **studio** | While you build | Renders every definition from its defaults, with one pill per external state |
 
@@ -166,11 +166,11 @@ defaults, with one pill per public state:
 unoverse studio
 ```
 
-Publishing runs the lint first and stops on any error, so nothing broken leaves your
-machine:
+Run the lint in your org repo, then commit and push. Every universe connected to the repo
+pulls the change, and the pull-request check runs the same lint, so nothing broken gets in:
 
 ```bash
-unoverse deploy studio
+unoverse lint
 ```
 
 Edits to something already published apply live. Anything brand new has to be published
@@ -183,7 +183,7 @@ before a workflow can use it.
 
 Ask Claude Code for a component, a template or an app, and it writes one that follows
 every rule on this page. The `unoverse-create` skill teaches it the folder grammar, the
-state tree, the closed primitive set and your project's own tokens.
+state tree, the closed primitive set and your org's own tokens.
 
 ```bash
 unoverse update

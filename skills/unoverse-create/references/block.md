@@ -8,11 +8,13 @@ behaviour, a block is an ingredient.
 ## Where it goes
 
 ```
-design/<org>/blocks/<category>/<block-name>.md
+blocks/<category>/<block-name>.md        at the root of your org repo
 ```
 
 Only the platform's own universal blocks live in `design/marketplace/blocks/`, in the
-platform monorepo.
+platform monorepo. The public demo org repo,
+[org-acme](https://github.com/unoverse-platform/org-acme), holds `sample-concise-answers`
+to read and copy.
 
 The folder is the category. The shipped ones are `core`, `formatting` and `media`; add a
 folder only for a genuinely new family.
@@ -43,6 +45,8 @@ The block's reference name is the filename in camelCase: `markdown-guidelines.md
 
 ## Ship
 
-`unoverse lint <project>`, then `unoverse deploy studio`. Lint checks every block: the
+`unoverse lint` inside your org repo, then push: every universe pulls the org's repo.
+`unoverse deploy studio` still reaches your own universe until your universe runs a release with the Git sync.
+Lint checks every block: the
 frontmatter parses (quote a value that holds `: `), `name` and `description` are present,
 the filename is kebab-case, the body is not empty and references no other block.

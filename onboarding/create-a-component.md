@@ -31,8 +31,8 @@ The [Design](/design/overview) tab is the full journey.
 
 | | |
 | --- | --- |
-| **What you'll build** | A price card component your Agent can stream data into, in your own project and your own brand |
-| **Where it lives** | `design/<your-project>/components/pricecard/` |
+| **What you'll build** | A price card component your Agent can stream data into, in your own org and your own brand |
+| **Where it lives** | `components/pricecard/`, at the root of your org repo |
 | **Where you'll see it** | Live in **studio** while you design, and in the conversation once it is wired to a workflow |
 
 ## Build it
@@ -57,8 +57,9 @@ Edit the definition and the preview follows as you save.
 </Step>
 <Step title="Create your org">
 
-Your own work lives in your org: its components, its apps, its brand. The folder you run in
-becomes its name, and that name travels with everything the org publishes.
+Your own work lives in your org: its components, its apps, its brand. One org is one Git
+repo. `unoverse create` asks for the org's name, suggesting the folder's, and that name
+travels with everything the org publishes.
 
 ```ansi Terminal
 [32m$[0m mkdir acme && cd acme
@@ -71,34 +72,37 @@ becomes its name, and that name travels with everything the org publishes.
     2  Universe   [2mRun the platform yourself, on your own infrastructure[0m
     3  Client     [2mA client accelerator that talks to unoverse[0m
 
-  [2mCreated design/acme/, prompts/ and nodes/ in /Users/you/acme[0m
+  Org name [2m[acme][0m:
+
+  [2mCreated the org "acme" in /Users/you/acme (a Git repo, first commit made)[0m
 ```
 
-Choose **Studio**. Adding a second org later is the **New project** item in **studio**'s
-project dropdown.
+Choose **Studio**, and **studio** opens on the new repo. A second org is a second repo,
+made the same way in a new folder.
 
-You get three folders, and your org sits inside `design/`:
+The folder is now your org's repo, and the org's folders sit at its root:
 
 ```
 acme/
-  design/
-    acme/              your org
-      components/      one piece of interface
-      apps/            whole surfaces
-      styles/          colour, type, spacing
-      skills/          behaviour an Agent follows
-      blocks/          reusable prompt fragments
-      nodes/           your own integrations
-      identity/        who the organisation is
+  unoverse.yaml        org: acme, the org's name
+  styles/              colour, type, spacing
+  identity/            who the organisation is
+  .github/workflows/   a pull-request check that runs unoverse lint
 ```
 
-A worked example lands in each, so no folder starts empty: a welcome component, a chat app,
-and a colour file showing how the token cascade works.
+That is the baseline: your starting tokens and your four identity documents. Add the other
+folders as you need them: `components/`, `apps/`, `skills/`, `blocks/`, `nodes/`. The
+org's name comes from `unoverse.yaml`, never from the folder, so the folder may be called
+anything.
+
+Worked examples live in one public demo org repo,
+[org-acme](https://github.com/unoverse-platform/org-acme): a welcome component, a chat app,
+a skill, a block and two nodes. Read them and copy what you need.
 
 </Step>
 <Step title="Make your theme">
 
-The first design work in a new org is the brand. It lives in `design/acme/styles/`:
+The first design work in a new org is the brand. It lives in `styles/`:
 
 | Folder | What you set there |
 | --- | --- |
@@ -113,12 +117,12 @@ Change token values freely; keep every token name, and the theme contract stays 
 </Step>
 <Step title="Create your own component">
 
-Author your component in your project, at `design/acme/components/pricecard/pricecard.yaml`. The file name is the component's name, and the lint enforces it. Here is a complete simple price card, and what it renders:
+Author your component in your org repo, at `components/pricecard/pricecard.yaml`. The file name is the component's name, and the lint enforces it. Here is a complete simple price card, and what it renders:
 
 <Tabs>
 <Tab title="Definition">
 
-```yaml design/acme/components/pricecard/pricecard.yaml
+```yaml components/pricecard/pricecard.yaml
 unoverse: "1.0"
 type: component
 name: pricecard
@@ -207,7 +211,7 @@ Reading it top to bottom:
 </Step>
 <Step title="Check it">
 
-Check it from anywhere in your workspace:
+Check it from anywhere in your org repo:
 
 ```bash
 unoverse lint
@@ -240,8 +244,10 @@ Step through the workflow and the card renders live in the conversation, in your
 </Steps>
 
 <Note>
-Nothing restarts. `unoverse deploy studio` sends the component to your universe, and it is
-live there the moment the deploy finishes, new or changed.
+Nothing restarts. Push the component to your org repo, and every universe connected to it
+pulls the change: within seconds by webhook, within five minutes by polling. Until your universe runs a release with the Git sync, `unoverse deploy studio`
+still sends your work to your own universe. [Environments](/architecture/environments)
+covers connecting a universe to the repo.
 </Note>
 
 ## How far this goes
@@ -267,7 +273,7 @@ apps and tokens.
 <div className="skill-eyebrow">Installed by unoverse update</div>
 <div className="skill-title">unoverse-create</div>
 
-The same skill that builds nodes designs components. Open your project and describe what you want:
+The same skill that builds nodes designs components. Open your org repo and describe what you want:
 
 > Create a pricing card component with a title, three feature lines, and a call to action.
 

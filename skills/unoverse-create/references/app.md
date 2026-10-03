@@ -5,8 +5,9 @@
 [manifest](https://docs.unoverse.ai/reference/manifest.md),
 [scales](https://docs.unoverse.ai/reference/scales.md) for app sizes.
 
-Apps are always a project's own; none ship in the base set. Your exemplar is any app already
-in the workspace, and the anatomy on the Apps page.
+Apps are always an org's own; none ship in the base set. Your exemplar is any app already
+in your org repo, the `chat` app in the public demo org repo
+[org-acme](https://github.com/unoverse-platform/org-acme), and the anatomy on the Apps page.
 
 ## The rules that bite
 
@@ -16,7 +17,7 @@ in the workspace, and the anatomy on the Apps page.
    `Place` (`name`, `holds: one | many`, `appWidth`, an optional `frame` with a bare
    `ComponentSlot`). It never matches state names, never orders states, and never decides
    what is shown. The screen fills the places; an empty place draws nothing.
-2. **Declare every place your project's interfaces name.** A component's state says where
+2. **Declare every place your org's interfaces name.** A component's state says where
    it goes (`place: rail`, `place: main`); an app missing that place sends it into the
    conversation, which a voice app does not draw. `chat`, the conversation, every app has.
    The lint refuses a missing place by name.
@@ -24,7 +25,7 @@ in the workspace, and the anatomy on the Apps page.
    retired ladder and a lint error in an app with places, as is a second app state.
 4. **Moods are not states.** A welcome hero on an empty conversation, a call's phases:
    `visibleWhen` in the one layout.
-5. **Each layout owns its widths.** `appWidth` is a named size from the project's app
+5. **Each layout owns its widths.** `appWidth` is a named size from the org's app
    sizes, once per panel or place, never on a layout root, never guarded. Nothing in the
    manifest sizes the app, and the manifest carries no `layout:`.
 6. **Input tools are app chrome.** A composer, a form, a picker never arrive as a
@@ -34,13 +35,13 @@ in the workspace, and the anatomy on the Apps page.
 
 ## Workflow
 
-1. Read the Apps page and any app in the workspace.
+1. Read the Apps page and any app in your org repo.
 2. Write the envelope: one state, one layout.
 3. Write the layout: the core (conversation or call), then the places, laid out against
    each other. Shared chrome goes once in `components/`.
 4. Write the manifest: description, `whenToUse`, category, input schema, and the binding
    to the workflow it owns. Without a real binding the app is not done.
-5. `unoverse lint`, preview in **studio**, `unoverse deploy studio`.
+5. `unoverse lint`, preview in **studio**, then commit and push to your org repo: every universe pulls it. `unoverse deploy studio` still reaches your own universe until your universe runs a release with the Git sync.
 
 ## Things that go wrong
 

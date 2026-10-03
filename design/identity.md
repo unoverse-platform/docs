@@ -7,12 +7,12 @@ Identity is who an organisation is, written down once so every Agent, every extr
 every piece of writing uses the same words: what the business does, what its brand stands
 for, why it exists, and its story.
 
-A new project ships the four documents with their instructions written and their values
-empty. [Quick start](/design/quick-start) creates the project.
+A new org repo ships the four documents with their instructions written and their values
+empty. [Quick start](/design/quick-start) creates the org repo.
 
 ## Four documents
 
-Each document is a folder under `design/<project>/identity/`, with a `manifest.yaml` and the
+Each document is a folder under `identity/` at the root of your org repo, with a `manifest.yaml` and the
 document itself.
 
 | Document | Holds | Where it goes when published |
@@ -65,20 +65,20 @@ the rules, and `unoverse update` installs it. Only `default` values change; the 
 the manifests stay as shipped.
 
 Fill `organisation` first. Its `what` and `vocabulary` ground every extraction and every
-Agent that runs as this project, so the actual lines of work and the actual product names
+Agent that runs as this org, so the actual lines of work and the actual product names
 matter more than prose.
 
 ## Publish it
 
-Publishing the project puts the four documents where they work.
+Publishing the org puts the four documents where they work.
 
 - `organisation` becomes the grounding. Every extraction and every Agent that runs as this
-  project reads its `what` and `vocabulary` before anything else.
-- `brand`, `purpose` and `story` are listed in the **Identity** tab of **Studio** with the
+  org reads its `what` and `vocabulary` before anything else.
+- `brand`, `purpose` and `story` are listed in the **Identity** tab of **studio** with the
   same **Available** switch every asset has. Switched on, each is a row on **spatial**, with
   its words on the row, so an Agent finds the purpose the way it finds a product and can
   quote it.
-- The **Organisation** document has a **Grounding** switch instead. Off, the project grounds
+- The **Organisation** document has a **Grounding** switch instead. Off, the org grounds
   on nothing.
 
 ## Read it in a node
@@ -96,8 +96,8 @@ instructions: |-
   Our promise: {{identity.brand.promise}}
 ```
 
-`{{identity}}` renders all four documents. The project a run works as decides whose
-identity this is, so one node serves every project.
+`{{identity}}` renders all four documents. The org a run works as decides whose
+identity this is, so one node serves every org.
 [Handlebars and expressions](/nodes/expressions) lists the other roots.
 
 ## Next steps
@@ -107,5 +107,5 @@ Every root a node can read, and how to shape a value on the way into a call.
 </Card>
 
 <Card title="Validate and ship" icon="rocket" href="/design/validate-and-ship" horizontal>
-Lint the project and publish it, so the identity reaches the grounding and the map.
+Lint the org repo and publish it, so the identity reaches the grounding and the map.
 </Card>

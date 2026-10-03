@@ -53,7 +53,7 @@ reader loads first.
 
 ## Before you deploy
 
-Check every node in the workspace, with nothing running:
+Check every node in your org repo, with nothing running:
 
 ```bash
 unoverse lint
@@ -61,8 +61,8 @@ unoverse lint
 
 It runs every static rule. An output nothing emits to, an events table out of connector
 order, a host missing from `allowedHosts`, a fixture that does not match the settings form:
-each message names the rule it broke. `unoverse deploy studio` runs the same check before
-it sends anything, so a tick here is a tick there.
+each message names the rule it broke. Every pull request runs the same check, and so
+does `unoverse deploy studio`, so a tick here is a tick there.
 
 ## Keys stay yours
 

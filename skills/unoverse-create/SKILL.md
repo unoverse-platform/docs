@@ -1,20 +1,21 @@
 ---
 name: unoverse-create
-description: "Create or edit anything a developer authors on unoverse: components, apps, templates, atoms and styles, brands and org packs, Agent skills and prompt blocks, custom workflow nodes (all under design/<project>/), and workflows built live on the canvas. Use whenever the user wants to create, add, build or change a component, app, card, page, theme, brand, org pack, Agent skill, prompt block, custom node or workflow in an unoverse workspace, even when they do not say unoverse (they describe a card with a button, a page the AI fills in, a node that calls an API)."
+description: "Create or edit anything a developer authors on unoverse: components, apps, templates, atoms and styles, brands and org packs, Agent skills and prompt blocks, custom workflow nodes (all in the org's own repo), and workflows built live on the canvas. Use whenever the user wants to create, add, build or change a component, app, card, page, theme, brand, org pack, Agent skill, prompt block, custom node or workflow in an unoverse workspace, even when they do not say unoverse (they describe a card with a button, a page the AI fills in, a node that calls an API)."
 ---
 
 # Creating on unoverse
 
-You are helping a developer build in an unoverse workspace. Everything the platform reads lives in one project folder.
+You are helping a developer build in an unoverse org. One org is one Git repo, and the org's
+folders sit at its root. `unoverse.yaml` there declares the org (`org: acme`).
 
 | Folder | What lives there |
 |---|---|
-| `design/<project>/` | Interfaces as data: components, apps, templates, atoms, styles, and Agents (a workflow listed for the map). One project is one org |
-| `design/<project>/skills/`, `blocks/` | Behaviour: Agent skills and prompt blocks |
-| `design/<project>/nodes/` | Logic: custom workflow nodes, as YAML packages |
+| `components/`, `apps/`, `templates/`, `atoms/`, `styles/`, `identity/`, `agents/` | Interfaces as data, the org's identity, and Agents (a workflow listed for the map) |
+| `skills/`, `blocks/` | Behaviour: Agent skills and prompt blocks |
+| `nodes/` | Logic: custom workflow nodes, as YAML packages. A node type is one per platform: give each its own |
 
-Paths here are relative to the workspace root. In the platform monorepo the root is
-`apps/unoverse/`.
+Paths here are relative to the org repo's root. In the platform monorepo an org still sits at
+`apps/unoverse/design/<org>/`, the same folders one level down.
 
 ## The documentation is the source, and it is searchable
 
@@ -31,13 +32,15 @@ the page. It never restates a page, so when the two disagree, the page wins.
 
 ## Step 0: anchor in the workspace
 
-1. **Pick the project.** Every design artifact belongs to `design/<project>/`. If there is
-   more than one, or the only one looks like a placeholder, ask. Never invent a project
-   folder to hold one artifact.
+1. **Find the org.** Read `unoverse.yaml` at the repo root: its `org:` is the org everything
+   here belongs to. No such file means this is not an org repo: ask, and never invent one to
+   hold an artifact. A new org is made with `unoverse create` in an empty folder.
 2. **Read the closest shipped exemplar first.** The base design system and every published
    node are public at
-   [marketplace/definitions](https://github.com/unoverse-platform/marketplace/tree/main/definitions).
-   Compose those atoms and mirror that shape. Never hand-roll what the base already ships.
+   [marketplace/definitions](https://github.com/unoverse-platform/marketplace/tree/main/definitions),
+   and a complete worked org is public at
+   [org-acme](https://github.com/unoverse-platform/org-acme). Compose those atoms and mirror
+   that shape. Never hand-roll what the base already ships.
    [The design system](https://docs.unoverse.ai/design/design-system.md) explains what ships.
 
 ## Step 1: identify the artifact, read its playbook
@@ -83,12 +86,14 @@ Zero errors before anything else. Every message names the rule and the page. The
 |---|---|
 | Component, atom, app, template, style | Preview in **studio** (`unoverse studio`) |
 | Node | The **Nodes** screen in **studio**: Load sample, then Run, against the real service |
-| Agent skill, prompt block | Lint is the check; they take effect on deploy |
+| Agent skill, prompt block | Lint is the check; they take effect when the universe syncs |
 
 ```bash
-unoverse deploy studio
+unoverse lint
 ```
 
-Deploy runs the same lint first and ships every kind in the workspace. Nothing goes if lint
-fails. Tell the developer where to look once it is live: the rendered thing is the
-deliverable, never the YAML alone.
+Then commit and push. The org's universe pulls the repo, runs the same lint, and applies it;
+nothing goes if lint fails. The sync is not yet released: until the universe has it and is
+connected to the repo, `unoverse deploy studio` sends the work directly, after the same lint.
+Tell the developer where to look once it is live: the rendered thing is the deliverable, never
+the YAML alone.

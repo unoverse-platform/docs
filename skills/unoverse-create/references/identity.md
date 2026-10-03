@@ -3,8 +3,8 @@
 **Read first:** [Identity](https://docs.unoverse.ai/design/identity.md). The shape of the
 four documents, where they go when published, and how a node reads them.
 
-**Exemplar:** the four shipped with every new project, briefs written and defaults empty,
-under `design/<project>/identity/`.
+**Exemplar:** the four shipped with every new org repo, briefs written and defaults empty,
+under `identity/` at the repo root.
 
 ## The diagnostic that matters most
 
@@ -32,10 +32,10 @@ stay as shipped.
 ## Order
 
 `organisation` first. Its `what` and `vocabulary` ground every extraction and every Agent
-that runs as this project. Then `purpose`, then `brand`, because the brand represents the
+that runs as this org. Then `purpose`, then `brand`, because the brand represents the
 purpose and its `represents` field is written against it. Then `story`.
 
 ## Done when
 
 Every `default` the sources can answer is filled, every one they cannot is empty, the lint
-is clean, and the project is published. The Identity page above says what publishing does.
+is clean, and the org is published. The Identity page above says what publishing does.

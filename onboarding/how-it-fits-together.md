@@ -20,8 +20,9 @@ publish over the API. What changes is who runs the universe.
 
 **Connecting is the faster start.** You point **studio** at a universe that is already
 deployed. That might be a hosted unoverse you have an account on, or your own company's
-deployment you have permissions for. Your components, apps, skills and nodes publish
-into that universe's database, and authoring never requires a deployment of your own.
+deployment you have permissions for. Your components, apps, skills and nodes live in your
+org's Git repo, the universe pulls them into its database, and authoring never requires a
+deployment of your own.
 
 **Running your own puts the same platform in your account.** It suits a full enterprise
 deployment in a private cloud. It is the only option when data cannot leave your network.
@@ -146,17 +147,18 @@ reach them, and [Data](/architecture/data) covers what each store holds.
 ## Your code and the platform stay separate
 
 The platform runs on the VM as Docker images, pulled from the registry by tag. Everything
-you author lives in your universe's database and arrives by publishing.
+you author lives in your org's own Git repo, and every universe pulls that repo into its
+database ([Environments](/architecture/environments)).
 
 You author in **[Studio](/onboarding/studio)**: components, apps, skills and nodes. It is
-not one of the platform services. It is a developer tool you install from npm, it runs on
-your own machine against your own files, and it sends your work to a universe over the API
-when you publish. Nothing of **studio** is deployed with the platform.
+not one of the platform services. It is a developer tool you install from npm, and it runs
+on your own machine against your org repo. Nothing of **studio** is deployed with the
+platform.
 
 ![Your code and the platform](../images/architecture-code-separation.png)
 
 The separation makes the first mode work. A universe someone else runs is still one you can
-author against, because publishing is an API call rather than a deploy.
+author for, because the universe pulls your repo rather than taking a deploy.
 
 You never fork the platform, and the platform never writes to your folders. Upgrading is an
 image pull, and it cannot disturb your content. The full story is in

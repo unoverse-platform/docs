@@ -76,7 +76,7 @@ unoverse create
 
 Choose **Universe**. The wizard asks for your **registry token** (from your unoverse admin) and validates it against the registry before anything downloads: the platform is licensed through that token, so there is nothing to run without it. It then configures the universe end to end: writes your `.env`, logs into the registry, and sets up the database. There is no separate setup wizard to run afterwards.
 
-Most people don't need this page at all: authoring happens in a **studio** workspace, the wizard's default, see [studio](/onboarding/studio). The universe kit is for operators running the full platform.
+Most people don't need this page at all: authoring happens in an org repo opened in **studio**, the wizard's default, see [studio](/onboarding/studio). The universe kit is for operators running the full platform.
 
 <Accordion title="Prefer GitHub?">
 The kit is also a template repo: on [`unoverse-platform/starter`](https://github.com/unoverse-platform/starter), **Use this template → Create a new repository**, then clone your copy. Setup still comes from the CLI: `npm install -g unoverse`, then `unoverse create` in the clone runs the same configuration the wizard does (token, `.env`, database).
@@ -145,13 +145,13 @@ Don't mix them up. `.env` is local development on your laptop; production config
 
 ## Where your code lives
 
-**Not in this repo.** This repo operates the universe; everything you author lives in a **studio** workspace: **studio** scaffolds it (one project folder, `design/<project>/`), validates it as you work, and `unoverse deploy studio` sends it to your universe over the API.
+**Not in this repo.** This repo operates the universe; everything you author lives in your org's own Git repo. `unoverse create` (choose **Studio**) makes it, with the org's folders at the root, and **studio** validates it as you work. Your universe pulls the org's repo: connect it on the org page's **Source** tab ([Environments](/architecture/environments)).
 
-| You build | In | Guide |
+| You build | In your org repo | Guide |
 | --- | --- | --- |
-| **Logic**: custom workflow nodes (YAML manifests) | `design/<project>/nodes/` | [Create Your First Node](/onboarding/create-your-first-node) |
-| **Design**: components, apps, styles | workspace `design/` | [Create a component](/onboarding/create-a-component) |
-| **Behavior**: Agent skills and prompt blocks | `design/<project>/skills/` and `blocks/` | [Create Your First Agent](/onboarding/create-your-first-agent) |
+| **Logic**: custom workflow nodes (YAML manifests) | `nodes/` | [Create Your First Node](/onboarding/create-your-first-node) |
+| **Design**: components, apps, styles | `components/`, `apps/`, `styles/` | [Create a component](/onboarding/create-a-component) |
+| **Behavior**: Agent skills and prompt blocks | `skills/` and `blocks/` | [Create Your First Agent](/onboarding/create-your-first-agent) |
 
 You don't have to build everything yourself. The **marketplace** offers the design system and ready-made nodes and services to install into your universe, per item.
 
@@ -159,8 +159,8 @@ You don't have to build everything yourself. The **marketplace** offers the desi
 
 ```bash Daily workflow
 unoverse start            # start your day
-# author in studio, in your workspace
-unoverse deploy studio    # ship what you built; it is live at once
+# author in studio, in your org repo
+git push                  # every connected universe pulls it
 unoverse stop             # end your day
 ```
 

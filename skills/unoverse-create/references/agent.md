@@ -5,7 +5,7 @@ a canvas with no interface of its own, listed on the map so a conversation can r
 It is the one thing authored for the map alone: everything else (a component, a template, an
 app) is offered to the map by its Available switch and keeps its meta on its own manifest.
 
-One file: `design/<project>/agents/<name>.yaml`.
+One file: `agents/<name>.yaml`, at the root of your org repo.
 
 ## The rules that bite
 
@@ -25,7 +25,7 @@ One file: `design/<project>/agents/<name>.yaml`.
 
 ## Workflow
 
-1. Read the Tasks page and any Agent in the workspace.
+1. Read the Tasks page and any Agent in your org repo.
 2. Write the file: `type: agent`, `name` equal to the file name, the discovery meta, the
    `message`, and the door.
 3. `unoverse lint`, then Studio's Agents lane to see it and switch it Available.

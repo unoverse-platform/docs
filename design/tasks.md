@@ -248,7 +248,7 @@ run's result is the tool's result. A task is done only when its door says so.
 ## The Agent file
 
 A workflow with no interface has no manifest anywhere, so it is the one thing authored for
-the map alone: one file, `design/<org>/agents/<name>.yaml`.
+the map alone: one file, `agents/<name>.yaml` at the root of your org repo.
 
 ```yaml order-status.yaml
 type: agent

@@ -20,8 +20,10 @@
 
 **Exemplar:** every published node at
 [marketplace/definitions/nodes](https://github.com/unoverse-platform/marketplace/tree/main/definitions/nodes).
-The Anatomy page's table says which one to read for which shape. Add to an existing
-package in the workspace where one fits; create a package only for a new integration.
+The Anatomy page's table says which one to read for which shape. The public demo org repo,
+[org-acme](https://github.com/unoverse-platform/org-acme), holds `AcmeWeather` and
+`AcmeChatStream` to read and copy. Add to an existing package in your org repo's `nodes/`
+where one fits; create a package only for a new integration.
 
 ## A node is YAML
 
@@ -46,6 +48,8 @@ the platform is missing a capability: say so and stop, never reach for code.
 7. **Never hard-code instruction text.** `{{prompt.<blockName>}}` tracks the block.
 8. **`cacheable: true` only for a pure read. `emitsExternally: true` for anything that
    cannot be undone.**
+9. **A node type is one per platform.** A type another org already holds is refused, so a
+   copied node gets your own type.
 
 ## Workflow
 
@@ -58,7 +62,7 @@ the platform is missing a capability: say so and stop, never reach for code.
    service. Keys come from the workspace `.env`, named from the credential and field in
    upper snake case with the trailing `Credential` dropped: `openAICredential.apiKey`
    is `OPENAI_API_KEY`. A node that lints but has never run is not done.
-7. `unoverse deploy studio`.
+7. Commit and push to your org repo: every universe pulls it. `unoverse deploy studio` still reaches your own universe until your universe runs a release with the Git sync.
 
 ## Things that go wrong
 

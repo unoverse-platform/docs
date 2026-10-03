@@ -6,7 +6,7 @@ title: "unoverse CLI"
 `unoverse` is the one command for everything you do on the platform. Install it once and
 you can:
 
-- create a project, a universe or a client app
+- create an org repo, a universe or a client app
 - author components, nodes and skills in **studio**
 - run a universe on your machine, and deploy it to your own server
 
@@ -83,7 +83,7 @@ A bare `unoverse`, `unoverse --help` and `unoverse -h` all print the same thing.
 
 ## The commands
 
-Two work wherever you are: `unoverse create` sets up a project, a universe or a client app, and
+Two work wherever you are: `unoverse create` sets up an org repo, a universe or a client app, and
 `unoverse update` brings your tooling current. The rest depend on where you are standing.
 
 ### studio
@@ -91,7 +91,8 @@ Two work wherever you are: `unoverse create` sets up a project, a universe or a 
 | Command | What it does |
 | --- | --- |
 | `unoverse studio` | Launches **studio**, downloading it on first run. |
-| `unoverse lint` | Checks every component, app, skill, block and node in the workspace. The same check `deploy studio` runs first. |
+| `unoverse lint` | Checks every component, app, skill, block and node in your org repo. Inside an org repo it takes no argument, because `unoverse.yaml` declares the org. The same check runs on every pull request and before a universe applies a commit. |
+| `unoverse deploy studio` | Lints your org repo, then sends it to your own universe, until your universe runs a release with the Git sync. Universes pull the org's repo ([Environments](/architecture/environments)). |
 | `unoverse login` | Signs in to a universe. `deploy studio` remembers the address in `unoverse.yaml`. |
 
 ### A universe

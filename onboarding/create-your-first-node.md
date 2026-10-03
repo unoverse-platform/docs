@@ -10,13 +10,13 @@ There is nothing to compile and no package to install. You write the files, run 
 | | |
 | --- | --- |
 | **What you'll build** | <span className="node-chip">Quote</span>, a node that fetches a famous quote |
-| **Where it lives** | `design/<project>/nodes/quote/` in your **studio** workspace |
+| **Where it lives** | `nodes/quote/`, at the root of your org repo |
 | **What it outputs** | Two connectors: `quote` and `author` |
 | **Why this API** | It needs no key, so you can build and run it in under a minute |
 
 ## Before you begin
 
-You have a **studio** workspace, from `unoverse studio`. Building and running the node needs
+You have an org repo, from `unoverse create` (choose **Studio**). Building and running the node needs
 nothing else. For the last step, where you use it in a workflow, your universe is running
 and you have the workflow from [Create Your First Agent](/onboarding/create-your-first-agent).
 
@@ -56,14 +56,15 @@ Four small files, and none of them is code.
 
 [Anatomy of a node](/nodes/manifest-nodes) covers each of those in full.
 
-**Read a working one first.** Your project ships with sample nodes in `design/<project>/nodes/samples`, and
-**studio** lists them beside your own. Open one to see the same files you are about to write,
-already filled in.
+**Read a working one first.** The public demo org repo,
+[org-acme](https://github.com/unoverse-platform/org-acme), holds two sample nodes,
+`AcmeWeather` and `AcmeChatStream`. Open one to see the same files you are about to write,
+already filled in. If you copy one, give it your own type.
 
 <Steps>
 <Step title="Create the package">
 
-A package holds one or more nodes and declares which hosts they may call. In your **studio** workspace, create `design/<project>/nodes/quote/` with one file in it:
+A package holds one or more nodes and declares which hosts they may call. In your org repo, create `nodes/quote/` with one file in it:
 
 ```yaml package.yaml
 name: quote
@@ -82,6 +83,9 @@ allowedHosts:
 <Step title="Describe the node">
 
 Create `quote/nodes/Quote/node.yaml`. This one file says what the node is, what it connects to, and how to test it.
+
+A node type is one per platform. If another org already holds `Quote`, the platform refuses
+yours, so choose a type of your own.
 
 ```yaml nodes/Quote/node.yaml
 type: Quote
@@ -184,21 +188,24 @@ nothing is published. [Testing nodes](/nodes/testing-nodes) covers it in full.
 </Step>
 <Step title="Check it and deploy it">
 
-From anywhere in your workspace:
+From anywhere in your org repo:
 
 ```bash
 unoverse lint
 ```
 
-Every rule a node must meet is checked, and each message names the one it broke. Then ship
-it to your universe:
+Every rule a node must meet is checked, and each message names the one it broke. Then
+commit and push to your org repo. Every universe connected to the repo pulls it, and
+<span className="node-chip">Quote</span> is in the node library in **canvas** once the pull
+lands ([Environments](/architecture/environments)).
+
+Until your universe runs a release with the Git sync, you can still ship to your own universe from the terminal:
 
 ```bash
 unoverse deploy studio
 ```
 
-Deploy runs the same check first, and <span className="node-chip">Quote</span> is in the
-node library in **canvas** the moment it finishes.
+Deploy runs the same check first.
 
 </Step>
 <Step title="Use it in a workflow">
@@ -243,7 +250,7 @@ A node carries no keys, so sharing one never shares a secret. [Credentials](/nod
 
 Your node runs from the files in your repo, which is all you need while you build.
 
-To give it to anyone else, ship it from your terminal with `unoverse deploy studio`. That writes the node into a universe as a record: no build, no package, nothing to download, and it is live in that universe's node library as soon as the deploy finishes.
+To give it to anyone else, push it to your org repo. Every universe connected to the repo pulls it as a record: no build, no package, nothing to download. It is live in that universe's node library as soon as the pull lands.
 
 The node carries a URL and asks for a key, so the two things anyone installing it will read are its `allowedHosts` and its credential declaration. Keep both honest.
 
@@ -254,7 +261,7 @@ The node carries a URL and asks for a key, so the two things anyone installing i
 <div className="skill-eyebrow">Installed by unoverse update</div>
 <div className="skill-title">unoverse-create</div>
 
-Claude Code already knows everything on this page. Open your project and describe the node you want:
+Claude Code already knows everything on this page. Open your org repo and describe the node you want:
 
 > Create a node that fetches the top story from a news API.
 

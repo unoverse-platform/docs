@@ -136,7 +136,7 @@ Include it when:
 4. **Show sequences.** The value is in the choreography, not the inventory.
 5. **Keep it short.** Under a hundred lines, because it is in the prompt on every turn.
 
-Agent skills are a different thing, authored in `design/<project>/skills/` and discovered at run time.
+Agent skills are a different thing, authored in `skills/` at the root of your org repo and discovered at run time.
 `instructions` is part of the MCP schema and travels with the tools.
 
 ## Who records a call

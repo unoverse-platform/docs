@@ -3,17 +3,30 @@ sidebarTitle: "Validate and ship"
 title: "Validate and ship"
 ---
 
-Publish your work with two commands, and nothing broken reaches a universe. What lands is
-live in every canvas at once.
+Publish your work by pushing it to your org repo, and nothing broken reaches a universe.
+What lands is live in every canvas at once.
 
 ## Ship
 
-Publishing runs from the terminal. Design assets never deploy through the core platform.
+Every universe pulls your org's Git repo. Design assets never deploy through the core
+platform, and nothing is pushed into a universe.
 
 1. **Preview in mock.** Exercise every state from the prop defaults and the state picker.
 2. **Preview in live.** Stream real data through it and watch the stream log stay clean.
    The preview runs the production path, so this is the release test ([studio](/design/studio)).
-3. **Publish.**
+3. **Publish.** Lint your org repo, then commit and push.
+
+```bash
+unoverse lint
+```
+
+A pull request runs the same lint as a check. A universe connected to the repo picks up the push by
+webhook within seconds, by polling within five minutes, or with **Sync now**.
+[Environments](/architecture/environments) covers connecting a universe on the org page's
+**Source** tab.
+
+Until your universe runs a release with the Git sync, you can still publish to your own universe from the
+terminal:
 
 ```bash
 unoverse login
@@ -28,8 +41,8 @@ before a workflow can use it.
 
 ## What the lint checks
 
-`deploy studio` runs the lint first and stops on any error, so nothing broken leaves your
-machine.
+The pull-request check and `deploy studio` both run the lint first and stop on any error,
+so nothing broken leaves your machine.
 
 | Level | Means |
 |---|---|

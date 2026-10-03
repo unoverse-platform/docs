@@ -11,9 +11,9 @@ and needs Node and nothing else.
 unoverse studio
 ```
 
-It opens on http://localhost:4108 and finds your project by looking for `design/` in the
-current folder, any parent, or a single folder directly below, so it works from inside your
-project or from the folder you created it in. [Studio](/onboarding/studio) covers the
+It opens on http://localhost:4108 and finds your org repo by its `unoverse.yaml`. It looks
+in the current folder, any parent, or a single folder directly below, so it works from
+inside your org repo or from the folder you created it in. [Studio](/onboarding/studio) covers the
 install.
 
 ## What you get
@@ -33,8 +33,8 @@ The nav is grouped in three:
 | Code | **Nodes** |
 
 A header switcher scopes the whole of **studio**: the lists and the preview theme. The
-Components list shows the design system plus your own components, and **All** shows every
-project at once with a badge per card.
+Components list shows the design system plus your org's own components, and **All** shows
+every source at once with a badge per card.
 
 Atoms preview but never serve, because the server expands every `Ref` before anything
 leaves it, so no channel ever receives an atom.
@@ -113,7 +113,10 @@ file edit and no restart, because you are only placing a node.
 
 ## The full loop
 
-Edit the definition, watch it in mock, prove it in live, then publish.
+Edit the definition, watch it in mock, prove it in live, then publish. Commit and push to
+your org repo, and every universe connected to it pulls the change
+([Environments](/architecture/environments)). Until your universe runs a release with the Git sync, you can still
+send it to your own universe:
 
 ```bash
 unoverse deploy studio
@@ -122,7 +125,7 @@ unoverse deploy studio
 Layouts, styles and copy refresh in the preview as you save, carried by the resource
 subscription, and nothing restarts.
 
-Deploying is what a new definition needs, or one whose node contract changed through new
+Publishing is what a new definition needs, or one whose node contract changed through new
 props, a new name or changed discovery meta. The platform builds one node from each
 definition it holds, so a definition it has never seen has to arrive first. It goes live as
 it lands, with no restart and no code generation.

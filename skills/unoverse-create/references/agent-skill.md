@@ -7,13 +7,15 @@ Agent, not code. Do not confuse it with this skill, which is for Claude Code.
 ## Where it goes
 
 ```
-design/<org>/skills/<skill-name>/
+skills/<skill-name>/           at the root of your org repo
   SKILL.md                 required: frontmatter plus the instructions
   references/              optional files the Agent may be handed
 ```
 
 It is addressed `<org>/<skill-name>`. Only the platform's own universal skills live in
-`design/marketplace/skills/`, in the platform monorepo.
+`design/marketplace/skills/`, in the platform monorepo. To start from a working one, read
+`sample-complaint-handling` in the public demo org repo,
+[org-acme](https://github.com/unoverse-platform/org-acme), and copy it.
 
 ## Frontmatter the platform reads
 
@@ -47,7 +49,8 @@ the line.
 
 ## Ship
 
-`unoverse lint <project>` (or `unoverse lint marketplace` for the universal tier), then
-`unoverse deploy studio`. Lint checks every skill: the frontmatter parses, `name` matches
+`unoverse lint` inside your org repo (the org is declared, so it takes no argument), then
+push. Every universe pulls the org's repo ([Environments](https://docs.unoverse.ai/architecture/environments)).
+`unoverse deploy studio` still reaches your own universe until your universe runs a release with the Git sync. Lint checks every skill: the frontmatter parses, `name` matches
 the folder, `description` is one line, `whenToUse` exists and does not repeat the
 description, the body is not empty. The universe rescans skills on deploy.

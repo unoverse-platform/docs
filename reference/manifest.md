@@ -13,7 +13,7 @@ lint validates against.
 
 ## Example
 
-```yaml design/acme/components/product-card/manifest.yaml
+```yaml components/product-card/manifest.yaml
 title: Product Card
 description: A compact product card, expandable to full product detail.
 whenToUse: >
@@ -26,7 +26,7 @@ lifetime: turn
 
 An app's manifest is the whole envelope, and adds its state tree:
 
-```yaml design/acme/apps/acme-chat/manifest.yaml
+```yaml apps/acme-chat/manifest.yaml
 name: acme-chat
 description: The Acme support chat.
 whenToUse: Ask Acme a question, or get general help.
