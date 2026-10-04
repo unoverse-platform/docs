@@ -39,7 +39,7 @@ the page. It never restates a page, so when the two disagree, the page wins.
    node are public at
    [marketplace/definitions](https://github.com/unoverse-platform/marketplace/tree/main/definitions),
    and a complete worked org is public at
-   [org-acme](https://github.com/unoverse-platform/org-acme). Compose those atoms and mirror
+   [acme](https://github.com/unoverse-orgs/acme). Compose those atoms and mirror
    that shape. Never hand-roll what the base already ships.
    [The design system](https://docs.unoverse.ai/design/design-system.md) explains what ships.
 

@@ -112,7 +112,7 @@ Every published node is public. Find the one closest to what you are building an
 
 **[marketplace/definitions/nodes](https://github.com/unoverse-platform/marketplace/tree/main/definitions/nodes)**
 
-The public demo org repo, [org-acme](https://github.com/unoverse-platform/org-acme), holds
+The public demo org repo, [acme](https://github.com/unoverse-orgs/acme), holds
 two more to read and copy: `AcmeWeather` and `AcmeChatStream`.
 
 | Read it for | Node |

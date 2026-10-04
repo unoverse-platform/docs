@@ -57,7 +57,7 @@ Four small files, and none of them is code.
 [Anatomy of a node](/nodes/manifest-nodes) covers each of those in full.
 
 **Read a working one first.** The public demo org repo,
-[org-acme](https://github.com/unoverse-platform/org-acme), holds two sample nodes,
+[acme](https://github.com/unoverse-orgs/acme), holds two sample nodes,
 `AcmeWeather` and `AcmeChatStream`. Open one to see the same files you are about to write,
 already filled in. If you copy one, give it your own type.
 

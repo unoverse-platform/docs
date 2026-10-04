@@ -32,7 +32,7 @@ with a first commit, and the org's folders sit at its root:
 
 That is the baseline. Add `components/`, `apps/`, `skills/`, `blocks/` and `nodes/` as you
 need them. Worked examples live in the public demo org repo,
-[org-acme](https://github.com/unoverse-platform/org-acme), to read and copy.
+[acme](https://github.com/unoverse-orgs/acme), to read and copy.
 
 ## Write the definition
 

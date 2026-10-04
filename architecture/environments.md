@@ -35,7 +35,7 @@ unoverse create
 ```
 
 For examples to read and
-copy, clone the demo org, [Acme](https://github.com/unoverse-platform/org-acme).
+copy, clone the demo org, [Acme](https://github.com/unoverse-orgs/acme).
 
 A universe can hold several orgs, each pulled from its own repo. Two orgs may each have an app
 called `chat`. A node type is one per platform, so give a node you copy your own type.

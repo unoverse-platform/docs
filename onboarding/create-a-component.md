@@ -96,7 +96,7 @@ org's name comes from `unoverse.yaml`, never from the folder, so the folder may 
 anything.
 
 Worked examples live in one public demo org repo,
-[org-acme](https://github.com/unoverse-platform/org-acme): a welcome component, a chat app,
+[acme](https://github.com/unoverse-orgs/acme): a welcome component, a chat app,
 a skill, a block and two nodes. Read them and copy what you need.
 
 </Step>

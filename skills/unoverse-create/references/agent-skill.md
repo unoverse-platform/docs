@@ -15,7 +15,7 @@ skills/<skill-name>/           at the root of your org repo
 It is addressed `<org>/<skill-name>`. Only the platform's own universal skills live in
 `design/marketplace/skills/`, in the platform monorepo. To start from a working one, read
 `sample-complaint-handling` in the public demo org repo,
-[org-acme](https://github.com/unoverse-platform/org-acme), and copy it.
+[acme](https://github.com/unoverse-orgs/acme), and copy it.
 
 ## Frontmatter the platform reads
 

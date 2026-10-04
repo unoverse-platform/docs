@@ -13,7 +13,7 @@ blocks/<category>/<block-name>.md        at the root of your org repo
 
 Only the platform's own universal blocks live in `design/marketplace/blocks/`, in the
 platform monorepo. The public demo org repo,
-[org-acme](https://github.com/unoverse-platform/org-acme), holds `sample-concise-answers`
+[acme](https://github.com/unoverse-orgs/acme), holds `sample-concise-answers`
 to read and copy.
 
 The folder is the category. The shipped ones are `core`, `formatting` and `media`; add a

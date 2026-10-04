@@ -21,7 +21,7 @@
 **Exemplar:** every published node at
 [marketplace/definitions/nodes](https://github.com/unoverse-platform/marketplace/tree/main/definitions/nodes).
 The Anatomy page's table says which one to read for which shape. The public demo org repo,
-[org-acme](https://github.com/unoverse-platform/org-acme), holds `AcmeWeather` and
+[acme](https://github.com/unoverse-orgs/acme), holds `AcmeWeather` and
 `AcmeChatStream` to read and copy. Add to an existing package in your org repo's `nodes/`
 where one fits; create a package only for a new integration.
 

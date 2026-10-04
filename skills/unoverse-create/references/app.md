@@ -7,7 +7,7 @@
 
 Apps are always an org's own; none ship in the base set. Your exemplar is any app already
 in your org repo, the `chat` app in the public demo org repo
-[org-acme](https://github.com/unoverse-platform/org-acme), and the anatomy on the Apps page.
+[acme](https://github.com/unoverse-orgs/acme), and the anatomy on the Apps page.
 
 ## The rules that bite
 
