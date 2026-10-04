@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://docs.unoverse.ai/schemas/objects/dataset.schema.json",
   "title": "A dataset's table",
-  "description": "The shape of the table an object owns (docs/unoverse/data/objects/dataset.md). The declaration IS the schema: it generates a migration a person reviews, and nobody edits a database schema by hand.",
+  "description": "The shape of the table an object owns (docs/unoverse/data/objects/dataset.md). The declaration IS the schema: the platform makes the table from it. Nobody writes SQL and nobody edits a database schema by hand.",
   "type": "object",
   "required": [
     "columns"
