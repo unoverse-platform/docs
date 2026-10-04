@@ -41,7 +41,7 @@ const DOCS = join(HERE, "..");
 const REPO = join(DOCS, "../..");
 const PUBLISH = process.argv.includes("--publish");
 const SCHEMA_DIR = join(REPO, "packages/sdk/conformance/schema");
-const STYLES = join(REPO, "apps/unoverse/design/marketplace/styles");
+const STYLES = join(REPO, "packages/marketplace/definitions/styles");
 // The preview goes to the OS temp dir, NOT anywhere under packages/docs. rsync excludes only
 // .git/, node_modules/, .turbo/ and .DS_Store, so a dotfolder here would ship exactly like a
 // normal one — which is how three unlinked pages reached the live site on 2026-08-23.

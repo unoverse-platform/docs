@@ -115,7 +115,7 @@ file edit and no restart, because you are only placing a node.
 
 Edit the definition, watch it in mock, prove it in live, then publish. Commit and push to
 your org repo, and every universe connected to it pulls the change
-([Environments](/architecture/environments)). Until your universe runs a release with the Git sync, you can still
+([Environments](/architecture/environments)). Until the org is connected to its repo, you can still
 send it to your own universe:
 
 ```bash

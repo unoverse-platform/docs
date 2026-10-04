@@ -14,8 +14,7 @@ folders sit at its root. `unoverse.yaml` there declares the org (`org: acme`).
 | `skills/`, `blocks/` | Behaviour: Agent skills and prompt blocks |
 | `nodes/` | Logic: custom workflow nodes, as YAML packages. A node type is one per platform: give each its own |
 
-Paths here are relative to the org repo's root. In the platform monorepo an org still sits at
-`apps/unoverse/design/<org>/`, the same folders one level down.
+Paths here are relative to the org repo's root.
 
 ## The documentation is the source, and it is searchable
 
@@ -93,7 +92,8 @@ unoverse lint
 ```
 
 Then commit and push. The org's universe pulls the repo, runs the same lint, and applies it;
-nothing goes if lint fails. The sync is not yet released: until the universe has it and is
-connected to the repo, `unoverse deploy studio` sends the work directly, after the same lint.
+nothing goes if lint fails. Until the org is connected to its repo, `unoverse deploy studio`
+sends the work directly, after the same lint. Connecting is
+[Connect a repo](https://docs.unoverse.ai/onboarding/connect-a-repo.md).
 Tell the developer where to look once it is live: the rendered thing is the deliverable, never
 the YAML alone.

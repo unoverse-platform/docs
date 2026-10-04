@@ -42,9 +42,8 @@ called `chat`. A node type is one per platform, so give a node you copy your own
 
 ## Connecting a universe to your repo
 
-An admin connects the org once, on its **Source** tab in the universe. They set the repo, the
-branch or tags to follow, and a read-only key. Then they add the webhook it shows to your Git host. A push then reaches the universe
-in seconds. Without the webhook, the universe checks every five minutes, and **Sync now** pulls
+An admin connects the org once, on its **Source** tab in the universe
+([Connect a repo](/onboarding/connect-a-repo)). A push then reaches the universe in seconds. Without the webhook, the universe checks every five minutes, and **Sync now** pulls
 at once. Before applying anything it runs the same checks your pull request
 ran, and if anything fails it applies nothing and keeps serving the last good version.
 
@@ -59,8 +58,8 @@ flowchart LR
 To roll back, revert in Git, or point production at the previous tag.
 
 <Note>
-The Git sync is built but not yet released. Until your universe runs a release that has it,
-`unoverse deploy studio` sends your work to the universe directly.
+Until an org is connected to its repo, `unoverse deploy studio` sends its work to the universe
+directly.
 </Note>
 
 **Workflows are not in Git yet.** Moving one from UAT to production today means rebuilding it

@@ -41,7 +41,7 @@ in your org repo, the `chat` app in the public demo org repo
    each other. Shared chrome goes once in `components/`.
 4. Write the manifest: description, `whenToUse`, category, input schema, and the binding
    to the workflow it owns. Without a real binding the app is not done.
-5. `unoverse lint`, preview in **studio**, then commit and push to your org repo: every universe pulls it. `unoverse deploy studio` still reaches your own universe until your universe runs a release with the Git sync.
+5. `unoverse lint`, preview in **studio**, then commit and push to your org repo: every universe pulls it. `unoverse deploy studio` still reaches your own universe until the org is connected to its repo.
 
 ## Things that go wrong
 

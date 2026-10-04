@@ -168,14 +168,14 @@ git push
 An admin connects the org to its repo once, on the org's **Source** tab in the universe. They
 set the repo, the branch (or release tags) to follow, a read-only deploy key and a webhook. After
 that, a push arrives within seconds, or within five minutes without the webhook, and **Sync
-now** pulls at once. [Environments](/architecture/environments) covers dev, UAT and production.
+now** pulls at once. [Connect a repo](/onboarding/connect-a-repo) walks through it, and
+[Environments](/architecture/environments) covers dev, UAT and production.
 
 To undo a change, revert it in Git, and the universe follows.
 
 <Note>
-The Git sync is built but not yet released. Until your universe runs a release that has it, or
-until it is connected to the repo, `unoverse deploy studio` sends the org's work to it from your
-terminal. It lints, shows a plan, and asks before sending.
+Until the org is connected to its repo, `unoverse deploy studio` sends the org's work to your
+universe from your terminal. It lints, shows a plan, and asks before sending.
 </Note>
 
 ## Set up your editor

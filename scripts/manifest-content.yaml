@@ -1,5 +1,5 @@
 # Copy for the component/app manifest reference. The schema at
-# apps/unoverse/design/_schema/manifest.schema.json supplies the shape; five of its 22
+# packages/docs/schemas/design/manifest.schema.json supplies the shape; five of its 22
 # properties carry no description, so they are written here. The rest are reader-facing
 # already and are used as-is.
 manifest:

@@ -1,0 +1,1838 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/design/unoverse.schema.json",
+  "title": "Unoverse definition",
+  "description": "Editor guidance for rx/ definitions (UNOVERSE_AUTHORING.md, UNOVERSE_LAYERS.md). A file with `unoverse` is a definition envelope; otherwise it is a bare node partial (components/ , states/ , layouts/ , $include siblings). Structural only — style/bind/props/action stay freeform so no valid value is ever flagged.",
+  "if": {
+    "required": [
+      "unoverse"
+    ]
+  },
+  "then": {
+    "$ref": "#/definitions/definition"
+  },
+  "else": {
+    "//": "A file with `calls` is an api-call sidecar (the same call format a node's api/run.yaml uses, run by the same executor), not part of the primitive tree — it is left alone rather than validated as a node and flagged for having no `type`.",
+    "if": {
+      "required": [
+        "calls"
+      ]
+    },
+    "then": true,
+    "else": {
+      "//": "A file whose every entry is an OBJECT is a PROPS EXTRACT (the envelope pulls it in with props: { $include }) — validated as the props map, never as a node tree.",
+      "//2": "The test used to be `every entry declares input`, which read a CONVENTION as the definition of the shape. A prop that is not fed at runtime — one the platform fills, or one nobody writes — carries no `input`, and the moment a single prop dropped it the whole file stopped being recognised and got red-squiggled as a node missing its `type` (observed 2026-09-01 on perfect-day/chapter's props.yaml). A props file says what its props ARE; whether each is fed is a fact about one of them.",
+      "//3": "It cannot mistake a node tree for props: a node ALWAYS carries `type: <string>` at its top level, and a string value fails `additionalProperties: object` at the first key.",
+      "if": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": {
+          "type": "object"
+        }
+      },
+      "then": {
+        "$ref": "#/definitions/props"
+      },
+      "else": {
+        "$ref": "#/definitions/node"
+      }
+    }
+  },
+  "definitions": {
+    "definition": {
+      "type": "object",
+      "required": [
+        "unoverse",
+        "type",
+        "name"
+      ],
+      "properties": {
+        "unoverse": {
+          "type": "string",
+          "description": "Schema version, e.g. \"1.0\"."
+        },
+        "type": {
+          "description": "THE DECLARATION WORD (authored; `kind` is the legacy spelling the loader still reads). `component` presents ONE thing with its own states; `template` is an ARRANGEMENT of parts that deliveries fill (UNOVERSE_TEMPLATE_MODEL.md); `app` is the surface — its envelope holds the states tree, its manifest the MCP face; `atom` is leaf vocabulary a Ref inlines.",
+          "enum": [
+            "component",
+            "template",
+            "app",
+            "atom"
+          ]
+        },
+        "states": {
+          "type": "object",
+          "description": "THE STATE TREE, top level on EVERY kind (2026-08-29): first declared = arrival. Every state declares its layout as a root-relative path (flat components excepted). A component's state may name its `place:` (UNOVERSE_SCREEN.md §2.3) and nest steps as substates; an app with places has ONE state whose layout declares them; a template's layouts hold the three-word sections.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [],
+            "properties": {
+              "layout": {
+                "type": "string",
+                "description": "REQUIRED: the arrangement this state draws, as a path relative to the app folder (e.g. layouts/standard)."
+              },
+              "preview": {
+                "description": "This state's Studio mocks: an ARRAY seeds components; an OBJECT is authored app-state data. The retired ladder's app states used it; an app with places has none.",
+                "oneOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "object"
+                  }
+                ]
+              },
+              "states": {
+                "type": "object",
+                "description": "CONTAINED substates (a component's steps) — exist only inside this state and never name a place. Each declares its drawing as a path.",
+                "additionalProperties": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [],
+                  "properties": {
+                    "layout": {
+                      "type": "string"
+                    },
+                    "preview": {}
+                  }
+                }
+              },
+              "on": {
+                "type": "string",
+                "description": "RETIRED (UNOVERSE_STATE_MODEL §5, one word): a step is a state. Drop `on:` and write `state` everywhere (Switch on: state, field: state, key: state). The lint refuses it."
+              },
+              "initial": {
+                "type": "string",
+                "description": "LEGACY: first-declared is the initial; the key is read but redundant."
+              },
+              "layouts": {
+                "type": "object",
+                "description": "COMPONENTS: variant arrangements (horizontal/vertical), values = layout paths."
+              },
+              "place": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+                "description": "The place an interface in this state is shown in (UNOVERSE_SCREEN.md §2.3). Entering the state moves the interface there. `chat` is the conversation; any other name must be a Place some app declares, which the design lint checks."
+              },
+              "fullscreen": {
+                "type": "boolean",
+                "description": "true = this state takes the whole screen (UNOVERSE_SCREEN.md §2.3b). The visitor's click enters it; Esc leaves it, back to the state it came from, on the same step. A `Place` in its layout is where the page's avatar draws while fullscreen. Built for templates a website page draws; inside an app it has no effect yet."
+              },
+              "arrows": {
+                "type": "boolean",
+                "description": "true = the arrow keys step this state's steps, as slides are stepped. Only a state marked so answers the keys; a form whose last step is its thanks leaves it out, so the keys never skip it."
+              }
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name (independent of filename)."
+        },
+        "category": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string",
+          "description": "What it is. For a component with a manifest.json, meta lives in the MANIFEST (single home) — do not duplicate here."
+        },
+        "whenToUse": {
+          "type": "string",
+          "description": "Selection text. Lives in manifest.json when the component is discoverable — never duplicated in the envelope."
+        },
+        "defaultState": {
+          "type": "string",
+          "description": "LEGACY (STATE MODEL v2): the pre-v2 spelling of the arrival state. Author a `state.view` TREE instead — its `initial` is the arrival state and its top-level names are the public menu. Kept only so unmigrated definitions still read."
+        },
+        "nodeSize": {
+          "$ref": "#/definitions/nodeSize"
+        },
+        "props": {
+          "if": {
+            "required": [
+              "$include"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "$include": {
+                "type": "string",
+                "description": "The props extract: a sibling file holding the props map (UNOVERSE_MCP_FORMS §Per-field purpose)."
+              }
+            }
+          },
+          "else": {
+            "$ref": "#/definitions/props"
+          },
+          "description": "EXTERNAL contract — the rare workflow-fed inputs (input: true). Static content is HARDCODED in the tree; internal state lives in `state`. May be extracted to a sibling file via { $include: <stem> }."
+        },
+        "outputs": {
+          "$ref": "#/definitions/outputs"
+        },
+        "root": {
+          "$ref": "#/definitions/node",
+          "description": "The primitive tree — the UI. FLAT components and atoms only (the drawing itself), or a tree component's AUTHORED SHELL (real chrome beyond the plain Switch). A tree component normally omits it: the compiler synthesizes the root from `states:` (2026-08-29)."
+        },
+        "parts": {
+          "type": "array",
+          "description": "TEMPLATES, LEGACY (superseded 2026-08-29 by states + the three-word layout sections): the old ordered parts contract, still read for unswept folders.",
+          "items": {
+            "$ref": "#/definitions/templatePart"
+          }
+        },
+        "shapes": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "TEMPLATES, LEGACY (superseded 2026-08-29): the old spelling of states-own-layouts. Write states: instead.",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "layout"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "layout": {
+                "type": "string",
+                "description": "The arrangement this state draws (layouts/<value>)."
+              }
+            }
+          }
+        },
+        "state": {
+          "type": "object",
+          "description": "LEGACY (superseded 2026-08-29 by `values:`): scalar starting values; the old `state.view` wrapper for the tree is also read here. New authoring: tree at top-level `states:`, scalars in `values:`.",
+          "properties": {
+            "view": {
+              "$ref": "#/definitions/viewTree"
+            }
+          }
+        },
+        "stateOrder": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "RETIRED with the ladder (UNOVERSE_SCREEN.md §6): placement is stated by `place:`, never by order. Present here only so unmigrated definitions still read."
+        },
+        "values": {
+          "type": "object",
+          "description": "STARTING VALUES (2026-08-29): the initial values of keys the component writes via setValue (step, phase, progressPct). SCALARS only — arrays/objects/URLs are content or data (hardcode in the layout, or props input:true). Replaces the legacy `state:` scalar block."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "component"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "category"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "atom"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "root"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "template"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "anyOf": [
+              {
+                "required": [
+                  "states"
+                ]
+              },
+              {
+                "required": [
+                  "root"
+                ]
+              }
+            ],
+            "$comment": "A template declares its TREE (`states:`) or its DRAWING (`root:`). The second is a BLOCK (2026-08-31): a flat file with no manifest and no states — pair, feature, single, rail, stack — a shape a page imports by Ref rather than a screen someone opens. Requiring states of it would be demanding a state machine from a fragment."
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "app"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "states"
+            ]
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "type": {
+                    "const": "component"
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              {
+                "not": {
+                  "required": [
+                    "states"
+                  ]
+                }
+              },
+              {
+                "not": {
+                  "required": [
+                    "state"
+                  ]
+                }
+              }
+            ]
+          },
+          "then": {
+            "required": [
+              "root"
+            ]
+          }
+        }
+      ]
+    },
+    "templatePart": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "static"
+          ],
+          "additionalProperties": false,
+          "description": "A STATIC part: authored markup the designer fixed. Nothing can touch it — no filler, no director.",
+          "properties": {
+            "static": {
+              "type": "string",
+              "description": "The authored drawing (layouts/<value>)."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "slot"
+          ],
+          "additionalProperties": false,
+          "description": "A SLOT: an open part. It names its fill lane — `accepts: interfaces` (the workflow lane: deliveries stream in) or `query:` (the template fetches its own interfaces) or `prompt:` (an Agent fills a component's `input: true` props). A slot with no lane renders as a grey labelled placeholder.",
+          "properties": {
+            "slot": {
+              "type": "string",
+              "description": "The slot's name — what the manifest's preview mocks and the parts table key on."
+            },
+            "accepts": {
+              "const": "interfaces",
+              "description": "The workflow/query lanes: this slot holds interfaces the store delivers."
+            },
+            "prompt": {
+              "type": "object",
+              "required": [
+                "component"
+              ],
+              "additionalProperties": false,
+              "description": "The written lane: a component whose `input: true` props an Agent fills with grounded prose. Never the director's territory.",
+              "properties": {
+                "component": {
+                  "type": "string",
+                  "description": "The briefed (prompt) component's name — its briefs are its schema."
+                }
+              }
+            },
+            "limit": {
+              "type": "number",
+              "description": "HARD cap on how many the slot holds — enforced by the machine, never trusted to the model. Context: a UNIVERSAL (marketplace) template never authors it; it is written at the use."
+            },
+            "hold": {
+              "enum": [
+                "latest",
+                "all"
+              ],
+              "description": "The reaction to a delivery. `latest` (the unwritten DEFAULT): each delivery replaces the set, a confirmed-empty delivery clears it. `all`: accumulate. Context — written at the use, not on a universal template."
+            },
+            "state": {
+              "type": "string",
+              "description": "The FACE arrivals render in (absent = their own declared state). This is the name the shape's ComponentSlot claim matches on, and where Studio seeds this slot's preview mocks. An authored `state:` marks a FRAMED slot (masthead, footer): part of the template's frame in every shape."
+            },
+            "preview": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "This slot's Studio mocks (one grammar: preview lives ON the thing it seeds): interface refs, each rendering its OWN defaults at the face this slot names — never authored preview data."
+            }
+          }
+        }
+      ]
+    },
+    "viewTree": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "states"
+      ],
+      "description": "THE COMPONENT'S STATE TREE (STATE MODEL v2 §5). States own layouts, never the reverse. Top-level names are PUBLIC — the whole vocabulary an app may react to and place the component in; anything nested beneath them is PRIVATE (the app must not move for it). The server compiles this into publicStates / initialView / stateTree and the flat scalars the render scope reads.",
+      "properties": {
+        "initial": {
+          "type": "string",
+          "description": "The state the component arrives in, and the base it retracts to when a host closes it. Defaults to the first declared state."
+        },
+        "states": {
+          "type": "object",
+          "description": "The public states, in declaration order. Each key is a state NAME that carries meaning (detail, focus, products); layout filenames are plumbing.",
+          "additionalProperties": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "description": "A state. It DECLARES the layout it draws as a root-relative path (2026-08-29 ruling — no same-name default, no assumed folder). The ONE exception: a FLAT component (no layouts/ folder, the drawing is the root itself) declares face-only states with no layout.",
+            "properties": {
+              "layout": {
+                "type": "string",
+                "description": "The layout this state draws, as a path relative to the component folder (e.g. layouts/products — subfolders legal). REQUIRED whenever the state owns a drawing file; omitted only in a FLAT component whose root is the drawing."
+              },
+              "on": {
+                "type": "string",
+                "description": "RETIRED (UNOVERSE_STATE_MODEL §5, one word): a step is a state. Drop `on:` and write `state` everywhere (Switch on: state, field: state, key: state). The lint refuses it."
+              },
+              "initial": {
+                "type": "string",
+                "description": "Which substate this state opens in."
+              },
+              "states": {
+                "type": "object",
+                "description": "PRIVATE substates — steps inside this state. The app never sees these names and never rearranges for them. Each declares its drawing as a root-relative path (the axis-prefix filename convention survives as readability).",
+                "additionalProperties": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "layout": {
+                      "type": "string",
+                      "description": "This substate's drawing, as a root-relative path (e.g. layouts/step-register)."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "props": {
+      "type": "object",
+      "additionalProperties": {
+        "comment": "Validate real (object) prop defs; leave non-object values (e.g. `_comment_*` JSON comments) alone so they're never flagged.",
+        "if": {
+          "type": "object"
+        },
+        "then": {
+          "properties": {
+            "type": {
+              "enum": [
+                "string",
+                "number",
+                "boolean",
+                "object",
+                "array"
+              ]
+            },
+            "default": {},
+            "input": {
+              "type": "boolean",
+              "description": "true = filled from outside, by a workflow or a model call, so it is a field on the component's tool (the default is just the mock). false = the component's own value, drawn from its default, never on the tool."
+            },
+            "enum": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              },
+              "description": "Closed value set for this prop — Studio's control renders a dropdown of these instead of free text."
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "description": "Component OUTPUT contract (components only): keys this component writes to its own slice (via setValue) that are its PRODUCT — e.g. a wizard's answers. nodegen projects them as the generated node's output ports; the node emits them (standard promise __outputs) when a run carries the submitted component state. View-state keys (step, progress…) must NOT be declared. See UNOVERSE_NODE_RUNTIME.md § Component outputs.",
+      "additionalProperties": {
+        "if": {
+          "type": "object"
+        },
+        "then": {
+          "properties": {
+            "type": {
+              "enum": [
+                "string",
+                "number",
+                "boolean",
+                "object",
+                "array"
+              ]
+            },
+            "description": {
+              "type": "string"
+            },
+            "enum": {
+              "type": "array",
+              "description": "Closed set of allowed values (option values). Doubles as the MCP elicitation enum so foreign hosts render a select, not free text."
+            }
+          }
+        }
+      }
+    },
+    "nodeSize": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "if": {
+        "required": [
+          "$include"
+        ]
+      },
+      "then": {
+        "required": [
+          "$include"
+        ],
+        "properties": {
+          "$include": {
+            "type": "string",
+            "description": "Inline a sibling file (recursively). Path is relative to the ROOT definition folder — e.g. \"components/header\", \"states/welcome\", \"layouts/compact\"."
+          }
+        }
+      },
+      "else": {
+        "if": {
+          "anyOf": [
+            {
+              "required": [
+                "static"
+              ]
+            },
+            {
+              "required": [
+                "director"
+              ]
+            },
+            {
+              "required": [
+                "copywriter"
+              ]
+            },
+            {
+              "required": [
+                "query"
+              ]
+            }
+          ]
+        },
+        "then": {
+          "$ref": "#/definitions/retiredSectionWord"
+        },
+        "else": {
+          "$ref": "#/definitions/typedNode"
+        }
+      },
+      "allOf": [
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Box"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveBox"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Stack"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveStack"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Row"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveRow"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Column"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveColumn"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Text"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveText"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Image"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveImage"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Markdown"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveMarkdown"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Icon"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveIcon"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Skeleton"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveSkeleton"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Orb"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveOrb"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Button"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveButton"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Input"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveInput"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Select"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveSelect"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Each"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveEach"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Switch"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveSwitch"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Ref"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveRef"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "ComponentSlot"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveComponentSlot"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Timeline"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveTimeline"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Place"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitivePlace"
+          }
+        }
+      ]
+    },
+    "typedNode": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "description": "The closed primitive set (UNOVERSE_AUTHORING.md §10). Adding to it is an SDK change gated by guard tests. `Container` is a NAMED region of an app (UNOVERSE_INTERFACE_MODEL): the layout places it and owns its width, the manifest's `containers` block says which interface it holds.",
+          "enum": [
+            "Box",
+            "Stack",
+            "Row",
+            "Column",
+            "Each",
+            "Switch",
+            "ComponentSlot",
+            "Template",
+            "Place",
+            "Timeline",
+            "Text",
+            "Image",
+            "Button",
+            "Input",
+            "Select",
+            "Markdown",
+            "Skeleton",
+            "Icon",
+            "Orb",
+            "Ref"
+          ]
+        },
+        "style": {
+          "$ref": "#/definitions/style"
+        },
+        "bind": {
+          "type": "object",
+          "description": "targetProp → data field, e.g. { \"value\": \"title\" }."
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/node"
+          }
+        },
+        "visibleWhen": {
+          "$ref": "#/definitions/condition"
+        },
+        "action": {},
+        "ref": {
+          "type": "string",
+          "description": "Atom name (rx/atoms) to inline (Ref only)."
+        },
+        "props": {
+          "type": "object",
+          "description": "Ref field remap: atomField → your data field."
+        },
+        "icon": {
+          "type": "string"
+        },
+        "on": {
+          "type": "string",
+          "description": "Switch discriminant — the field whose value selects a case."
+        },
+        "cases": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/node"
+          },
+          "description": "Switch branches: value → node. A branch must NOT re-check its own value (a layer never guards itself — UNOVERSE_LAYERS.md §3)."
+        },
+        "select": {
+          "type": "object",
+          "description": "ComponentSlot filter: {} = the conversation flow; a REACTION surface adds where:{field,eq} (+ from:\"all\", limit:1) — select by STATE, never by component type (STATE_MODEL §5b)."
+        },
+        "fallback": {
+          "$ref": "#/definitions/node"
+        },
+        "user": {
+          "$ref": "#/definitions/node"
+        },
+        "assistant": {
+          "$ref": "#/definitions/node"
+        },
+        "assistantData": {
+          "type": "object"
+        },
+        "userData": {
+          "type": "object"
+        },
+        "frame": {
+          "$ref": "#/definitions/node",
+          "description": "ComponentSlot ONLY: the surface chrome the selected component renders inside (the inner ComponentSlot is the placement)."
+        },
+        "value": {
+          "description": "Text literal content — components are microapps: static copy is HARDCODED (bind wins when present)."
+        },
+        "items": {
+          "type": "array",
+          "description": "Each ONLY: literal hardcoded rows (the microapp default). Workflow-fed lists use bind.items instead."
+        },
+        "src": {
+          "type": "string",
+          "description": "Image literal src (bind.src wins when present)."
+        },
+        "alt": {
+          "type": "string",
+          "description": "Image literal alt (bind.alt wins when present)."
+        },
+        "state": {
+          "enum": [
+            "working",
+            "searching",
+            "solving",
+            "listening",
+            "connecting",
+            "weaving",
+            "composing",
+            "breathing",
+            "shaping",
+            "halo",
+            "sonar",
+            "shimmer",
+            "pulse"
+          ],
+          "description": "Orb ONLY: which of the nine animations to draw (bind.state wins when present; unknown values degrade to \"working\")."
+        },
+        "size": {
+          "type": "number",
+          "description": "Orb ONLY: rendered size in px (bind.size wins). Tuning snaps to the nearest baked preset — 20 (inline) or 64 (avatar); other sizes draw crisply at the true size with that tuning."
+        },
+        "speed": {
+          "type": "number",
+          "description": "Orb ONLY: speed multiplier on the preset's baked speed (default 1)."
+        },
+        "name": {
+          "type": "string",
+          "description": "Icon glyph literal under the key a Ref's `with` writes (see core/types.ts)."
+        },
+        "appWidth": {
+          "type": "string",
+          "description": "State-owned app width: on a plain node = an always-open panel; on a ComponentSlot = its panel width while the surface is occupied. Resolves via theme.appSize; 'flex' = fill the host."
+        },
+        "item": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/node"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "TWO nodes read this key, and the shape says which. On Each it is the per-item SUBTREE, and the item is its data scope ({index, position, ...item} for objects, {index, position, value} for primitives). On Template it is a STRING naming WHAT the place holds (UNOVERSE_TEMPLATE_MODEL.md: holder grammar, deliberately the same shape as `interface:`), e.g. `template: grid-page`; the placed node owns the mount and the template owns its own states. A renderer branches on the node's `type`, never on this key alone.",
+          "$comment": "An `Each`'s repeated drawing — renamed from `template` 2026-09-01, because that word also names the KIND (a page) and a mounted template, and only the shape of the value told them apart."
+        },
+        "holds": {
+          "enum": [
+            "one",
+            "many"
+          ],
+          "description": "Place ONLY: `one` shows the newest interface shown into it; `many` shows the set the last show named (UNOVERSE_SCREEN.md §2.2)."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Switch"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "on",
+              "cases"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Ref"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "ref"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Each"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$comment": "`item`, not `template` — the 2026-09-01 rename reached the property definition below and not this requirement, so every correctly-authored Each in the design tree red-squiggled as missing a word that no longer exists. All 86 of them use `item`.",
+            "required": [
+              "item"
+            ],
+            "anyOf": [
+              {
+                "required": [
+                  "items"
+                ]
+              },
+              {
+                "required": [
+                  "bind"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "style": {
+      "type": "object",
+      "description": "Token names only — never raw px/rem/#hex (LAW 1); values live in rx/styles. KEYS are the closed cross-platform vocabulary (the set the SDK style interpreter maps — sdk/style.ts); an unknown key is a typo or a web-ism no renderer implements.",
+      "propertyNames": {
+        "enum": [
+          "width",
+          "height",
+          "maxWidth",
+          "minWidth",
+          "minHeight",
+          "maxHeight",
+          "flex",
+          "padding",
+          "margin",
+          "gap",
+          "overflow",
+          "position",
+          "inset",
+          "top",
+          "right",
+          "bottom",
+          "left",
+          "zIndex",
+          "direction",
+          "wrap",
+          "align",
+          "justify",
+          "display",
+          "columns",
+          "span",
+          "stackBelow",
+          "stage",
+          "container",
+          "hideBelow",
+          "hideAbove",
+          "background",
+          "radial",
+          "border",
+          "borderTop",
+          "borderRight",
+          "borderBottom",
+          "borderLeft",
+          "outline",
+          "shadow",
+          "radius",
+          "radiusTopLeft",
+          "radiusTopRight",
+          "radiusBottomLeft",
+          "radiusBottomRight",
+          "font",
+          "weight",
+          "lineHeight",
+          "color",
+          "textAlign",
+          "fit",
+          "transform",
+          "transition",
+          "animation",
+          "animationDelay",
+          "cursor",
+          "hover",
+          "active",
+          "when"
+        ]
+      },
+      "properties": {
+        "hover": {
+          "$ref": "#/definitions/style"
+        },
+        "active": {
+          "$ref": "#/definitions/style"
+        },
+        "when": {
+          "type": "array",
+          "description": "Data-driven style variants: entries whose condition holds merge `apply` over the base (docs: the four moves).",
+          "items": {
+            "type": "object",
+            "required": [
+              "field",
+              "apply"
+            ],
+            "properties": {
+              "field": {
+                "type": "string"
+              },
+              "eq": {},
+              "ne": {},
+              "in": {
+                "type": "array"
+              },
+              "apply": {
+                "$ref": "#/definitions/style"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "condition": {
+      "description": "A small declarative predicate — NOT a language. Pick ONE of eq / ne / in, or (with none) a truthy test on the named field. No and/or/arithmetic (UNOVERSE_AUTHORING.md §7).",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Truthy test on this field/flag (empty array = falsy)."
+        },
+        {
+          "type": "object",
+          "required": [
+            "field"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "field": {
+              "type": "string"
+            },
+            "eq": {},
+            "ne": {},
+            "in": {
+              "type": "array"
+            }
+          }
+        }
+      ]
+    },
+    "primitiveBox": {
+      "type": "object",
+      "description": "The Box primitive.",
+      "properties": {
+        "type": {
+          "const": "Box"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {},
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "children": {},
+        "autoScroll": {},
+        "revealOnStick": {},
+        "selection": {},
+        "appWidth": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveStack": {
+      "type": "object",
+      "description": "The Stack primitive.",
+      "properties": {
+        "type": {
+          "const": "Stack"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {},
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "children": {},
+        "autoScroll": {},
+        "revealOnStick": {},
+        "appWidth": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveRow": {
+      "type": "object",
+      "description": "The Row primitive.",
+      "properties": {
+        "type": {
+          "const": "Row"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {},
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "children": {},
+        "autoScroll": {},
+        "revealOnStick": {},
+        "appWidth": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveColumn": {
+      "type": "object",
+      "description": "The Column primitive.",
+      "properties": {
+        "type": {
+          "const": "Column"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {},
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "children": {},
+        "autoScroll": {},
+        "revealOnStick": {},
+        "appWidth": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveText": {
+      "type": "object",
+      "description": "The Text primitive.",
+      "properties": {
+        "type": {
+          "const": "Text"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "value"
+            ]
+          },
+          "description": "Text reads bind.value."
+        },
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "value": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveImage": {
+      "type": "object",
+      "description": "The Image primitive.",
+      "properties": {
+        "type": {
+          "const": "Image"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "src",
+              "alt"
+            ]
+          },
+          "description": "Image reads bind.src, bind.alt."
+        },
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "src": {},
+        "alt": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveMarkdown": {
+      "type": "object",
+      "description": "The Markdown primitive.",
+      "properties": {
+        "type": {
+          "const": "Markdown"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "value"
+            ]
+          },
+          "description": "Markdown reads bind.value."
+        },
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "value": {},
+        "inheritLinkColor": {},
+        "citeAction": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveIcon": {
+      "type": "object",
+      "description": "The Icon primitive.",
+      "properties": {
+        "type": {
+          "const": "Icon"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "name"
+            ]
+          },
+          "description": "Icon reads bind.name."
+        },
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "icon": {},
+        "name": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveSkeleton": {
+      "type": "object",
+      "description": "The Skeleton primitive.",
+      "properties": {
+        "type": {
+          "const": "Skeleton"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {},
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "variant": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveOrb": {
+      "type": "object",
+      "description": "The Orb primitive.",
+      "properties": {
+        "type": {
+          "const": "Orb"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {},
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "state": {},
+        "size": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveButton": {
+      "type": "object",
+      "description": "The Button primitive.",
+      "properties": {
+        "type": {
+          "const": "Button"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "label"
+            ]
+          },
+          "description": "Button reads bind.label."
+        },
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "children": {},
+        "value": {},
+        "label": {},
+        "icon": {},
+        "disabledWhen": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveInput": {
+      "type": "object",
+      "description": "The Input primitive.",
+      "properties": {
+        "type": {
+          "const": "Input"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "value",
+              "placeholder"
+            ]
+          },
+          "description": "Input reads bind.value, bind.placeholder."
+        },
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "placeholder": {},
+        "inputType": {},
+        "disabledWhen": {},
+        "maxLength": {},
+        "multiline": {},
+        "rows": {},
+        "inputMode": {},
+        "autoComplete": {},
+        "advanceOnFill": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveSelect": {
+      "type": "object",
+      "description": "The Select primitive.",
+      "properties": {
+        "type": {
+          "const": "Select"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "options",
+              "value"
+            ]
+          },
+          "description": "Select reads bind.options, bind.value."
+        },
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "placeholder": {},
+        "options": {},
+        "disabledWhen": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveEach": {
+      "type": "object",
+      "description": "The Each primitive.",
+      "properties": {
+        "type": {
+          "const": "Each"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "items"
+            ]
+          },
+          "description": "Each reads bind.items."
+        },
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "app": {},
+        "items": {},
+        "item": {
+          "$comment": "An `Each`'s repeated drawing — renamed from `template` 2026-09-01, because that word also names the KIND (a page) and a mounted template, and only the shape of the value told them apart."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveSwitch": {
+      "type": "object",
+      "description": "The Switch primitive.",
+      "properties": {
+        "type": {
+          "const": "Switch"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {},
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "on": {},
+        "cases": {},
+        "fallback": {}
+      },
+      "required": [
+        "type",
+        "on",
+        "cases"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveRef": {
+      "type": "object",
+      "description": "The Ref primitive.",
+      "properties": {
+        "type": {
+          "const": "Ref"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {},
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "ref": {},
+        "props": {},
+        "with": {},
+        "children": {},
+        "name": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveComponentSlot": {
+      "type": "object",
+      "description": "The ComponentSlot primitive.",
+      "properties": {
+        "type": {
+          "const": "ComponentSlot"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {},
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "select": {},
+        "frame": {},
+        "fallback": {},
+        "pinned": {},
+        "appWidth": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveTimeline": {
+      "type": "object",
+      "description": "The Timeline primitive.",
+      "properties": {
+        "type": {
+          "const": "Timeline"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {},
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "user": {},
+        "assistant": {},
+        "userData": {},
+        "assistantData": {},
+        "autoScroll": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "retiredSectionWord": {
+      "type": "object",
+      "description": "A retired template layout word. RETIRED. Place the part with type: Ref and ref: components/<name>, and mark each of its props input: true (an Agent fills it) or input: false (drawn from its default) (UNOVERSE_TEMPLATE_MODEL §9b).",
+      "properties": {
+        "static": {
+          "not": {},
+          "description": "`static:` is RETIRED. Place the part with type: Ref and ref: components/<name>, and mark each of its props input: true (an Agent fills it) or input: false (drawn from its default) (UNOVERSE_TEMPLATE_MODEL §9b)."
+        },
+        "director": {
+          "not": {},
+          "description": "`director:` is RETIRED. Place the part with type: Ref and ref: components/<name>, and mark each of its props input: true (an Agent fills it) or input: false (drawn from its default) (UNOVERSE_TEMPLATE_MODEL §9b)."
+        },
+        "copywriter": {
+          "not": {},
+          "description": "`copywriter:` is RETIRED. Place the part with type: Ref and ref: components/<name>, and mark each of its props input: true (an Agent fills it) or input: false (drawn from its default) (UNOVERSE_TEMPLATE_MODEL §9b)."
+        },
+        "query": {
+          "not": {},
+          "description": "`query:` is RETIRED. Place the part with type: Ref and ref: components/<name>, and mark each of its props input: true (an Agent fills it) or input: false (drawn from its default) (UNOVERSE_TEMPLATE_MODEL §9b)."
+        }
+      }
+    },
+    "primitivePlace": {
+      "type": "object",
+      "description": "The Place primitive: a named spot the screen shows interfaces into (UNOVERSE_SCREEN.md §2.2).",
+      "properties": {
+        "type": {
+          "const": "Place"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {},
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+          "not": {
+            "const": "chat"
+          },
+          "description": "The place's name, kebab-case. A component state names it with `place:` to be shown here. `chat` is the conversation, which every app has already, so no Place takes that name. An app with places has one state, draws in Places and never in slots that claim by state, and declares every place its org's interfaces name; the design lint checks all three (UNOVERSE_SCREEN.md §2.2)."
+        },
+        "holds": {},
+        "frame": {},
+        "fallback": {},
+        "appWidth": {}
+      },
+      "required": [
+        "type",
+        "name",
+        "holds"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -77,7 +77,8 @@
           {
             "group": "Ship It",
             "pages": [
-              "onboarding/deployment"
+              "onboarding/deployment",
+              "onboarding/connect-a-repo"
             ]
           }
         ],

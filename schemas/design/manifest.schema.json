@@ -1,0 +1,344 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/design/manifest.schema.json",
+  "title": "Unoverse manifest",
+  "description": "The manifest of a component or app folder (manifest.yaml). It carries the meta an agent selects on (title/description/whenToUse/category), the workflow binding, and \u2014 for an app \u2014 the STATE TREE the whole state model derives from (STATE MODEL v2 \u00a75). Unknown keys are left alone: this is editor guidance, not a gate. The tree itself is enforced by lint and the conformance guards.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The definition name. Matches the folder (and the Ref), capitals included."
+    },
+    "title": {
+      "type": "string",
+      "description": "Display name."
+    },
+    "description": {
+      "type": "string",
+      "description": "What it is. The single home for this text \u2014 never duplicated in the definition envelope."
+    },
+    "whenToUse": {
+      "type": "string",
+      "description": "Selection text: the sentence an agent chooses on. Say what it is for and what it is NOT for."
+    },
+    "category": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "defaultState": {
+      "type": "string",
+      "description": "LEGACY arrival state (STATE MODEL v2). A component declares its arrival as the `initial` of its `state.view` tree; an app's base is the first entry of `states:`. Kept only so unmigrated folders still read."
+    },
+    "states": {
+      "$ref": "#/definitions/appStates",
+      "description": "LEGACY HOME (one folder grammar, 2026-08-29): the app tree lives in the ENVELOPE (`<name>.yaml`) now \u2014 this manifest block is still read for unswept folders only."
+    },
+    "layout": {
+      "type": "string",
+      "description": "APPS: the base arrangement (layouts/<value>) \u2014 the app's resting state, and the first entry of `states:`."
+    },
+    "preview": {
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "APPS: the Studio walk. Each key is a state name. An ARRAY seeds that state with components; an OBJECT is authored app-state data \u2014 the fields the workflow would have echoed \u2014 so a state can be seen without a live run.",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "A component name, with the state it opens in after a hash: deal#grid (STATE_MODEL rule 3)."
+                    },
+                    {
+                      "type": "object",
+                      "minProperties": 1,
+                      "maxProperties": 1,
+                      "additionalProperties": {
+                        "type": "object"
+                      },
+                      "description": "The envelope form: one key, the component, carrying its own view and data: { deal: { view: grid } }."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        {
+          "type": "array",
+          "description": "THE CONTAINER-MODEL MOCK (UNOVERSE_INTERFACE_MODEL \u00a75): a flat list of interfaces, each `- <name>: { view, ...data }` carrying its OWN view. For an app with no states \u2014 there are no state keys to file a mock under.",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        }
+      ],
+      "description": "APPS: the Studio walk. Each key is a state name. An ARRAY seeds that state with components; an OBJECT is authored app-state data \u2014 the fields the workflow would have echoed \u2014 so a state can be seen without a live run."
+    },
+    "lifetime": {
+      "enum": [
+        "conversation"
+      ],
+      "description": "COMPONENTS: opt out of supersession (rule 5). An instance marked `conversation` is not replaced when a newer instance arrives in the same state \u2014 it stays for the whole conversation."
+    },
+    "lifecycle": {
+      "type": "array",
+      "description": "COMPONENTS: hooks that fire on a moment, not a URL. `onEnterView` runs when the instance enters one of the named states.",
+      "items": {
+        "type": "object",
+        "required": [
+          "phase",
+          "handler"
+        ],
+        "properties": {
+          "phase": {
+            "type": "string",
+            "description": "The moment, e.g. onEnterView."
+          },
+          "layouts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Which STATES the hook fires on (the key is historical; the values are state names)."
+          },
+          "handler": {
+            "type": "string",
+            "description": "The platform handler, e.g. getDetail \u2014 content is fetched by reference and never travels through a model."
+          }
+        }
+      }
+    },
+    "inputSchema": {
+      "type": "object",
+      "description": "APPS: the JSON Schema of the app's own input (what the calling agent sends to open it)."
+    },
+    "binding": {
+      "type": "object",
+      "description": "APPS: the workflow this app runs.",
+      "properties": {
+        "workflow": {
+          "type": "string"
+        },
+        "trigger": {
+          "type": "string"
+        }
+      }
+    },
+    "service": {
+      "type": "string",
+      "description": "APPS: the transport the app needs, e.g. voice."
+    },
+    "autoTrigger": {
+      "type": "boolean"
+    },
+    "default": {
+      "type": "boolean",
+      "description": "APPS: the org's landing app."
+    },
+    "allowedHosts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The outbound hosts this folder may reach: a lifecycle hook's server-side calls, and the pictures its content loads in an outside host such as ChatGPT or Claude, whose window blocks images from any host not listed. Bare hosts in the node package grammar: \"www.example.com\", \"*.example.com\" (one level), \"**.example.com\" (any depth). Part of the manifest's content hash."
+    },
+    "credentials": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Credential NAMES, resolved server-side from encrypted storage. A key never enters the folder."
+    },
+    "analytics": {
+      "type": "array",
+      "description": "COMPONENTS: declared analytics moments (docs/design/analytics.md). ONE rule: `phase` entries OBSERVE a state entry (onEnterView, scoped by `layouts`); `action` entries observe a SERVER action AND close the person's lifecycle state (LIFECYCLE_STATES.md \u00a77) under the same event name. The platform names nothing and stamps where automatically.",
+      "items": {
+        "type": "object",
+        "required": [
+          "event"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "phase": {
+            "type": "string",
+            "description": "Observe a moment, e.g. onEnterView. Give phase OR action."
+          },
+          "action": {
+            "type": "string",
+            "description": "Observe a server action (e.g. apply) AND close the lifecycle state."
+          },
+          "layouts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "phase entries: which STATES fire it (values are state names)."
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Alternative spelling of the same scope."
+          },
+          "event": {
+            "type": "string",
+            "description": "The event name, e.g. view_item, generate_lead."
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Values sent with it; {{field}} reads the instance's data, unresolved params drop."
+          }
+        }
+      }
+    },
+    "templates": {
+      "type": "object",
+      "description": "THE CONTAINER MODEL (UNOVERSE_INTERFACE_MODEL \u00a74): the app IS its containers. Each is source + claim + preview; the layout places one by name (`type: Container, name: rail`) and owns its width. `workflow`/`autoTrigger`/`query` are served as data until per-container routing lands.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "interface": {
+            "type": "string",
+            "description": "Shorthand: a one-state container holding this interface. Its defaults are its preview."
+          },
+          "states": {
+            "type": "object",
+            "description": "The container's OWN states \u2014 each holds an interface (page holds the deal, chat holds text-chat). More than one = the container's tabs.",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "interface": {
+                  "type": "string"
+                },
+                "workflow": {
+                  "type": "string"
+                },
+                "trigger": {
+                  "type": "string"
+                },
+                "autoTrigger": {
+                  "type": "boolean"
+                },
+                "query": {
+                  "type": "object"
+                },
+                "inputSchema": {
+                  "type": "object",
+                  "description": "The JSON Schema of what this state's workflow receives \u2014 the schema lives WITH the workflow that consumes it."
+                },
+                "state": {
+                  "type": "string",
+                  "description": "Which face of the interface this container state shows. Default: the container state's own name when the interface declares it, else the interface's initial."
+                },
+                "width": {
+                  "type": "string",
+                  "description": "This container state's width: an app-size name or raw CSS. Omit to hug the held interface (a state's interface owns its size); a holds-nothing state (a collapsed drawer) is where this earns its place."
+                }
+              }
+            }
+          },
+          "workflow": {
+            "type": "string",
+            "description": "Source: this container's own workflow."
+          },
+          "trigger": {
+            "type": "string"
+          },
+          "autoTrigger": {
+            "type": "boolean"
+          },
+          "query": {
+            "type": "object",
+            "description": "Source: a flat interface query \u2014 pending the query build."
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "appStates": {
+      "type": "object",
+      "description": "THE APP TREE (STATE MODEL v2 \u00a75): one declaration, everything follows. TOP-LEVEL ORDER IS THE PRIORITY LADDER \u2014 the base first, then the reaction states in PROMINENCE order, a state the guest taps into ranking above the one it came from (focus > detail > rail). The screen shows the highest state any hosted component matches; higher states mask what is below. NESTING IS CONTAINMENT: a substate exists only inside its parent arrangement and the compiler strips it from every other one. `stateOrder` is derived from this, never authored, and there is no pinned flag: order fixes priority problems.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "layout"
+        ],
+        "description": "A state of the app. It DECLARES the layout it draws as a root-relative path (2026-08-29 ruling \u2014 no same-name default, no assumed folder, `{}` is not a complete state) and carries only what SEEDS it (`preview`). What a place holds and the judgment granted to it live on the PLACED NODE in the state's layout.",
+        "properties": {
+          "layout": {
+            "type": "string",
+            "description": "REQUIRED: the arrangement this state draws, as a path relative to the app folder (e.g. layouts/standard \u2014 subfolders legal). Nothing is assumed from the state's name."
+          },
+          "preview": {
+            "description": "This state's Studio mocks: an ARRAY seeds components; an OBJECT is authored app-state data.",
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "A component name, with the state it opens in after a hash: deal#grid (STATE_MODEL rule 3)."
+                    },
+                    {
+                      "type": "object",
+                      "minProperties": 1,
+                      "maxProperties": 1,
+                      "additionalProperties": {
+                        "type": "object"
+                      },
+                      "description": "The envelope form: one key, the component, carrying its own view and data: { deal: { view: grid } }."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "object"
+              }
+            ]
+          },
+          "states": {
+            "type": "object",
+            "description": "CONTAINED substates: arrangements that exist only inside this state (e.g. a welcome landing inside the base). Never listed in the ladder. Each declares its drawing as a path (the <owner>-<sub> filename prefix survives as naming readability).",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "layout"
+              ],
+              "properties": {
+                "layout": {
+                  "type": "string",
+                  "description": "REQUIRED: this substate's drawing, as a root-relative path (e.g. layouts/page-reading)."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

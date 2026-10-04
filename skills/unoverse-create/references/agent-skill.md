@@ -13,7 +13,7 @@ skills/<skill-name>/           at the root of your org repo
 ```
 
 It is addressed `<org>/<skill-name>`. Only the platform's own universal skills live in
-`design/marketplace/skills/`, in the platform monorepo. To start from a working one, read
+`packages/marketplace/definitions/skills/`, in the platform monorepo. To start from a working one, read
 `sample-complaint-handling` in the public demo org repo,
 [acme](https://github.com/unoverse-orgs/acme), and copy it.
 
@@ -51,6 +51,6 @@ the line.
 
 `unoverse lint` inside your org repo (the org is declared, so it takes no argument), then
 push. Every universe pulls the org's repo ([Environments](https://docs.unoverse.ai/architecture/environments)).
-`unoverse deploy studio` still reaches your own universe until your universe runs a release with the Git sync. Lint checks every skill: the frontmatter parses, `name` matches
+`unoverse deploy studio` still reaches your own universe until the org is connected to its repo. Lint checks every skill: the frontmatter parses, `name` matches
 the folder, `description` is one line, `whenToUse` exists and does not repeat the
 description, the body is not empty. The universe rescans skills on deploy.

@@ -27,6 +27,7 @@ with a first commit, and the org's folders sit at its root:
     <Tree.Folder name={<><b>styles</b> <span className="tree-note">colour, type, spacing</span></>} defaultOpen />
     <Tree.Folder name={<><b>identity</b> <span className="tree-note">who the organisation is</span></>} defaultOpen />
     <Tree.Folder name={<><b>.github/workflows</b> <span className="tree-note">a pull-request check that runs unoverse lint</span></>} defaultOpen />
+    <Tree.Folder name={<><b>.vscode</b> <span className="tree-note">editor checks for every file you write</span></>} defaultOpen />
   </Tree.Folder>
 </Tree>
 
@@ -108,23 +109,36 @@ that split never blurs: discovery meta lives here and nowhere else.
 
 ## Catch mistakes as you type
 
-The schema at `design/_schema/unoverse.schema.json` marks an unknown primitive, a missing
-`whenToUse` or an illegal condition while you are still in the file. Wire it once through
-the YAML extension in `.vscode/settings.json`:
+Your editor can mark an unknown primitive, a missing `whenToUse` or an illegal condition
+while you are still in the file. `unoverse create` sets this up: the org repo's
+`.vscode/settings.json` maps each kind of file to a schema on this site.
+
+The checks need the YAML extension, `redhat.vscode-yaml`, which the repo recommends when
+you open it. These are the design entries the settings carry:
 
 ```jsonc
 {
   "yaml.schemas": {
-    "./design/_schema/unoverse.schema.json": [
-      "**/design/**/components/**/*.yaml",
-      "**/design/**/apps/**/*.yaml",
-      "**/design/**/atoms/*.yaml"
-    ]
+    "https://docs.unoverse.ai/schemas/design/unoverse.schema.json": [
+      "components/**/!(manifest).yaml",
+      "templates/**/!(manifest).yaml",
+      "apps/**/!(manifest).yaml",
+      "atoms/**/*.yaml"
+    ],
+    "https://docs.unoverse.ai/schemas/design/manifest.schema.json": [
+      "components/**/manifest.yaml",
+      "templates/**/manifest.yaml",
+      "apps/**/manifest.yaml"
+    ],
+    "https://docs.unoverse.ai/schemas/design/agent.schema.json": ["agents/*.yaml"]
   }
 }
 ```
 
-The schema file stays JSON because it is the schema, not a definition.
+A manifest has its own shape, so the definition schema skips files named `manifest.yaml`
+and the manifest schema checks them. The settings file is written once and never replaced.
+An org repo made before these entries existed gets the same checks when you paste them into
+its `yaml.schemas`.
 
 ## See it
 
@@ -142,7 +156,7 @@ This card has none, so it shows none.
 ## Ship it
 
 Commit and push to your org repo. Every universe connected to the repo pulls it
-([Environments](/architecture/environments)). Until your universe runs a release with the Git sync, you can still
+([Environments](/architecture/environments)). Until the org is connected to its repo, you can still
 send it to your own universe from the terminal:
 
 ```bash

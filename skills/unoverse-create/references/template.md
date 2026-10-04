@@ -50,7 +50,7 @@ Everything in the component playbook applies.
    (an Agent writes it) or `input: false` (drawn as designed), and describe every one.
 4. Write the manifest: title, description, `whenToUse`, category, version, and `binding`
    when a workflow works it. Nothing else. Quote any string holding a colon.
-5. `unoverse lint`, preview in **studio** at several widths, then commit and push to your org repo: every universe pulls it. `unoverse deploy studio` still reaches your own universe until your universe runs a release with the Git sync.
+5. `unoverse lint`, preview in **studio** at several widths, then commit and push to your org repo: every universe pulls it. `unoverse deploy studio` still reaches your own universe until the org is connected to its repo.
 
 ## Done means
 

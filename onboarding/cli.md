@@ -92,7 +92,7 @@ Two work wherever you are: `unoverse create` sets up an org repo, a universe or 
 | --- | --- |
 | `unoverse studio` | Launches **studio**, downloading it on first run. |
 | `unoverse lint` | Checks every component, app, skill, block and node in your org repo. Inside an org repo it takes no argument, because `unoverse.yaml` declares the org. The same check runs on every pull request and before a universe applies a commit. |
-| `unoverse deploy studio` | Lints your org repo, then sends it to your own universe, until your universe runs a release with the Git sync. Universes pull the org's repo ([Environments](/architecture/environments)). |
+| `unoverse deploy studio` | Lints your org repo, then sends it to your own universe, until the org is connected to its repo. Universes pull the org's repo ([Environments](/architecture/environments)). |
 | `unoverse login` | Signs in to a universe. `deploy studio` remembers the address in `unoverse.yaml`. |
 
 ### A universe

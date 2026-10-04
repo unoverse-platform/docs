@@ -112,7 +112,7 @@ repeated. If several components draw the same card, the card's style is written 
 composed with `Ref`:
 
 ```yaml
-# design/marketplace/atoms/card.yaml: the shape, once
+# packages/marketplace/definitions/atoms/card.yaml: the shape, once
 name: card
 root:
   type: Box

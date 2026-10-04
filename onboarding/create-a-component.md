@@ -245,7 +245,7 @@ Step through the workflow and the card renders live in the conversation, in your
 
 <Note>
 Nothing restarts. Push the component to your org repo, and every universe connected to it
-pulls the change: within seconds by webhook, within five minutes by polling. Until your universe runs a release with the Git sync, `unoverse deploy studio`
+pulls the change: within seconds by webhook, within five minutes by polling. Until the org is connected to its repo, `unoverse deploy studio`
 still sends your work to your own universe. [Environments](/architecture/environments)
 covers connecting a universe to the repo.
 </Note>

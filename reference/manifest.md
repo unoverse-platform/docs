@@ -7,8 +7,8 @@ The contract file beside a component or an app. Its presence is what makes the t
 discoverable, so an Agent can find it and open it.
 
 <div className="ref-source">
-Generated from <code>design/_schema/manifest.schema.json</code>, the same file the design
-lint validates against.
+Generated from <a href="https://docs.unoverse.ai/schemas/design/manifest.schema.json"><code>schemas/design/manifest.schema.json</code></a>,
+the same file your editor checks a manifest against as you type.
 </div>
 
 ## Example

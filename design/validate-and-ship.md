@@ -22,10 +22,10 @@ unoverse lint
 
 A pull request runs the same lint as a check. A universe connected to the repo picks up the push by
 webhook within seconds, by polling within five minutes, or with **Sync now**.
-[Environments](/architecture/environments) covers connecting a universe on the org page's
+[Connect a repo](/onboarding/connect-a-repo) covers connecting a universe on the org page's
 **Source** tab.
 
-Until your universe runs a release with the Git sync, you can still publish to your own universe from the
+Until the org is connected to its repo, you can still publish to your own universe from the
 terminal:
 
 ```bash
@@ -65,13 +65,18 @@ The rules themselves are taught where you use them:
 
 ## Caught as you type
 
-The schema at `design/_schema/unoverse.schema.json` validates every definition in your
-editor, before the lint ever runs. It is structural, with no false positives, and it flags
-a missing envelope field, an unknown primitive, a broken `Switch` or `Each`, and any
-condition beyond `eq`, `ne`, `in` and truthy.
+Your editor checks every definition before the lint ever runs, against
+[unoverse.schema.json](https://docs.unoverse.ai/schemas/design/unoverse.schema.json). The
+check is structural, with no false positives. It flags a missing envelope field, an unknown
+primitive, a broken `Switch` or `Each`, and any condition beyond `eq`, `ne`, `in` and truthy.
 
-Wire it once through the YAML extension, which [Quick start](/design/quick-start) covers in
-one snippet. Without it you meet these mistakes at publish rather than at the keystroke.
+Manifests are checked against
+[manifest.schema.json](https://docs.unoverse.ai/schemas/design/manifest.schema.json), and
+Agents against [agent.schema.json](https://docs.unoverse.ai/schemas/design/agent.schema.json).
+
+`unoverse create` maps all three in the org repo's `.vscode/settings.json`, and the YAML
+extension applies them. [Quick start](/design/quick-start) shows the mapping, for a repo made
+before it existed. Without it you meet these mistakes at publish rather than at the keystroke.
 
 ## What only you can judge
 

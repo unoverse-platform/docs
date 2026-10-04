@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/design/agent.schema.json",
+  "title": "Unoverse Agent",
+  "description": "An Agent: a workflow with no interface of its own, listed on the map so a conversation can reach for it (design/<org>/agents/<name>.yaml). The discovery meta plus the door: a canvas in the org, its Input Trigger, and the node whose output is the result. Every Agent is a native MCP tool. Editor guidance, not a gate: lint enforces the rules.",
+  "type": "object",
+  "required": ["type", "name", "whenToUse", "workflow", "trigger", "output"],
+  "properties": {
+    "type": { "const": "agent" },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "The file name, kebab-case. The tool's name on the wire."
+    },
+    "title": { "type": "string", "description": "Display name." },
+    "description": { "type": "string", "description": "What it is. One line, the listing subtitle." },
+    "whenToUse": { "type": "string", "description": "Selection text, in the customer's words: what they are trying to get done." },
+    "instructions": { "type": "string", "description": "What to do: the steps the Agent follows." },
+    "skills": { "type": "array", "items": { "type": "string" }, "description": "The skills the Agent needs, by name." },
+    "category": { "type": "string", "description": "The domain of the job, never the implementation." },
+    "version": { "type": "string" },
+    "message": { "type": "string", "description": "What the face says while the Agent runs." },
+    "app": {
+      "type": "string",
+      "pattern": "^unoverse://components/",
+      "description": "The face while it runs. Defaults to unoverse://components/agent-card; name a component only when the result deserves its own face."
+    },
+    "workflow": { "type": "string", "description": "The canvas id (wf-…), any canvas in the org." },
+    "trigger": { "type": "string", "description": "The Input Trigger node id." },
+    "output": { "type": "string", "description": "The node whose output is the Agent's result." }
+  }
+}

@@ -145,7 +145,7 @@ Don't mix them up. `.env` is local development on your laptop; production config
 
 ## Where your code lives
 
-**Not in this repo.** This repo operates the universe; everything you author lives in your org's own Git repo. `unoverse create` (choose **Studio**) makes it, with the org's folders at the root, and **studio** validates it as you work. Your universe pulls the org's repo: connect it on the org page's **Source** tab ([Environments](/architecture/environments)).
+**Not in this repo.** This repo operates the universe; everything you author lives in your org's own Git repo. `unoverse create` (choose **Studio**) makes it, with the org's folders at the root, and **studio** validates it as you work. Your universe pulls the org's repo: connect it on the org page's **Source** tab ([Connect a repo](/onboarding/connect-a-repo)).
 
 | You build | In your org repo | Guide |
 | --- | --- | --- |

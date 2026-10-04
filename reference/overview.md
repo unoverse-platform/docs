@@ -12,7 +12,7 @@ platform does not accept. They are regenerated whenever a schema changes.
 
 | | You write | Validated by |
 |---|---|---|
-| **Design** | `components/`, `apps/`, at the root of your org repo | `design/_schema/unoverse.schema.json` |
+| **Design** | `components/`, `apps/`, at the root of your org repo | [unoverse.schema.json](https://docs.unoverse.ai/schemas/design/unoverse.schema.json) and [manifest.schema.json](https://docs.unoverse.ai/schemas/design/manifest.schema.json) |
 | **Nodes** | `nodes/<name>/`, at the root of your org repo | the nine schemas at [schemas/nodes](https://docs.unoverse.ai/schemas/nodes/node.schema.json) |
 
 ## Not here yet
