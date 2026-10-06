@@ -66,7 +66,7 @@ of those phases can be re-run on their own: `unoverse deploy db` and `unoverse d
 
 The CLI reads the deploy target from your ground's rendered configuration and generates a temporary Ansible inventory on every run, so there is no inventory file to maintain.
 
-Your own work (nodes, design, prompts) never rides a deploy. It arrives through `unoverse deploy studio`, live immediately, or from the marketplace, one item at a time.
+Your own work (nodes, design, prompts) never rides a deploy. It arrives from your org's Git repo, live when the universe's sync applies the commit, or from the marketplace, one item at a time.
 
 ---
 

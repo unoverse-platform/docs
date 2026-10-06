@@ -9,7 +9,7 @@ What needs a restart, and what does not.
 
 | You changed | Do |
 |---|---|
-| A node, component, app, skill or block, through `unoverse deploy studio` | Nothing. It is live when the deploy finishes |
+| A node, component, app, skill or block, pushed to your org's Git repo | Nothing. It is live when the universe's sync applies the commit |
 | Something installed from the marketplace | Nothing. It is live when the install finishes |
 | The platform images | Update them, below |
 
@@ -60,7 +60,7 @@ docker compose exec -T unoverse node -e \
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
-| A deployed node or component is not in **canvas** | The deploy did not finish, or hit a lint error | Re-run `unoverse deploy studio` and read its output |
+| A pushed node or component is not in **canvas** | The sync has not applied the commit, or hit a lint error | Check the org's **Source** tab History, then press **Sync now** |
 | A component renders its old version | The browser cached it | Hard-refresh |
 | `nodes: 0` | unoverse did not load its packages | `unoverse logs unoverse` |
 

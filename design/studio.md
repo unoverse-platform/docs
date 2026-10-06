@@ -115,11 +115,11 @@ file edit and no restart, because you are only placing a node.
 
 Edit the definition, watch it in mock, prove it in live, then publish. Commit and push to
 your org repo, and every universe connected to it pulls the change
-([Environments](/architecture/environments)). Until the org is connected to its repo, you can still
-send it to your own universe:
+([Environments](/architecture/environments)).
 
 ```bash
-unoverse deploy studio
+unoverse lint
+git push
 ```
 
 Layouts, styles and copy refresh in the preview as you save, carried by the resource

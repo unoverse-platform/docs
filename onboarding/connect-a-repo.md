@@ -78,12 +78,13 @@ The steps are the same, and only where the secret goes changes.
 
 ## Test on your own machine
 
-A universe running on your laptop can follow a folder instead of a Git host. You commit, and
-the universe syncs that commit within a second, with no push, no key and no webhook.
+A universe running on your laptop can follow a folder instead of a Git host. Save a file, and
+the universe syncs it within a second, with no commit, no push, no key and no webhook. It runs
+the same checks first, so a file with an error is refused until you fix it.
 
 On the org's **Source** tab, enter the folder's full path as the repo, such as
-`/Users/you/orgs/acme`. A path starting with `~` is refused. The universe reads commits, not
-unsaved edits, so commit to try a change.
+`/Users/you/orgs/acme`. A path starting with `~` is refused. When your change is ready for other
+universes, commit and push it as usual.
 
 A deployed universe refuses a folder. Use a Git host for every universe other than your own.
 

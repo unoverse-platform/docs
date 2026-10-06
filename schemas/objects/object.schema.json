@@ -224,6 +224,20 @@
         ]
       }
     },
+    "matching": {
+      "type": "object",
+      "description": "How a name is matched to a row of this object (docs/unoverse/data/objects/entity-resolution.md, \"How an org declares it\"): ids decide, then any of its names as words, then a few candidates put to a judge. Every field is a prop of the object.",
+      "additionalProperties": false,
+      "required": ["names"],
+      "properties": {
+        "ids": { "type": "array", "items": { "type": "string" }, "minItems": 1, "description": "Fields whose equal value on both rows, compared as words, decides it is the same thing." },
+        "names": { "type": "array", "items": { "type": "string" }, "minItems": 1, "description": "The fields that hold its names; a mention matching any of them, as words, is this row." },
+        "remember": { "type": "string", "description": "One of names, a list: where a name confirmed by the judge or a person is added, so the next one matches at once." },
+        "evidence": { "type": "array", "items": { "type": "string" }, "description": "Fields shown to the judge beside each candidate, to tell like names apart." },
+        "ruleOut": { "type": "array", "items": { "type": "string" }, "description": "Fields that, filled on both and different as words, mean never the same thing." },
+        "judge": { "type": "string", "description": "The node that decides a name the rules leave open, choosing among the candidates or none (TypeSafeChoice). Absent, an open name goes to review." }
+      }
+    },
     "dataset": {
       "oneOf": [
         {

@@ -155,16 +155,15 @@ This card has none, so it shows none.
 
 ## Ship it
 
-Commit and push to your org repo. Every universe connected to the repo pulls it
-([Environments](/architecture/environments)). Until the org is connected to its repo, you can still
-send it to your own universe from the terminal:
+Check it, then commit and push to your org repo. Every universe connected to the repo pulls it
+([Environments](/architecture/environments)).
 
 ```bash
-unoverse login
-unoverse deploy studio
+unoverse lint
+git push
 ```
 
-Lint runs first and blocks on any error, so nothing broken reaches a universe. Once it
+The universe runs the same lint before it applies the commit, so nothing broken reaches it. Once it
 lands, your card is a node any workflow can use: open it in **studio**, click **Copy for
 Canvas**, and paste it onto a workflow with `Cmd+V`.
 

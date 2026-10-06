@@ -56,9 +56,8 @@ Outside a universe, that is the whole surface:
 
   [1mAfter that[0m
     [32mstudio[0m          Design components, nodes and agent skills
-    [32mlint[0m            Check your components, nodes and skills, the same way deploy does
-    [32mdeploy[0m          Ship it
-      [2mdeploy studio         your components, nodes and skills → your universe[0m
+    [32mlint[0m            Check your components, nodes and skills, the same way your universe does
+    [32mdeploy[0m          Put a universe on a cloud
       [2mdeploy aws            your universe → AWS[0m
       [2mdeploy digitalocean   your universe → DigitalOcean[0m
     [32mlogin[0m           Sign in to a universe (deploy asks by itself when needed)
@@ -92,8 +91,9 @@ Two work wherever you are: `unoverse create` sets up an org repo, a universe or 
 | --- | --- |
 | `unoverse studio` | Launches **studio**, downloading it on first run. |
 | `unoverse lint` | Checks every component, app, skill, block and node in your org repo. Inside an org repo it takes no argument, because `unoverse.yaml` declares the org. The same check runs on every pull request and before a universe applies a commit. |
-| `unoverse deploy studio` | Lints your org repo, then sends it to your own universe, until the org is connected to its repo. Universes pull the org's repo ([Environments](/architecture/environments)). |
-| `unoverse login` | Signs in to a universe. `deploy studio` remembers the address in `unoverse.yaml`. |
+| `unoverse login` | Signs in to a universe. With no address, it uses the universe your org repo's `unoverse.yaml` names. |
+
+Your work ships by `unoverse lint`, then a commit and a push to your org repo. Every universe connected to the repo pulls it ([Environments](/architecture/environments)).
 
 ### A universe
 

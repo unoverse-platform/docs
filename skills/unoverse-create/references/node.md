@@ -62,7 +62,7 @@ the platform is missing a capability: say so and stop, never reach for code.
    service. Keys come from the workspace `.env`, named from the credential and field in
    upper snake case with the trailing `Credential` dropped: `openAICredential.apiKey`
    is `OPENAI_API_KEY`. A node that lints but has never run is not done.
-7. Commit and push to your org repo: every universe pulls it. `unoverse deploy studio` still reaches your own universe until the org is connected to its repo.
+7. Commit and push to your org repo: every universe pulls it.
 
 ## Things that go wrong
 

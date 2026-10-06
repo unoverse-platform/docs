@@ -93,4 +93,4 @@ Access URLs:
 ## Next Steps
 
 - [database.md](/runbooks/database) - Configure database connection
-- Your own nodes, design, and prompts arrive through `unoverse deploy studio` or the marketplace, never through this deploy
+- Your own nodes, design, and prompts arrive through your org's Git repo or the marketplace, never through this deploy

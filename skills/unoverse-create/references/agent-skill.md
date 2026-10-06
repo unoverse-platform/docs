@@ -51,6 +51,6 @@ the line.
 
 `unoverse lint` inside your org repo (the org is declared, so it takes no argument), then
 push. Every universe pulls the org's repo ([Environments](https://docs.unoverse.ai/architecture/environments)).
-`unoverse deploy studio` still reaches your own universe until the org is connected to its repo. Lint checks every skill: the frontmatter parses, `name` matches
+Lint checks every skill: the frontmatter parses, `name` matches
 the folder, `description` is one line, `whenToUse` exists and does not repeat the
-description, the body is not empty. The universe rescans skills on deploy.
+description, the body is not empty. The universe rescans skills when its sync applies a commit.

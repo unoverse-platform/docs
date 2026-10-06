@@ -23,8 +23,7 @@ There is no server to start and no database to connect to, so it works offline.
 | Check it | `unoverse lint`, the same check every pull request runs |
 | Ship it | Commit and push to your org repo. Every universe connected to it pulls every node with your components and skills |
 
-A node is live in a universe's node library as soon as that universe's pull lands. Until the
-Git sync replaces it, `unoverse deploy studio` still sends your work to your own universe.
+A node is live in a universe's node library as soon as that universe's pull lands.
 A node type is one per platform, so a type another org already holds is refused.
 
 ## Editor help

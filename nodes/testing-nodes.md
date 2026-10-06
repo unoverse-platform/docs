@@ -62,7 +62,7 @@ unoverse lint
 It runs every static rule. An output nothing emits to, an events table out of connector
 order, a host missing from `allowedHosts`, a fixture that does not match the settings form:
 each message names the rule it broke. Every pull request runs the same check, and so
-does `unoverse deploy studio`, so a tick here is a tick there.
+does a universe before it applies a commit, so a tick here is a tick there.
 
 ## Keys stay yours
 

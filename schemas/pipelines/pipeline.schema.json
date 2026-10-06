@@ -125,6 +125,10 @@
               "const": true,
               "description": "The item MAY be one; the model says."
             },
+            "per": {
+              "const": "section",
+              "description": "Written after the document is cut, one read per stored piece of each named section, instead of in the document's first read."
+            },
             "parts": {
               "type": "object",
               "additionalProperties": {

@@ -18,6 +18,7 @@ platform, and nothing is pushed into a universe.
 
 ```bash
 unoverse lint
+git push
 ```
 
 A pull request runs the same lint as a check. A universe connected to the repo picks up the push by
@@ -25,24 +26,16 @@ webhook within seconds, by polling within five minutes, or with **Sync now**.
 [Connect a repo](/onboarding/connect-a-repo) covers connecting a universe on the org page's
 **Source** tab.
 
-Until the org is connected to its repo, you can still publish to your own universe from the
-terminal:
-
-```bash
-unoverse login
-unoverse deploy studio
-```
-
-`login` is a one-time browser sign-in to the universe you are publishing to, and publishing
-is a specific permission on your account.
+A change is live when the universe's sync applies the commit. The org's **Source** tab shows
+each commit in its History.
 
 Edits to something already published apply live. Anything brand new has to be published
 before a workflow can use it.
 
 ## What the lint checks
 
-The pull-request check and `deploy studio` both run the lint first and stop on any error,
-so nothing broken leaves your machine.
+The pull-request check and the universe's sync both run the lint first and stop on any error,
+so nothing broken reaches a universe.
 
 | Level | Means |
 |---|---|

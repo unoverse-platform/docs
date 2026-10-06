@@ -46,7 +46,6 @@ The block's reference name is the filename in camelCase: `markdown-guidelines.md
 ## Ship
 
 `unoverse lint` inside your org repo, then push: every universe pulls the org's repo.
-`unoverse deploy studio` still reaches your own universe until the org is connected to its repo.
 Lint checks every block: the
 frontmatter parses (quote a value that holds `: `), `name` and `description` are present,
 the filename is kebab-case, the body is not empty and references no other block.

@@ -155,7 +155,7 @@ Three checks and a workbench, each catching mistakes at a different moment:
 | Tool | When it runs | What it catches |
 |---|---|---|
 | **The schema** | As you type, through the [`redhat.vscode-yaml` extension](/onboarding/platform) | An unknown primitive, a missing field, an illegal condition |
-| **The lint** | At publish: `unoverse lint`, the pull-request check and `unoverse deploy studio` | Raw values, invented style keys, broken paths, tree violations. Zero errors to ship |
+| **The lint** | At publish: `unoverse lint`, the pull-request check and the universe's sync | Raw values, invented style keys, broken paths, tree violations. Zero errors to ship |
 | **The guards** | In the platform's own CI | The same rules, enforced again where you cannot drift past them |
 | **studio** | While you build | Renders every definition from its defaults, with one pill per external state |
 

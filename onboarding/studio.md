@@ -173,11 +173,6 @@ now** pulls at once. [Connect a repo](/onboarding/connect-a-repo) walks through 
 
 To undo a change, revert it in Git, and the universe follows.
 
-<Note>
-Until the org is connected to its repo, `unoverse deploy studio` sends the org's work to your
-universe from your terminal. It lints, shows a plan, and asks before sending.
-</Note>
-
 ## Set up your editor
 
 Everything you author is validated against a schema as you type, so a typo or an unknown

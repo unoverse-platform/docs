@@ -12,7 +12,7 @@ order: the stream log, then the state inspector, then the definition
 | Symptom | Cause | Fix |
 |---|---|---|
 | Renders blank, or shows defaults while data clearly streams | A `bind` does not match the streamed field name, or the prop has no default so partial data blanks it | Check the stream log for the actual delivered keys, align the `bind`, and give every prop a default |
-| Definition edits do nothing | The change touched the node contract, its props or discovery meta, so the published node is still the old one | Publish again by pushing to your org repo (or `unoverse deploy studio` to your own universe), then re-check |
+| Definition edits do nothing | The change touched the node contract, its props or discovery meta, so the published node is still the old one | Publish again by pushing to your org repo, then re-check once the universe's sync applies the commit |
 | An element is missing entirely | A primitive typo, or an invented primitive | The schema should have flagged it, so wire the schema ([Quick start](/design/quick-start)) and compose from the closed set |
 | A style is silently ignored | A raw value such as `12px`, or a token name that does not exist in your semantic set | Token names only. Check `styles/semantic/` in your org repo for the real name |
 | Right in one theme, broken in another | The definition references a base palette entry, or the theme is missing a token | Reference semantic names only, and run the theme-contract guard |

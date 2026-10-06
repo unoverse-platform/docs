@@ -57,11 +57,6 @@ flowchart LR
 
 To roll back, revert in Git, or point production at the previous tag.
 
-<Note>
-Until an org is connected to its repo, `unoverse deploy studio` sends its work to the universe
-directly.
-</Note>
-
 **Workflows are not in Git yet.** Moving one from UAT to production today means rebuilding it
 on the production **canvas**. Publishing a workflow to your repo is planned.
 

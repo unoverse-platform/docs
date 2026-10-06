@@ -199,13 +199,11 @@ commit and push to your org repo. Every universe connected to the repo pulls it,
 <span className="node-chip">Quote</span> is in the node library in **canvas** once the pull
 lands ([Environments](/architecture/environments)).
 
-Until the org is connected to its repo, you can still ship to your own universe from the terminal:
-
 ```bash
-unoverse deploy studio
+git push
 ```
 
-Deploy runs the same check first.
+The universe runs the same check before it applies the commit.
 
 </Step>
 <Step title="Use it in a workflow">

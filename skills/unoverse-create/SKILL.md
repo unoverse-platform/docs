@@ -92,8 +92,7 @@ unoverse lint
 ```
 
 Then commit and push. The org's universe pulls the repo, runs the same lint, and applies it;
-nothing goes if lint fails. Until the org is connected to its repo, `unoverse deploy studio`
-sends the work directly, after the same lint. Connecting is
+nothing goes if lint fails. Nothing is pushed into a universe directly. Connecting is
 [Connect a repo](https://docs.unoverse.ai/onboarding/connect-a-repo.md).
 Tell the developer where to look once it is live: the rendered thing is the deliverable, never
 the YAML alone.
