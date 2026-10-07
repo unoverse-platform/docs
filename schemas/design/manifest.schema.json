@@ -129,10 +129,14 @@
     },
     "binding": {
       "type": "object",
-      "description": "APPS: the workflow this app runs.",
+      "description": "APPS: the workflow this app runs, or the pipeline it hands its answers to.",
       "properties": {
         "workflow": {
           "type": "string"
+        },
+        "pipeline": {
+          "type": "string",
+          "description": "The org's pipeline the submit goes to, by name: its Input Trigger takes the answers (docs/unoverse/data/pipelines/README.md, collect)."
         },
         "trigger": {
           "type": "string"

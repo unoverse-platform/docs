@@ -159,7 +159,10 @@ The submit is the standard one, the same as any form's, and it is just the last 
 1. The person presses Enter. The page sends `submit` with the task's URI and every answer.
 2. The submit goes to whoever opened the task. An Agent that opened it from Spatial gets the
    answers as its tool call's result. A task with a `binding` has its own workflow called at
-   its trigger, with the task's URI and the answers, as the person.
+   its trigger, with the task's URI and the answers, as the person. A binding may name a
+   pipeline instead, `binding: { pipeline: <name> }`: the answers go to the pipeline's Input
+   Trigger, `POST /api/pipelines/<org>/<name>/execute` with the app's own org, and the run is
+   shown live in an agent-card, as a workflow task's is.
 3. The Task Runner in that call lays the answers over the saved row. If nothing is
    outstanding, it completes the row and fires `done` and `result`; if a field is still
    empty, it holds the step back and publishes it, and the page shows what is short.

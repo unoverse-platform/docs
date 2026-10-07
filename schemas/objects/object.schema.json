@@ -47,7 +47,8 @@
         "people",
         "product",
         "brand",
-        "document"
+        "document",
+        "observation"
       ],
       "description": "Which of the twelve elements of the vocabulary this object IS (docs/unoverse/data/objects/README.md, the table of kinds and elements): a classification, never a shape. The Spatial view's filters and the search toggles read it. Not inherited; the need declares none."
     },
@@ -235,7 +236,8 @@
         "remember": { "type": "string", "description": "One of names, a list: where a name confirmed by the judge or a person is added, so the next one matches at once." },
         "evidence": { "type": "array", "items": { "type": "string" }, "description": "Fields shown to the judge beside each candidate, to tell like names apart." },
         "ruleOut": { "type": "array", "items": { "type": "string" }, "description": "Fields that, filled on both and different as words, mean never the same thing." },
-        "judge": { "type": "string", "description": "The node that decides a name the rules leave open, choosing among the candidates or none (TypeSafeChoice). Absent, an open name goes to review." }
+        "judge": { "type": "string", "description": "The node that decides a name the rules leave open, choosing among the candidates or none (TypeSafeChoice). Absent, an open name goes to review." },
+        "createFrom": { "type": "array", "items": { "type": "string" }, "description": "The lines, by name (a document's about), whose name the judge is sure is no record held makes the record. A mention on any other line, or a name of one word, never does." }
       }
     },
     "dataset": {
