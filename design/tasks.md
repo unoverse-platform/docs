@@ -3,18 +3,21 @@ sidebarTitle: "Tasks"
 title: "Tasks"
 ---
 
-A task is a unit of interaction for a person: a form they fill, a deck they go through.
-A component, a template, an app or an Agent file IS the task. There is no separate task
-file: each keeps its own manifest as the single home of what it is for.
+Everything is a task: a form someone fills, a deck they go through, a micro-app with steps, a
+workflow, a pipeline. A component, a template, an app, a workflow's Task Start or a pipeline IS
+the task. There is no separate task file: each keeps its own manifest (or, for a workflow, its
+Task Start) as the single home of what it is for. Every task is an MCP task
+(`docs/mcp/MCP_TASKS.md`).
 
 **The switch makes it a task.** Every asset with a manifest carries an Available switch on
 its own lane in Studio. Switched on, it is offered to every canvas in the org and lands on
 the map in the `task` category. Nothing is written twice: the task reads its title,
 description and selection text from the asset's own manifest.
 
-**A task is named by its own URI**, everywhere: on the map, in the task table, in every
-hand-off. `unoverse://templates/unoverse/about-you` is the about-you task. "Task" is a
-category on the map, never part of an address.
+**A task is named by one URI**, everywhere: on the map, in the task table, in every hand-off,
+on MCP. `unoverse://tasks/unoverse/about-you` is the about-you task, whatever it is built from;
+written short, `unoverse/about-you`. The URI is an address, not a file: it points at the asset
+that is the task (`docs/mcp/MCP_TASKS.md` § 2a, ruled 2026-10-10).
 
 ## Every task has the same shape
 
@@ -25,7 +28,7 @@ a task, whatever it is for:
 |---|---|---|
 | **Steps** | The state tree: external states, with the steps nested inside them as internal state | `<name>.yaml`, `states:` |
 | **Props** | What is on each step. `input: true` means an Agent or a workflow fills it; `input: false` means it is drawn from its `default` | On the component, or on the parts a template holds |
-| **Input** | The workflow that works it | The meta: `binding: { workflow, trigger }` on a component, template or app manifest; `workflow`, `trigger` and `output` on an Agent file |
+| **Input** | The workflow or pipeline that works it | The meta: `binding: { workflow, trigger }` or `binding: { pipeline }` on a component, template or app manifest; for a workflow task, its own Task Start (the Input Trigger: name, input schema, result from) |
 | **Output** | What it hands back, when it hands anything back | `outputs:` on the envelope, sent by a button whose action ends in `type: submit` |
 
 Every task also carries the same discovery meta: `title`, `description` and `whenToUse`.
@@ -35,11 +38,17 @@ a person through a form are handed the same thing: the step on screen and its pr
 presenter's skill says what is on them; the application's skill asks for each `input: true`
 prop still empty. Nothing about the task itself says which it is.
 
-**An Agent is a task that runs its own steps.** It is loaded the same ways and takes the
-standard input (its Input Trigger's schema). Its steps are the nodes of its workflow: nobody
-else fills or moves them, and it reports its progress node by node on its card. It finishes
-as every task does, handing back its output. Its run is its state: it is not saved to the
-task table, so an Agent task cannot yet be picked up again.
+**A workflow or a pipeline is a task that runs its own steps.** It is loaded the same ways
+and takes the standard input (its Task Start's schema). Its steps are the nodes of its
+workflow: nobody else fills or moves them, and it reports its progress node by node on its
+card. It finishes as every task does, handing back its output. Its run is its state: it is
+not saved to the task table, so it cannot yet be picked up again after a restart
+(`docs/mcp/MCP_TASKS.md` step 11).
+
+**"Agent" no longer names a task.** Until 2026-10-10 an Agent file (`agents/*.yaml`) listed a
+workflow on the map. That job is Task Start's now, and "Agent" means someone who calls tasks:
+a role with instructions, ways to be reached and woken, memory, and the tasks it may call
+(PROPOSED, the coming Agents design).
 
 ## Where it shows
 
@@ -162,7 +171,8 @@ The submit is the standard one, the same as any form's, and it is just the last 
    its trigger, with the task's URI and the answers, as the person. A binding may name a
    pipeline instead, `binding: { pipeline: <name> }`: the answers go to the pipeline's Input
    Trigger, `POST /api/pipelines/<org>/<name>/execute` with the app's own org, and the run is
-   shown live in an agent-card, as a workflow task's is.
+   shown live in an agent-card, as any task that runs its own steps is. The pipeline is a task
+   in its own right too: called directly, it is started and followed the same way.
 3. The Task Runner in that call lays the answers over the saved row. If nothing is
    outstanding, it completes the row and fires `done` and `result`; if a field is still
    empty, it holds the step back and publishes it, and the page shows what is short.
@@ -193,7 +203,7 @@ The standard above is ruled. These parts of it are not yet true in the code:
 
 - **One name.** The page saves a task under its short name (`unoverse/about-you`), the Task
   Runner under what it was given, and map rows carry a `unoverse://tasks/` address. All
-  become the task's URI.
+  become `unoverse://tasks/<org>/<name>` (`docs/mcp/MCP_TASKS.md` § 2a, steps U1 to U9).
 - **Saved by URI.** A task loaded by URI is not saved today.
 - **Analytics decides saving.** The page saves a task, and its submit completes it, only when
   the manifest has an `analytics` action. The finish line (`outputs` and a submit) decides
@@ -203,7 +213,8 @@ The standard above is ruled. These parts of it are not yet true in the code:
   person's open attempt at the task's URI, and every step carries the attempt's id.
 - **Optional fields.** Whether a prop can be marked `required` is not checked; today every
   collected answer holds the step back.
-- **Agent tasks saved.** An Agent's run is not saved, so an Agent task cannot be resumed.
+- **Workflow tasks saved.** A workflow's or a pipeline's run is not saved, so it cannot be
+  resumed after a restart (`docs/mcp/MCP_TASKS.md` step 11).
 - **Its own events.** Today seven places in the conversation code send a task's events, the
   finish only when the manifest declares an `analytics` action, and memory keeps its own task
   rows beside the journey. A task run by the Task Runner on a page sends none, so Signal never
@@ -215,6 +226,9 @@ The standard above is ruled. These parts of it are not yet true in the code:
   calls the template's binding with the answers, and the Task Runner in that call finishes it;
   the wait is gone. Seen live on about-you: typed, no voice, Enter fired `done` and
   `result`. Not built for a task in an app or on the map.
+- **A page's task starting itself.** Built for a page's template (2026-10-10): a binding with
+  `autoTrigger: true` starts its task once as the page draws it, so a template that only shows
+  what its workflow reads fills without a press. Not yet seen live.
 - **Completing once.** Completing a row today clears it, and nothing stops two calls both
   firing `result`.
 - **The definition on every call.** A Task Runner loaded by id reads the saved answers but not
@@ -239,52 +253,28 @@ A task opens onto one of three doors:
 
 - **Interface.** A component or a template the customer completes on screen: a chooser, a
   form, a transfer, a page.
-- **Agent.** A workflow on a canvas, fired at its Input Trigger. Either a bare Agent (an
-  `agents/` file, below) or an app whose binding fires a workflow, an Agent with an
-  interface in front.
+- **Workflow.** A workflow on a canvas, fired at its Input Trigger (its Task Start), or an app
+  whose binding fires a workflow, a workflow with an interface in front. A pipeline is the same.
 - **MCP.** A tool on another system. Reserved.
 
-Every task is a native MCP tool. An interface renders and elicits over MCP. An Agent is a
+Every task is a native MCP tool. An interface renders and elicits over MCP. A workflow is a
 task-augmented tool: its call creates an MCP task, progress is the task's status, and the
 run's result is the tool's result. A task is done only when its door says so.
 
-## The Agent file
+## Agents
 
-A workflow with no interface has no manifest anywhere, so it is the one thing authored for
-the map alone: one file, `agents/<name>.yaml` at the root of your org repo.
+An Agent is not a task: it is who calls tasks. One shape for every Agent, a folder
+`agents/<name>/` holding `agent.yaml` and `SOUL.md`: its skills, character, model, daily budget,
+ways in (Spatial, Slack, email, its calendar) and the tasks it may call, each by its one URI
+(`unoverse://tasks/<org>/<name>`). An Agent lives in Spatial, so a person or another Agent finds
+it there and wakes it. How to write one: the `unoverse-create` skill's agent reference; the
+design: `docs/architecture/signal/AGENTS.md` in the platform repo.
 
-```yaml order-status.yaml
-type: agent
-name: order-status
-title: Order Status
-description: Answers a question about the customer's recent orders from their own order history.
-whenToUse: Where is my order, when will it arrive, what did I order last month. Questions about my own orders, answered from my account.
-category: Orders
-version: 1.0.0
-message: Checking your orders
-workflow: wf-acme-orders          # any canvas in the org
-trigger: inputtrigger1            # the Input Trigger that starts it
-output: answer                    # the node whose output is the result
-```
-
-| Field | What it is |
-|---|---|
-| `name` | The file name, kebab-case. The tool's name on the wire |
-| `title`, `description`, `whenToUse`, `category`, `version` | The same discovery meta every manifest carries, written to the [discoverability rules](/nodes/node-discoverability) |
-| `message` | What the face says while the Agent runs |
-| `workflow`, `trigger`, `output` | The door: the canvas id, the Input Trigger node id, and the node whose output is the result. All three, always |
-| `app` | The face while it runs. Default is the shared `unoverse://components/agent-card`; an Agent whose result deserves its own component names it |
-| `instructions`, `skills` | What to do, and the skills the Agent needs, by name. Optional |
-
-The Agent's input schema is not on the file. It is the Input Trigger's own Input Schema,
-declared on the canvas where the workflow starts. A trigger that declares none takes a
-single `message`.
-
-## What happens when an Agent is called
+## What happens when a workflow task is called
 
 1. A search surfaces the task row. The harness mints it as a tool.
 2. The caller calls it. The server creates an MCP task, pushes the face into the
-   conversation with the Agent's name and message, and fires the workflow at its trigger
+   conversation with the task's name and message, and fires the workflow at its trigger
    with the caller's own identity.
 3. As the run moves, the face shows the latest four steps: the one running now and the
    ones just before it. An older step drops off the top as a new one starts, and the count

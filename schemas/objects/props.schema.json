@@ -74,6 +74,12 @@
         "items": {
           "$ref": "#/definitions/items"
         },
+        "answeredBy": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "description": "The kinds of document that may answer this field (the reading document's choice, e.g. offering-memorandum). Each page of a document of one of these kinds is asked for the field while it is still empty, and a value stated is written with its page and words (docs/unoverse/data/pipelines/proved-before-built.md). On an object filled from documents, every input: true field names them."
+        },
         "reuse": {
           "type": "boolean",
           "description": "true: the read is shown the values this field already holds on the object's rows in the org, and gives one of them, spelled exactly, when it names the same thing. For a name many rows share: a subject, a series."

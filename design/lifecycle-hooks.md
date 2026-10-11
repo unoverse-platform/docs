@@ -27,6 +27,7 @@ Which hook you need follows from what the data is:
 |---|---|
 | The item's own stored record | `handler: getDetail`, and no code at all |
 | Something else, such as a live rating or a third-party lookup | Your own handler, with the calls in `<handler>.yaml` |
+| What a platform node reads, such as the people Signal holds | Your own handler whose calls name the node: [A task the template carries](#a-task-the-template-carries) |
 | Something the model already knows | Not a hook. Content the model authored is a prop, fed by the workflow |
 
 ## The two moments
@@ -216,6 +217,80 @@ A raw `<phase>.js` file beside the manifest is the older form, and the one case 
 for the phase. It still runs, for handlers that predate declared calls, but it is not the
 pattern to copy: a script does its own fetch to any host with a key read from the
 environment, and the calls runtime settles both of those questions once.
+
+## A task the template carries
+
+A template, or a component, can carry its own task: a hook whose calls run **nodes**, not
+only web requests. Drop the template on a page and it runs its task as it loads, as the
+person viewing it. No canvas, no workflow and no Update Task: the task is a YAML file in the
+template's own folder, and it travels with the template.
+
+A call names a node by its type and one of its methods, the methods an Agent sees when the
+node is attached to it. `params` is a plain object, or a `return` expression that can read
+`props` and every earlier call. On a web page, `props.today` holds the date and time the page
+asked, so a task can say what is new this week:
+
+<CodeGroup>
+
+```yaml manifest.yaml
+title: People in Signal
+description: Everyone Signal holds, prospects and customers, newest first.
+lifecycle:
+  - phase: onStart
+    handler: listPeople
+```
+
+```yaml listpeople.yaml
+# Everyone Signal holds, read as the person viewing the page.
+calls:
+  - name: signal
+    node: SignalPeople
+    method: list_people
+    params: { limit: 200 }
+
+# The template's own fields, by name.
+returns: >-
+  return {
+    people: calls.signal.people.map(p => ({ id: p.person_id, name: p.name, role: p.role })),
+    summary: calls.signal.people.length + ' people'
+  }
+```
+
+</CodeGroup>
+
+The page that shows it only marks where it goes, as for any template:
+
+```html
+<div data-unoverse-interface="acme/people-list"></div>
+```
+
+A page can hand the task values, such as the id in its own address, as a JSON object on the
+same element. The task reads them as `props.input`; the page still sends values only, never
+calls:
+
+```html
+<div data-unoverse-interface="acme/person-profile" data-unoverse-input='{"id":"per_36a8"}'></div>
+```
+
+**It runs as the viewer, so the node's own lock decides.** A node that requires a role
+(`auth` in its `node.yaml`, or the box's Require role on a canvas) refuses a viewer who
+does not carry it, exactly as it would on a canvas: Signal People answers only an admin. A
+refusal is the call's reply, `{ ok: false, error }`, which `returns` can read. A guest
+carries no roles, so a node that asks for one never runs for a guest.
+
+**The task lives in the repo, never in the page.** What runs is the YAML in the template's
+folder, which lint checked and the universe pulled with the rest of the org. A web page
+names the template; it cannot send calls of its own, so a signed-in visitor can never choose
+which node runs with the organisation's stored keys.
+
+**Web calls and node calls mix in one list,** in order, each seeing every call before it
+as `calls.<name>`. A web call still needs its host in `allowedHosts`; a node call does not,
+because the node's own package already declares the hosts it reaches.
+
+**Workflows stay for work that takes time.** A task that researches, waits for a reply or
+runs for minutes belongs on a canvas, and a template can still name one in its `binding`.
+A task that reads and shapes, such as a list, a count or a profile, belongs in the
+template.
 
 ## Next steps
 

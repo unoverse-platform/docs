@@ -931,9 +931,13 @@
               "$ref": "_defs.schema.json#/definitions/expression",
               "description": "The assistant's own words this turn, read per streamed event and concatenated - e.g. \"return response.choices[0].delta.content\". Keeps a preamble in the history; without it the model loses its own reasoning thread between turns."
             },
+            "thinking": {
+              "$ref": "_defs.schema.json#/definitions/expression",
+              "description": "The assistant's own reasoning this turn, read per streamed event and concatenated - e.g. \"return response.choices[0].delta.reasoning_content\". For a vendor that keeps its reasoning only when it is sent back (GLM's preserved thinking): the loop hands it to `assistant` as `thinking`, so the model continues its plan instead of rebuilding it every turn."
+            },
             "assistant": {
               "$ref": "_defs.schema.json#/definitions/expression",
-              "description": "The assistant's tool-call turn, built from `calls` and `text`. Its SHAPE is the vendor's: Chat Completions wants { role: 'assistant', content, tool_calls: [...] }."
+              "description": "The assistant's tool-call turn, built from `calls`, `text` and `thinking`. Its SHAPE is the vendor's: Chat Completions wants { role: 'assistant', content, tool_calls: [...] }, and a vendor that preserves reasoning takes it back on the same message."
             }
           }
         }

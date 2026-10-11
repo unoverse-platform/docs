@@ -237,7 +237,37 @@
         "evidence": { "type": "array", "items": { "type": "string" }, "description": "Fields shown to the judge beside each candidate, to tell like names apart." },
         "ruleOut": { "type": "array", "items": { "type": "string" }, "description": "Fields that, filled on both and different as words, mean never the same thing." },
         "judge": { "type": "string", "description": "The node that decides a name the rules leave open, choosing among the candidates or none (TypeSafeChoice). Absent, an open name goes to review." },
+        "link": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["node"],
+          "description": "The node that scores the name against each candidate's names before the judge (Splink on Beam): sure the same, linked; sure different, none; between, the judge.",
+          "properties": { "node": { "type": "string", "minLength": 1 }, "config": { "type": "object" } }
+        },
+        "review": { "type": "object", "additionalProperties": false, "required": ["node"], "description": "The node that looks last at every name a run left open, with what the documents say where the name is used (OpenAIDecision): sure, it decides as a person would, with Undo; not sure, the name stays open for a person. Absent, the judge looks.", "properties": { "node": { "type": "string", "minLength": 1 }, "config": { "type": "object" } } },
         "createFrom": { "type": "array", "items": { "type": "string" }, "description": "The lines, by name (a document's about), whose name the judge is sure is no record held makes the record. A mention on any other line, or a name of one word, never does." }
+      }
+    },
+    "extract": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "How a page reader picks this object out of a page (pipelines README, \"Or read by a node\"): plain instructions and worked examples, handed to the read node beside the template made from the object's input props.",
+      "properties": {
+        "instructions": { "type": "string", "description": "What to take and what to leave, in plain words: what this object is, and what it is not." },
+        "never": { "type": "array", "items": { "type": "string" }, "description": "Words that are never a name on their own: a name made only of these (\"Voting Shares\", \"Custodians\") is no record. A name with any other word stays." },
+        "examples": {
+          "type": "array",
+          "description": "Worked examples: a piece of text, and the right answer for it, a list of this object's input fields. An empty answer shows what to leave.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["text", "answer"],
+            "properties": {
+              "text": { "type": "string" },
+              "answer": { "type": "array", "items": { "type": "object" } }
+            }
+          }
+        }
       }
     },
     "dataset": {

@@ -193,7 +193,9 @@ options:
 </ResponseField>
 
 <ResponseField name="Markdown">
-Renders markdown, for text an Agent wrote rather than text you laid out.
+Renders markdown, for text an Agent wrote rather than text you laid out. A link to another
+site opens in a new tab; a link to a path on the same site (`/signal/person/?id=…`) opens in
+place, the page's own next view.
 
 ```yaml
 type: Markdown

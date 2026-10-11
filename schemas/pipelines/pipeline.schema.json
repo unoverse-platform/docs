@@ -126,8 +126,19 @@
               "description": "The item MAY be one; the model says."
             },
             "per": {
-              "const": "section",
-              "description": "Written after the document is cut, one read per stored piece of each named section, instead of in the document's first read."
+              "const": "page",
+              "description": "Written once the document's pages are kept, one read per page, instead of in the document's first read (page-store.md: no sections)."
+            },
+            "read": {
+              "type": "object",
+              "required": ["node"],
+              "additionalProperties": false,
+              "description": "With per: page, the node that reads the pages for this object: handed the chunks that name it, with a template made from its input props (pipelines README, Or read by a node).",
+              "properties": {
+                "node": { "type": "string", "minLength": 1 },
+                "config": { "type": "object" },
+                "chunks": { "oneOf": [{ "type": "integer", "minimum": 1 }, { "const": "all" }], "description": "How many of the document's chunks it is handed: the best few by the object's words (default 4), or all of them." }
+              }
             },
             "parts": {
               "type": "object",

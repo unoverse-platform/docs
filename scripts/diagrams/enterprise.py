@@ -1,9 +1,10 @@
 """Regenerates both enterprise diagrams from one frame, so they cannot drift apart:
-images/architecture-kubernetes.svg (one copy) and images/architecture-active-active.svg (two zones).
+images/architecture-kubernetes.svg (one copy) and images/architecture-active-active.svg (three zones).
 Run from packages/docs: python3 scripts/diagrams/enterprise.py
 
 Everything outside the unoverse namespace is drawn once, here, for both. Only the namespace
-differs. The numbers mean the same thing on both; 9 exists only on the two-zone one.
+differs. The numbers mean the same thing on both; 9 and the disaster-recovery copy exist only
+on the three-zone one.
 """
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
@@ -51,36 +52,50 @@ def one_copy(NX):
     return dict(parts=b, NW=NW, into=[(SXX,R1)], out=(SXX+IW,R1),
                 keys=(VKX,DW,DATA_Y+dh), backup=(PGX,DW,DATA_Y+dh))
 
-def two_zones(NX):
+def three_zones(NX):
+    """Zones A and B each carry the full application and one copy of the data; zone C holds
+    the third Postgres copy, the Valkey vote and Spatial ML, so no machine is the only home
+    of anything that stops service."""
     b = []
     ZH = 152; ZA_Y = R1 - 59; ZB_Y = ZA_Y + ZH + 20
     ZB_R1 = ZB_Y + 59
-    HALF = 200; ZW = 2*HALF + 16 + 36; ZX = NX + 18
-    SBW, SGAP = 232, 56
-    SX = ZX + ZW + 48; SW = 18 + SBW + SGAP + SBW + 18
-    NW = (SX + SW + 18) - NX
+    COLW, G = 210, 16; ZW = 3*COLW + 2*G + 36; ZX = NX + 18
+    C3 = ZX + 18 + 2*(COLW + G)                     # the data column inside zones A and B
+    ZC = [("Spatial ML",["one copy · restarts in A or B","models in backup storage"],None),
+          ("Valkey · vote",["decides which copy is main","holds no data"],"database"),
+          ("Postgres · copy 3",["live copy","backups are taken here"],"postgres")]
+    SBW = max(fitbox(0,0,t,s,lg)[1] for t,s,lg in ZC)
+    CX = ZX + ZW + 48; CW = 18 + SBW + 18
+    NW = (CX + CW + 18) - NX
     b.append(boundary(NX,TOP,NW,NS_BOT-TOP,"unoverse · Unoverse-managed application",CELL,dash="4 4",bg="#fafafc"))
+    DATA = {ZA_Y: [("Valkey · main","live events · routing","database"),
+                   ("Postgres · primary","takes every write","postgres")],
+            ZB_Y: [("Postgres · standby","live copy · takes over","postgres"),
+                   ("Valkey · standby","automatic failover","database")]}
     for zy, name in [(ZA_Y,"Zone A · machine 1 · active"),(ZB_Y,"Zone B · machine 2 · active")]:
         r1, r2 = zy + 59, zy + 113
         b.append(boundary(ZX,zy,ZW,ZH,name,K,dash="4 4",bg="#ffffff"))
         sx = ZX + 18
-        b.append(svc(sx,r1-RH/2,HALF,"unoverse","API · MCP · engine · nodes","public",h=RH))
-        b.append(svc(sx+HALF+16,r1-RH/2,HALF,"Canvas","the app users work in","public",h=RH))
-        b.append(svc(sx,r2-RH/2,HALF,"Memory","profiles and tasks","internal",h=RH))
-        b.append(svc(sx+HALF+16,r2-RH/2,HALF,"Documents","reads and parses files · early","internal",h=RH))
-    b.append(text(ZX, NS_BOT-18, "Either zone alone carries the full load: a zone can be lost without stopping service.", 11.5, 400, MUTE))
+        b.append(svc(sx,r1-RH/2,COLW,"unoverse","API · MCP · engine · nodes","public",h=RH))
+        b.append(svc(sx+COLW+G,r1-RH/2,COLW,"Canvas","the app users work in","public",h=RH))
+        b.append(svc(sx,r2-RH/2,COLW,"Memory","profiles and tasks","internal",h=RH))
+        b.append(svc(sx+COLW+G,r2-RH/2,COLW,"Documents","reads and parses files · early","internal",h=RH))
+        for (t,s,lg), r in zip(DATA[zy], (r1, r2)):
+            b.append(svc(C3,r-RH/2,COLW,t,s,"internal",lg,h=RH))
+    # 9 the primary in zone A streams every write to the standby directly below it in zone B
+    PX9 = C3 + COLW/2
+    b.append(edge([(PX9,ZA_Y+113+RH/2),(PX9,ZB_Y+59-RH/2)])); b.append(step(PX9+20,ZA_Y+ZH+10,9))
+    b.append(text(ZX, NS_BOT-18, "Zone A or B alone carries the full load. Losing zone C pauses only Spatial ML.", 11.5, 400, MUTE))
     S_Y, S_BOT = ZA_Y, ZB_Y + ZH
-    b.append(boundary(SX,S_Y,SW,S_BOT-S_Y,"Shared by both zones · machine 3",GREY,dash="4 4",bg="#ffffff"))
-    ROW1 = S_Y + 30 + ((S_BOT - S_Y - 30) - (2*dh + 24)) / 2; ROW2 = ROW1 + dh + 24
-    LX, RX = SX + 18, SX + 18 + SBW + SGAP
-    b.append(fitbox(LX,ROW1,"Spatial ML",["one shared copy","models in backup storage"],None,minw=SBW)[0])
-    b.append(fitbox(RX,ROW1,"Valkey (Redis)",["main + automatic standby","routes each conversation"],"database",minw=SBW)[0])
-    b.append(fitbox(LX,ROW2,"Postgres · standby",["in zone B · live copy","takes over in minutes"],"postgres",minw=SBW)[0])
-    b.append(fitbox(RX,ROW2,"Postgres · primary",["in zone A","takes every write"],"postgres",minw=SBW)[0])
-    PY = ROW2 + dh/2
-    b.append(edge([(RX,PY),(LX+SBW,PY)])); b.append(step(LX+SBW+SGAP/2,PY-18,9))
+    b.append(boundary(CX,S_Y,CW,S_BOT-S_Y,"Zone C · machine 3",K,dash="4 4",bg="#ffffff"))
+    GAP = 20
+    ROW1 = S_Y + 34 + ((S_BOT - S_Y - 34) - (3*dh + 2*GAP)) / 2
+    LX = CX + 18
+    for i, (t,s,lg) in enumerate(ZC):
+        b.append(fitbox(LX,ROW1+i*(dh+GAP),t,s,lg,minw=SBW)[0])
+    PG3 = ROW1 + 2*(dh+GAP)
     return dict(parts=b, NW=NW, into=[(ZX+18,R1),(ZX+18,ZB_R1)], out=(NX+NW,R1),
-                keys=(LX,SBW,S_BOT), backup=(RX,SBW,ROW2+dh))
+                keys=(C3,COLW,S_BOT), backup=(LX,SBW,PG3+dh), dr=True)
 
 # ── The frame, the same for both ──
 
@@ -162,7 +177,16 @@ def draw(cell_fn, title, cluster_label, provide, sizing, out_path):
              ("Core systems",["integrations through nodes"]),
              ("Security logs",["audit trail · enterprise SIEM"])]
     RW_ = w_of(RIGHT, 240)
-    ENT_R = RCX + RW_ + 22
+    # Keys and backup sit centred under the box their arrow meets.
+    KX, KW, KTOP = cell["keys"]; PGX, PGW, PBOT = cell["backup"]
+    KC = KX + KW/2; PC = PGX + PGW/2
+    ks, kw, _ = fitbox(0,BOT_Y,"Keys and secrets",["held in the enterprise vault"],None,minw=KW)
+    bs, bw, _ = fitbox(0,BOT_Y,"Backup storage",["continuous · encrypted"],None,minw=PGW)
+    KBX, BBX = KC - kw/2, PC - bw/2
+    DR = ("Disaster recovery", ["second region · RPO 5 min · RTO 1 hour"])
+    DRX = BBX + bw + 112
+    drw = fitbox(0,0,*DR)[1] if cell.get("dr") else 0
+    ENT_R = max(RCX + RW_, DRX + drw) + 22
     ENT_BOT = BOT_Y + bh + 22
 
     b.append(boundary(EX,ENT_Y,ENT_R-EX,ENT_BOT-ENT_Y,"Enterprise environment · customer-managed",ENT))
@@ -175,10 +199,13 @@ def draw(cell_fn, title, cluster_label, provide, sizing, out_path):
     for (t,s),cy in zip(RIGHT,RIGHT_YS):
         b.append(fitbox(RCX,cy-bh/2,t,s,None,minw=RW_)[0])
 
-    KX, KW, KTOP = cell["keys"]; PGX, PGW, PBOT = cell["backup"]
-    b.append(fitbox(KX,BOT_Y,"Keys and secrets",["held in the enterprise vault"],None,minw=KW)[0])
-    b.append(fitbox(PGX,BOT_Y,"Backup storage",["continuous · encrypted"],None,minw=PGW)[0])
-    BNX = PX; BNW = KX - 28 - BNX
+    b.append(fitbox(KBX,BOT_Y,"Keys and secrets",["held in the enterprise vault"],None,minw=KW)[0])
+    b.append(fitbox(BBX,BOT_Y,"Backup storage",["continuous · encrypted"],None,minw=PGW)[0])
+    if cell.get("dr"):
+        # the backup is copied to a second region, where a standby cell restores from it
+        b.append(fitbox(DRX,BOT_Y,*DR)[0])
+        b.append(edge([(BBX+bw,BOT_Y+bh/2),(DRX,BOT_Y+bh/2)],"copied",lx=BBX+bw+56,ly=BOT_Y+bh/2))
+    BNX = PX; BNW = KBX - 28 - BNX
     b.append(f'<rect x="{BNX}" y="{BOT_Y}" width="{BNW}" height="{bh}" rx="10" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1.5"/>')
     b.append(text(BNX+18, BOT_Y+25, "No inbound connection from Unoverse. No standing vendor access.", 13, 600, "#4c1d95"))
     b.append(text(BNX+18, BOT_Y+43, "Model calls go through the enterprise AI gateway. Other outbound calls only to an approved list.", 12.5, 400, "#5b21b6"))
@@ -205,7 +232,6 @@ def draw(cell_fn, title, cluster_label, provide, sizing, out_path):
     for y,n in zip(RIGHT_YS,[2,4,5,7]):
         b.append(step((BUSX+RCX)/2+2,y,n))
     # keys up into the cell, 8 backups down out of it
-    KC = KX + KW/2; PC = PGX + PGW/2
     b.append(edge([(KC,BOT_Y),(KC,KTOP)]))
     b.append(edge([(PC,PBOT),(PC,BOT_Y)])); b.append(step(PC+18,(CL_BOT+BOT_Y)/2+2,8))
 
@@ -257,23 +283,129 @@ draw(one_copy, "unoverse: single box",
       + [("Cloud cost", "AWS or Azure, about $290 a month · about $190 with a 1-year commitment")],
       SERVICES),
      "images/architecture-kubernetes.svg")
-draw(two_zones, "unoverse: active-active, two zones",
-     "Kubernetes · 3 machines across 2 zones · each 8 vCPU · 32 GB RAM · 200 GB SSD · encrypted at rest",
-     [("3 machines, 2 zones", "each 8 vCPU · 32 GB RAM · 200 GB SSD"),
-      ("Load balancer", "WebSockets, 1-hour idle timeout")] + COMMON,
-     ([("3 machines, both zones up", "10 to 20 turns a second · about 40,000 to 70,000 an hour"),
-       ("One zone lost", "5 to 10 turns a second · service continues"),
+draw(three_zones, "unoverse: active-active, three zones",
+     "Kubernetes · 3 machines across 3 zones · each 8 vCPU · 32 GB RAM · 200 GB SSD · encrypted at rest",
+     [("3 machines, 3 zones", "each 8 vCPU · 32 GB RAM · 200 GB SSD"),
+      ("Load balancer", "WebSockets, 1-hour idle timeout"),
+      ("Second region", "1 machine and a backup copy, for disaster recovery")] + COMMON,
+     ([("All 3 zones up", "10 to 20 turns a second · about 40,000 to 70,000 an hour"),
+       ("Zone A or B lost", "5 to 10 turns a second · service continues"),
+       ("Zone C lost", "Spatial ML restarts in A or B within minutes · service continues"),
        ("In progress", "about 100 to 200 turns at once"),
        ("People", "about 600 to 1,200 chatting actively · thousands signed in"),
        ("To grow", "each extra machine adds 5 to 10 turns a second")] + LASTING
-      + [("Cloud cost", "AWS or Azure, about $950 to $1,000 a month · $650 to $700 with a 1-year commitment")],
+      + [("Cloud cost", "AWS or Azure, about $950 to $1,000 a month · $650 to $700 with a 1-year commitment"),
+         ("Disaster recovery", "about $290 a month more · about $190 with a 1-year commitment")],
       [("SERVICE", "MEMORY", "DISK", "MACHINE"),
        ("unoverse", "1 to 4 GB", "none", "1 and 2"),
        ("Memory", "0.25 to 1 GB", "none", "1 and 2"),
        ("Canvas", "0.03 to 0.25 GB", "none", "1 and 2"),
        ("Documents (early)", "1 to 6 GB", "10 GB", "1 and 2"),
+       ("Valkey", "0.06 to 0.5 GB", "2 GB", "1 and 2 · vote on 3"),
+       ("Postgres", "0.5 to 2 GB", "10 GB and up", "1, 2 and 3"),
        ("Spatial ML", "0.5 to 4 GB", "5 GB", "3"),
-       ("Valkey", "0.06 to 0.5 GB", "2 GB", "3"),
-       ("Postgres", "0.5 to 2 GB", "10 GB and up", "each copy"),
-       ("Total per zone", "2.3 to 11.3 of 32 GB", "10 GB")]),
+       ("Total, machine 1 or 2", "2.8 to 13.8 of 32 GB", "22 GB and up"),
+       ("Total, machine 3", "1 to 6 of 32 GB", "15 GB and up")]),
      "images/architecture-active-active.svg")
+
+# ── Environments: the same release in every environment, promoted left to right ──
+
+def environments(out_path):
+    """images/architecture-environments.svg: DEV, UAT, PROD and DR, how a release reaches each,
+    and how content moves. Machine sizes and costs are the ones on the two diagrams above."""
+    b = []; T = 96
+    ENV_T = T + 64                               # top of every environment
+    GAP = 140                                    # room for a label between boxes
+    M1 = ENV_T + 40                              # first machine's top
+    AY = M1 + dh/2                               # the row a release travels along
+
+    REL = ("Release", ["signed chart and images"])
+    UW = w_of([REL], 220)
+    b.append(boundary(24, AY-dh/2-48, UW+36, dh+66, "Unoverse (vendor)", GREY, dash="4 4"))
+    b.append(fitbox(42, AY-bh/2, *REL, None, minw=UW)[0])
+    UR = 42 + UW
+
+    EX = UR + 120
+    REG = ("Registry and GitOps", ["mirror of our release", "approves each upgrade"])
+    RGX = EX + 22; RGW = w_of([REG], 220)
+    MACH = {"DEV":  [("One machine", ["every service · one copy", "own database, keys and address"])],
+            "UAT":  [("One machine", ["every service · one copy", "own database, keys and address"])],
+            "PROD": [("Zone A · machine 1", ["the full application", "Postgres primary · Valkey main"]),
+                     ("Zone B · machine 2", ["the full application", "Postgres standby · Valkey standby"]),
+                     ("Zone C · machine 3", ["Spatial ML", "Postgres copy 3 · Valkey vote"])],
+            "DR":   [("Standby machine", ["restored from continuous backup", "RPO 5 min · RTO 1 hour"])]}
+    ORG = ("Org repo", ["workflows and content", "reviewed like code"])
+    MW = max(fitbox(0,0,t,s)[1] for ms in MACH.values() for t,s in ms)
+    EW = MW + 36
+    DEVX = RGX + RGW + GAP; UATX = DEVX + EW + GAP; PRODX = UATX + EW + GAP
+    LABEL = {"DEV": "DEV · 1 machine", "UAT": "UAT · 1 machine",
+             "PROD": "PROD · 3 machines, 3 zones", "DR": "DR · second region · 1 machine"}
+
+    def env(x, y, key):
+        ms = MACH[key]; h = 40 + len(ms)*dh + (len(ms)-1)*14 + 18
+        b.append(boundary(x, y, EW, h, LABEL[key], K, dash="4 4", bg="#fafafc"))
+        for i, (t, s) in enumerate(ms):
+            b.append(fitbox(x+18, y+40+i*(dh+14), t, s, None, minw=MW)[0])
+        return h
+
+    env(DEVX, ENV_T, "DEV"); env(UATX, ENV_T, "UAT")
+    PH = env(PRODX, ENV_T, "PROD")
+    DR_T = ENV_T + PH + 72
+    DRH = env(PRODX, DR_T, "DR")
+    DEVH = 40 + dh + 18
+
+    # content: authored in DEV, saved to the org repo, pulled by UAT (main) and PROD (tags)
+    ORG_T = ENV_T + DEVH + 72; OY = ORG_T + dh/2
+    b.append(fitbox(DEVX+18, ORG_T, *ORG, None, minw=MW)[0])
+
+    ENT_R = PRODX + EW + 22
+    NOTE_T = DR_T + DRH - bh
+    ENT_BOT = NOTE_T + bh + 22
+    b.insert(0, boundary(EX, T, ENT_R-EX, ENT_BOT-T, "Enterprise environment · customer-managed", ENT))
+    b.append(fitbox(RGX, AY-dh/2, *REG, None, minw=RGW)[0])
+
+    # the release: pulled, then promoted one environment at a time
+    b.append(edge([(UR,AY),(RGX,AY)], "pulled · signed", lx=(UR+RGX)/2, ly=AY, dashed=True))
+    for (x0, x1), label in zip([(RGX+RGW, DEVX), (DEVX+EW, UATX), (UATX+EW, PRODX)],
+                               ["every release", "approved", "passed UAT"]):
+        b.append(edge([(x0,AY),(x1,AY)], label, lx=(x0+x1)/2, ly=AY))
+    PC = PRODX + EW/2
+    b.append(edge([(PC, ENV_T+PH),(PC, DR_T)], "continuous backup", lx=PC, ly=(ENV_T+PH+DR_T)/2))
+
+    DC = DEVX + EW/2; UC = UATX + EW/2
+    b.append(edge([(DC, ENV_T+DEVH),(DC, ORG_T)], "save to repo", lx=DC, ly=(ENV_T+DEVH+ORG_T)/2))
+    b.append(f'<path d="M{DEVX+18+MW} {OY} L{UC} {OY}" fill="none" stroke="{EDGE}" stroke-width="1.6"/>')
+    b.append(edge([(UC,OY),(UC,ENV_T+DEVH)], "main", lx=UC, ly=(OY+ENV_T+DEVH)/2))
+    b.append(edge([(UC,OY),(PRODX,OY)], "release tags", lx=(UATX+EW+PRODX)/2, ly=OY))
+
+    b.append(f'<rect x="{RGX}" y="{NOTE_T}" width="{UATX+EW-RGX}" height="{bh}" rx="10" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1.5"/>')
+    b.append(text(RGX+18, NOTE_T+25, "Data never moves between environments. Each has its own database, keys and address.", 13, 600, "#4c1d95"))
+    b.append(text(RGX+18, NOTE_T+43, "Every environment runs a version the enterprise approved. Content moves only through the org repo.", 12.5, 400, "#5b21b6"))
+
+    # the table: what each environment is, and what it costs
+    ROWS = [("ENVIRONMENT", "MACHINES", "EACH MACHINE", "UPDATES", "COST A MONTH"),
+            ("DEV", "1", "8 vCPU · 32 GB RAM · 200 GB SSD", "every release, automatically", "about $290"),
+            ("UAT", "1", "8 vCPU · 32 GB RAM · 200 GB SSD", "a release the enterprise approves · org repo main", "about $290"),
+            ("PROD", "3, across 3 zones", "8 vCPU · 32 GB RAM · 200 GB SSD", "the release that passed UAT · org repo tags", "about $950 to $1,000"),
+            ("DR", "1, second region", "8 vCPU · 32 GB RAM · 200 GB SSD", "PROD's version · restored from backup", "about $290"),
+            ("Total", "6", "", "", "about $1,850")]
+    PY = ENT_BOT + 20; LH = 22; ph = 46 + len(ROWS)*LH + 30
+    b.append(f'<rect x="{EX}" y="{PY}" width="{ENT_R-EX}" height="{ph}" rx="10" fill="#ffffff" stroke="{ENT}" stroke-width="1.5"/>')
+    b.append(text(EX+18, PY+28, "ENVIRONMENTS · AWS OR AZURE · EXCLUDES AI USAGE", 11.5, 700, ENT, ls=1.2))
+    cols = [EX+18, EX+150, EX+330, EX+600, EX+980]
+    for i, row in enumerate(ROWS):
+        cy = PY + 54 + i*LH
+        for j, cell in enumerate(row):
+            if i == 0:
+                b.append(text(cols[j], cy, cell, 11, 700, MUTE, ls=0.6))
+            else:
+                bold = j == 0 or row[0] == "Total"
+                b.append(text(cols[j], cy, cell, 12.5, 700 if bold else 400, INK if bold else MUTE))
+    b.append(text(EX+18, PY+54+len(ROWS)*LH+8, "With a 1-year commitment, about $1,250 a month. DEV and UAT can be smaller (4 vCPU · 16 GB) or stopped out of hours.", 12.5, 400, MUTE))
+
+    W = ENT_R + 26; H = PY + ph + 26
+    pathlib.Path(out_path).write_text(
+      page(W, H, "unoverse: environments", "kubernetes", K, "".join(b), symbols(["kubernetes"])))
+    print("wrote", out_path, W, H)
+
+environments("images/architecture-environments.svg")

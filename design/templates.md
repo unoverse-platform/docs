@@ -120,11 +120,11 @@ opens in the place that state names, laid over the template. Its ✕ writes `gri
 back in its spot. The template never holds the component's fields in its `values:`, and
 never gives it a step of its own to open into.
 
-<Warning>
-**Not built yet.** Today a component placed in a template is drawn flat, with no state of its
-own. Until it is built, a set of things that each open is shown as top-level components in a
-place that holds many.
-</Warning>
+<Note>
+**Where the opened one goes.** In an app, a held component opens in the place its state names,
+laid over the template. Where there is no such place, as in **studio** or on a web page, it
+opens in its own spot inside the template.
+</Note>
 
 ## Writing into a part
 
@@ -331,6 +331,23 @@ A template that a workflow works names it in the same manifest, the field an app
 
 ```yaml
 binding: { workflow: wf-acme-site, trigger: inputtrigger1 }
+```
+
+A template that only shows what a node reads, such as a list of people, needs no workflow:
+it carries its own task, a YAML file in its folder that calls the node as the viewer when it
+loads ([Lifecycle hooks: a task the template carries](/design/lifecycle-hooks#a-task-the-template-carries)).
+
+On a web page, a workflow fills the template with the Update Task node: values keyed by a
+part's name fill that part, and a value whose key names no part fills the template's own prop
+of that name, such as the list a template holds.
+
+A template placed on a web page can start its own task as the page draws it. Add
+`autoTrigger: true` to the binding and the workflow runs once, on load, with nothing to press:
+the right shape for a template that only shows what a workflow reads, such as a list filled
+from a store. Without it, the task waits for the visitor.
+
+```yaml
+binding: { workflow: wf-acme-site, trigger: inputtrigger2, autoTrigger: true }
 ```
 
 ## Next steps

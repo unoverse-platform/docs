@@ -108,7 +108,7 @@ APPS: the transport the app needs, e.g. voice.
 </ResponseField>
 
 <ResponseField name="autoTrigger" type="boolean">
-Whether the app fires its bound workflow on load, without waiting for a message.
+Whether the app fires its bound workflow on load, without waiting for a message. Inside a template's `binding`, on a web page: whether the template starts its task once as the page draws it.
 </ResponseField>
 
 <ResponseField name="default" type="boolean">

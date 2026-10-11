@@ -10,7 +10,8 @@ folders sit at its root. `unoverse.yaml` there declares the org (`org: acme`).
 
 | Folder | What lives there |
 |---|---|
-| `components/`, `apps/`, `templates/`, `atoms/`, `styles/`, `identity/`, `agents/` | Interfaces as data, the org's identity, and Agents (a workflow listed for the map) |
+| `components/`, `apps/`, `templates/`, `atoms/`, `styles/`, `identity/` | Interfaces as data, and the org's identity |
+| `agents/` | Agents: one folder each, `agent.yaml` and `SOUL.md` |
 | `skills/`, `blocks/` | Behaviour: Agent skills and prompt blocks |
 | `nodes/` | Logic: custom workflow nodes, as YAML packages. A node type is one per platform: give each its own |
 
@@ -49,7 +50,7 @@ the page. It never restates a page, so when the two disagree, the page wins.
 | A component or atom, including a page the AI fills | `references/component.md` |
 | An app: a chat surface, a shell around components | `references/app.md` |
 | A template: a component that holds components, such as a menu or an email | `references/template.md` |
-| An Agent: a workflow with no interface, listed on the map so a conversation can reach for it | `references/agent.md` |
+| An Agent: someone who does work by calling tasks, with a soul, a model, a daily budget and ways to be reached (Slack, email, its calendar, Spatial) | `references/agent.md` |
 | A brand: an org pack, a rebrand, a clone for a new client | `references/brand.md` |
 | The org's identity: who it is, its brand, its purpose, its story, filled from its own sources | `references/identity.md` |
 | An Agent skill the platform's Agents follow at run time | `references/agent-skill.md` |

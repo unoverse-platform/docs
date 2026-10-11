@@ -114,6 +114,15 @@ pass and cannot call a tool at all.
 times is stuck. `maxTurns` does not catch it, because a model calling many *different* tools
 forever is not stuck by that rule.
 
+## A Task as a tool
+
+A **Task Start** offers its Task the same way. Draw a line from the handle at the bottom of a
+Task Start to an Agent, and the Agent has one more tool: the Task, named by its title,
+described by its description and when to use, taking its input schema.
+
+The Agent calls it as an MCP task: it gets the task's id at once, follows it, and reads its
+result when it finishes. A Task Start needs a title and a description before it offers anything.
+
 ## Writing instructions
 
 `instructions` is appended to the Agent's system prompt, so it costs tokens on every turn.

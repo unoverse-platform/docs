@@ -1,0 +1,185 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/agents/agent.schema.json",
+  "title": "Unoverse Agent",
+  "description": "agents/<name>/agent.yaml: an Agent, someone who does work by calling tasks (docs/architecture/signal/AGENTS.md § 3). Who is responsible for it and whether it is on are set per environment in Signal, never here; no credentials, no permissions beyond access.",
+  "type": "object",
+  "required": [
+    "type",
+    "name",
+    "title",
+    "role",
+    "description",
+    "whenToUse",
+    "skills",
+    "soul"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "unoverse": {
+      "type": "string"
+    },
+    "type": {
+      "const": "agent"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Equals the folder."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Its job title, e.g. Go-to-market lead. Signs its emails and Slack posts beside its name (title) and the address of its connected mailbox."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "whenToUse": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "avatar": {
+      "type": "string",
+      "pattern": "^https://",
+      "description": "Its picture: an image URL (https). Shown in Studio, Signal and beside what it signs."
+    },
+    "skills": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      "description": "What it does: Agent skills in the org's skills/, by name."
+    },
+    "soul": {
+      "type": "string",
+      "pattern": "\\.md$",
+      "description": "Who it is: its character, beside this file. Character only."
+    },
+    "model": {
+      "type": "object",
+      "required": [
+        "use"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "use": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Named, never defaulted."
+        },
+        "reasoning": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ]
+        },
+        "fallback": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "required": [
+        "perDay"
+      ],
+      "additionalProperties": false,
+      "description": "Required: no budget, no Agent.",
+      "properties": {
+        "perDay": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]+)? [A-Z]{3}$",
+          "description": "e.g. 20 USD"
+        },
+        "perRun": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]+)? [A-Z]{3}$"
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^unoverse://tasks/[a-z0-9][a-z0-9-]*/[A-Za-z0-9][A-Za-z0-9._-]*$"
+      },
+      "description": "The tasks it may call, each by its one URI. A marketplace MCP is a task too: unoverse://tasks/marketplace/signal-save hands over every tool it offers (MCP_TASKS.md § 2a)."
+    },
+    "access": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+:[a-z0-9-]+$"
+      },
+      "description": "The most it may ever do (noun:verb). None: no one's information."
+    },
+    "triggers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "node": {
+            "type": "string",
+            "description": "An existing node type. Not for spatial."
+          },
+          "wakes": {
+            "enum": [
+              "mentions",
+              "replies",
+              "events"
+            ]
+          },
+          "config": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "checkIn": {
+      "type": "string",
+      "pattern": "^[0-9]+(m|h)$"
+    },
+    "memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "agent": {
+          "enum": [
+            "on",
+            "off"
+          ],
+          "description": "Its own Agent Memory: goal, plan and notes, under its id. What it knows of people is Signal's."
+        }
+      }
+    },
+    "askWhenUnsure": {
+      "type": "string"
+    }
+  }
+}
