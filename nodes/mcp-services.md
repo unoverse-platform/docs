@@ -105,6 +105,36 @@ maxTurns: 5
 
 When the API changes how a function call is expressed, exactly one file changes.
 
+### Many tools: progressive discovery
+
+An Agent given many tools does not get every definition up front. This is MCP's own guidance
+for hosts ([Client Best Practices, Progressive Tool Discovery](https://modelcontextprotocol.io/docs/2026-07-28/develop/clients/client-best-practices)),
+and the platform's harness is the host, so it does this for every Agent, on any model.
+
+When the definitions of the tools wired to an Agent add up to more than about 2,000 tokens
+(MCP suggests switching at 1% to 5% of the context window), the model starts with two tools
+instead of all of them:
+
+| Tool | What it does |
+|---|---|
+| `search_tools` | Takes a plain description of the job and answers with the few tools that fit it, each with its full input schema and the server it comes from |
+| `call_tool` | Calls one of those tools by name, with its arguments |
+
+Below the threshold nothing changes: every tool is offered as before.
+
+Some tools are never held back: Spatial search, the screen verbs, and any tool a search or an
+open page has already given the Agent. A server's `instructions` still reach the Agent in
+full, so a rule that spans its tools is known before any tool is loaded.
+
+**The tool list never changes during a run.** Every call goes through `call_tool`, so the
+model's prompt cache holds from the first turn to the last. This is the second of MCP's two
+cache-safe options; adding tools mid-run would break the cache at that point.
+
+**What this asks of a node.** Nothing new, but your tool `description`s now do the finding:
+`search_tools` matches the job against each tool's name, server and description. A
+description that says what the tool is for is found; one that says how it works is not
+([Node discoverability](/nodes/node-discoverability)).
+
 ### Two limits, and why both exist
 
 `maxTurns` bounds how long the loop may run. Set it to 1 and the node answers in a single

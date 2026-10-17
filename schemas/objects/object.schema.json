@@ -204,7 +204,11 @@
             },
             "minProperties": 1,
             "maxProperties": 1,
-            "description": "One pair: this row's field naming that row's ({ manager: legalName })."
+            "description": "One pair: this row's field naming that row's ({ manager: legalName })."          },
+          "carries": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Fields of this row each line keeps (a provider's role for the fund it serves). A line that carries is added, never replaced, and a second value for the same line joins its list (relationships-and-labels.md, Lines to another object)."
           }
         },
         "oneOf": [
@@ -255,6 +259,9 @@
       "properties": {
         "instructions": { "type": "string", "description": "What to take and what to leave, in plain words: what this object is, and what it is not." },
         "never": { "type": "array", "items": { "type": "string" }, "description": "Words that are never a name on their own: a name made only of these (\"Voting Shares\", \"Custodians\") is no record. A name with any other word stays." },
+        "notAlso": { "type": "array", "items": { "type": "string" }, "description": "Other objects a name is never also: a name one document's read gives as a row of one of these is not made a row of this one (a manager's notAlso: [fund], so a fund in an allocation table is never also its manager)." },
+        "notAlsoWhen": { "type": "object", "additionalProperties": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } } }, "description": "Another object a name is never also when that object's row says so: { service-provider: { role: [administrator, custodian] } } — a name the same document's read gives as a service provider with one of those roles is not a row of this one; as one with another role, it may be." },
+        "notWhen": { "type": "array", "items": { "type": "string" }, "description": "Phrases of a notice or of another kind's role (issued by, representative, paying agent): a name every sentence of its chunk names only beside one of these, and beside none of this object's own field wordings, is not a row of this one." },
         "examples": {
           "type": "array",
           "description": "Worked examples: a piece of text, and the right answer for it, a list of this object's input fields. An empty answer shows what to leave.",

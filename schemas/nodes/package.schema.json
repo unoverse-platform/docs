@@ -81,7 +81,7 @@
           "items": {
             "type": "string"
           },
-          "description": "The credential SCHEMES this package's calls use (bearer, basic, apiKeyHeader, apiKeyQuery, oauth2ClientCredentials, awsSigV4). Named `auth` until 2026-07-28, renamed with the call key it mirrors so the package's promise and the call's spelling stay the same word. Nothing to do with node.yaml's `auth`, which is who may RUN a node."
+          "description": "The credential SCHEMES this package's calls use (bearer, basic, apiKeyHeader, apiKeyQuery, oauth2ClientCredentials, oauth2RefreshToken, awsSigV4). Named `auth` until 2026-07-28, renamed with the call key it mirrors so the package's promise and the call's spelling stay the same word. Nothing to do with node.yaml's `auth`, which is who may RUN a node."
         },
         "transport": {
           "type": "array",

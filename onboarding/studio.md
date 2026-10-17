@@ -61,6 +61,14 @@ There is nothing to update. A second org is a second repo, made in a new folder:
 unoverse create
 ```
 
+Already have an org repo? Clone it and open **studio** inside it.
+
+```bash
+git clone <your org repo>
+cd <org>
+unoverse studio
+```
+
 ## What you can author
 
 The main kinds of asset. Every one is a file in your own repository.

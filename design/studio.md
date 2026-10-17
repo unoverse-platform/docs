@@ -81,6 +81,10 @@ Flip the toggle and **studio** connects as an MCP client to your real running pl
 Real workflows stream real components, select real apps and deliver real data into the
 local preview, so you are watching production behaviour before shipping.
 
+**studio** connects to the universe you signed in to. Run `unoverse login <url>` once. If you
+sign in to more than one, add `universe: <url>` to your `unoverse.yaml` so **studio** knows
+which.
+
 Live mode proves the things mock cannot:
 
 - Your component's node receives and merges streamed data correctly.

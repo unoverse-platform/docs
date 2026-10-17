@@ -80,6 +80,29 @@
           "items": { "type": "string", "minLength": 1 },
           "description": "The kinds of document that may answer this field (the reading document's choice, e.g. offering-memorandum). Each page of a document of one of these kinds is asked for the field while it is still empty, and a value stated is written with its page and words (docs/unoverse/data/pipelines/proved-before-built.md). On an object filled from documents, every input: true field names them."
         },
+        "standard": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The field's id in the org's field list (one org's list is openfunds: OFST452010). A table's column or row named by this field's wordings, or by the standard field's own name, fills it (docs/unoverse/data/pipelines/tables.md)."
+        },
+        "format": {
+          "const": "date",
+          "description": "The field is a date, written yyyy-mm-dd. A date a document prints another way (31/Mar/2025, 21 October 2024) is written so; one that could be read two ways (03/04/2025) is left, never guessed."
+        },
+        "pattern": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The regular expression a value must match (an ISIN: ^[A-Z]{2}[A-Z0-9]{9}[0-9]$). A value that does not match is never saved, whichever reader read it."
+        },
+        "wordings": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "description": "The words documents print for this field (management related fees, mgmt fee), matched exactly after lower case. A new wording is proposed, approved by a person, then added here (docs/unoverse/data/pipelines/tables.md)."
+        },
+        "none": {
+          "description": "The value a table cell that states there is none (\"None\", \"N/A\", \"-\", \"Nil\") stands for (0 for a fee), kept as stated; without it such a cell fills nothing. Never a default: a field the documents do not state stays empty."
+        },
         "reuse": {
           "type": "boolean",
           "description": "true: the read is shown the values this field already holds on the object's rows in the org, and gives one of them, spelled exactly, when it names the same thing. For a name many rows share: a subject, a series."

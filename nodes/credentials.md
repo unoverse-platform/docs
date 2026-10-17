@@ -150,6 +150,7 @@ platform, so you pick one rather than assembling headers yourself.
 | `apiKeyHeader` | your key in a header you name |
 | `apiKeyQuery` | your key as a query parameter you name |
 | `oauth2ClientCredentials` | exchanges the client id and secret for a token, and refreshes it before it expires |
+| `oauth2RefreshToken` | exchanges the client id, secret and a refresh token (made once by a person in the vendor's developer portal) for a token, and refreshes it before it expires |
 | `awsSigV4` | signs the request with AWS Signature Version 4 |
 | `none` | no auth, for a public API |
 
@@ -164,6 +165,22 @@ credential:
   header: X-API-Key
   token: "{{ credentials.exampleCredential.apiKey }}"
 ```
+
+## When the service sends you messages
+
+A credential can also hold the secret a service signs its messages with, so the platform can tell
+a genuine message from a forged one (Slack: a mention of an Agent's own Slack app). Add the field
+to the credential, then name the platform's check and that field in `node.yaml`:
+
+```yaml node.yaml
+inbound:
+  verify: slack           # one of the platform's checks; a node never writes its own
+  secret: signingSecret   # the credential field holding the service's signing secret
+```
+
+The platform reads the raw message, checks it in constant time, refuses anything older than five
+minutes, and refuses when the secret is missing. Nothing the message says is trusted beyond that.
+The design: `docs/auth-security/INBOUND.md` in the platform repo.
 
 ## Testing with your own key
 

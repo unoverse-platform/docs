@@ -48,9 +48,10 @@
                 "apiKeyHeader",
                 "apiKeyQuery",
                 "oauth2ClientCredentials",
+                "oauth2RefreshToken",
                 "awsSigV4"
               ],
-              "description": "IMPLEMENTED schemes only. Values are added here only WITH their implementation, never ahead of it.\n\noauth2ClientCredentials exchanges a client id and secret for a short-lived token, form-encoded, caches it per connected app until it expires, and refreshes once on a 401. What the exchange returned is in scope as `token`, so a url can reach `{{ token.instanceUrl }}` where the vendor tells you where to talk as well as how.\n\nawsSigV4 signs the request with AWS Signature Version 4, which is what turns every AWS service into a manifest: the signature is computation over the request (it hashes the exact bytes being sent), so it belongs to the executor, while the endpoint, operation and body are description and stay here. Name `service` and, if it is not on the credential, `region`; the keys come from `awsCredential` and are never written in a manifest. Unlike every other scheme this resolves LAST, after the url and body are final, because a signature covers them."
+              "description": "IMPLEMENTED schemes only. Values are added here only WITH their implementation, never ahead of it.\n\noauth2ClientCredentials exchanges a client id and secret for a short-lived token, form-encoded, caches it per connected app until it expires, and refreshes once on a 401. What the exchange returned is in scope as `token`, so a url can reach `{{ token.instanceUrl }}` where the vendor tells you where to talk as well as how.\n\noauth2RefreshToken is the same exchange with a refresh token as well, for vendors that only issue tokens a person approved once (LinkedIn): the refresh token is made once in the vendor's developer portal and kept on the credential.\n\nawsSigV4 signs the request with AWS Signature Version 4, which is what turns every AWS service into a manifest: the signature is computation over the request (it hashes the exact bytes being sent), so it belongs to the executor, while the endpoint, operation and body are description and stay here. Name `service` and, if it is not on the credential, `region`; the keys come from `awsCredential` and are never written in a manifest. Unlike every other scheme this resolves LAST, after the url and body are final, because a signature covers them."
             },
             "token": {
               "$ref": "_defs.schema.json#/definitions/templateOrExpression"
@@ -82,19 +83,23 @@
             },
             "tokenUrl": {
               "$ref": "_defs.schema.json#/definitions/templateOrExpression",
-              "description": "oauth2ClientCredentials: where the token is minted, e.g. https://your-org.my.salesforce.com/services/oauth2/token."
+              "description": "oauth2ClientCredentials, oauth2RefreshToken: where the token is minted, e.g. https://your-org.my.salesforce.com/services/oauth2/token."
             },
             "clientId": {
               "$ref": "_defs.schema.json#/definitions/templateOrExpression",
-              "description": "oauth2ClientCredentials: the connected app's id. Not secret."
+              "description": "oauth2ClientCredentials, oauth2RefreshToken: the connected app's id. Not secret."
             },
             "clientSecret": {
               "$ref": "_defs.schema.json#/definitions/templateOrExpression",
-              "description": "oauth2ClientCredentials: the connected app's secret."
+              "description": "oauth2ClientCredentials, oauth2RefreshToken: the connected app's secret."
             },
             "scope": {
               "$ref": "_defs.schema.json#/definitions/templateOrExpression",
               "description": "oauth2ClientCredentials: optional scope string, when the vendor wants one."
+            },
+            "refreshToken": {
+              "$ref": "_defs.schema.json#/definitions/templateOrExpression",
+              "description": "oauth2RefreshToken: the long-lived refresh token a person made once for the app."
             }
           },
           "additionalProperties": false

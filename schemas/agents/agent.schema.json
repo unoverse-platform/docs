@@ -90,6 +90,11 @@
             "max"
           ]
         },
+        "turns": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "How many times it may think and call a task in one run; never more than its model's node allows."
+        },
         "fallback": {
           "type": "string",
           "minLength": 1

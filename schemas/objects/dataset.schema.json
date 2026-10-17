@@ -59,6 +59,15 @@
               "type": "string"
             },
             "description": "The only values this column may hold. The database refuses anything else, so a word that IS the language (a measure, a unit, a side) cannot arrive misspelled and quietly become a second thing that never adds up with the first. Leave it off for a column that carries a document's own words, which are not ours to enumerate."
+          },
+          "wordings": {
+            "type": "object",
+            "additionalProperties": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "description": "For a column with `enum`: the words a table's title or headings print for each value (net return: [performance, returns]), so a table found by its shape is known by what it holds. Each key is one of `enum`. Grows by approval (pipelines/tables.md 3b)."          },
+          "rowWordings": {
+            "type": "object",
+            "additionalProperties": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "description": "For a column with `enum`: the words a key-figures row's own label prints for each value (net asset value: [total net assets, fund size]), so one row of a label | value table is one figure. Each key is one of `enum`. Grows by approval (pipelines/tables.md 3b)."
           }
         }
       }

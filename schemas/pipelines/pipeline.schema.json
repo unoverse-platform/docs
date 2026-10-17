@@ -137,7 +137,32 @@
               "properties": {
                 "node": { "type": "string", "minLength": 1 },
                 "config": { "type": "object" },
-                "chunks": { "oneOf": [{ "type": "integer", "minimum": 1 }, { "const": "all" }], "description": "How many of the document's chunks it is handed: the best few by the object's words (default 4), or all of them." }
+                "chunks": { "oneOf": [{ "type": "integer", "minimum": 1 }, { "const": "all" }], "description": "How many of the document's chunks it is handed: the best few by the object's words (default 4), or all of them." },
+                "cacheable": { "type": "boolean", "description": "This read's answers may be reused, remembered under the version the called deployment reports at its /ready; a deployment that reports none is never remembered (pipelines README, A read may be remembered)." }
+              }
+            },
+            "tables": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Read from the document's tables too: a table's labels matched to the object's props by their wordings, a matched cell's value copied as printed (pipelines/tables.md).",
+              "properties": {
+                "whose": {
+                  "type": "object",
+                  "required": ["node"],
+                  "additionalProperties": false,
+                  "description": "The node that says which of the document's rows a table is about, when the document is linked to more than one.",
+                  "properties": { "node": { "type": "string", "minLength": 1 }, "config": { "type": "object" } }
+                },
+                "subject": { "type": "boolean", "description": "The object is what the document is about: a label | value table fills the row of this kind the document is linked to." },
+                "labels": {
+                  "type": "object",
+                  "required": ["node"],
+                  "additionalProperties": false,
+                  "description": "The node that proposes a field for a table label no rule matched (column matching step 4): asked once per org, one call per document; a person approves it in Review. Absent: the step is off.",
+                  "properties": { "node": { "type": "string", "minLength": 1 }, "config": { "type": "object" } }
+                },
+                "allocations": { "type": "string", "minLength": 1, "description": "The object's line an allocation table draws to each fund it holds, carrying the weight (pipelines/tables.md 3c)." },
+                "boards": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "The object's lines a board list may draw, each to whose board it is (the line whose kind the organisation is), carrying the role (pipelines/tables.md 3d)." }
               }
             },
             "parts": {

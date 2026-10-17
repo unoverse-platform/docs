@@ -83,6 +83,16 @@
       "default": "public",
       "description": "`internal` nodes load everywhere but never appear in the node library or palette. Used by harness and builder nodes."
     },
+    "inbound": {
+      "type": "object",
+      "description": "How the service this node talks to proves a message it SENDS US is genuine (docs/auth-security/INBOUND.md). Name one of the platform's verifiers and the field of this node's credential that holds the secret. A node can never describe its own check: the platform's verifier decides, and refuses when the secret is missing.",
+      "properties": {
+        "verify": { "enum": ["slack"], "description": "The platform verifier for this service's signature." },
+        "secret": { "type": "string", "description": "The field of this node's credential holding the signing secret, e.g. signingSecret." }
+      },
+      "required": ["verify", "secret"],
+      "additionalProperties": false
+    },
     "capabilities": {
       "type": "object",
       "description": "Engine-level behaviour of this node type. All optional.",
