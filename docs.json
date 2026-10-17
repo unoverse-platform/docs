@@ -162,6 +162,7 @@
       },
       {
         "tab": "Architecture",
+        "hidden": true,
         "groups": [
           {
             "group": "The Shape",
@@ -193,6 +194,7 @@
       },
       {
         "tab": "Runbooks",
+        "hidden": true,
         "groups": [
           {
             "group": "Deploy",
