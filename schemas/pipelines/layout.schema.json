@@ -1,0 +1,216 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://docs.unoverse.ai/schemas/pipelines/layout.schema.json",
+  "title": "Unoverse document layout",
+  "description": "pipelines/<pipeline>/documents/<type>.yaml, ONE per document type, never per house: the map of one document type (docs/unoverse/data/pipelines/document-map.md, 'Layouts'). How to recognise the type, its sections and how to find each, who each section is about, what reads it, what it gives, and what is never a record. A hint, never a gate: a section not found is read the general way and flagged. One small vocabulary of finders, the same in every layout. Field names are the objects' own props (props.yaml); the engine checks them against the org at load, a schema cannot.",
+  "type": "object",
+  "required": ["layout", "reportType", "recognise", "sections"],
+  "additionalProperties": false,
+  "properties": {
+    "unoverse": { "type": "string" },
+    "layout": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Equals the file name."
+    },
+    "figures": { "enum": ["none"], "description": "A type whose figures are never metrics (a letter, a market note): every number stays in its table, where search finds it." },
+    "reportType": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "A value of fund-document.reportType (the org's REPORT_TYPES)."
+    },
+    "describe": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What a document of this type is, in plain words, from its own definition: who writes it, its usual order, what in it is never the subject's. Given to the model before every section it reads. Names no fund, firm, index or term."
+    },
+    "recognise": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Signals that this document is of this type. `all` must every one match; `any` needs one. The first read's report type is a signal like any other. A document that matches no layout is read generally.",
+      "properties": {
+        "all": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/signal" } },
+        "any": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/signal" } }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/section" }
+    },
+    "includes": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "description": "Shared section files this layout takes in (documents/_shared/<name>.yaml), such as the country notices every retail document ends with."
+    },
+    "match": {
+      "type": "object",
+      "description": "Local rules for the matcher, per kind: which keys decide a match for records this type gives, in order, and what a name with no candidate becomes. Never a name: aliases and same-as pairs live on records.",
+      "propertyNames": { "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "An object kind of the org (its object's name), as the org declares it." },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["by"],
+        "properties": {
+          "by": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "enum": ["isin", "lei", "bloombergCode", "name", "name-within-fund", "name-within-firm", "alias", "class-isin"] },
+            "description": "Keys tried in order; the first that finds a record decides. `class-isin`: a fund found through the ISIN of one of its classes."
+          },
+          "noCandidate": { "type": "string", "enum": ["review", "make"], "description": "What happens when no key finds a record: `review` (default) holds it for a person; `make` creates it, only for a kind the type is the source of (a prospectus makes its funds)." }
+        }
+      }
+    },
+    "never": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/never" },
+      "description": "Names this type prints that are never records. Structured so the confirm step can apply them."
+    }
+  },
+  "definitions": {
+    "signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "text": { "type": "string", "minLength": 1, "description": "Words printed on the page (a regular expression)." },
+        "heading": { "type": "string", "minLength": 1, "description": "A heading printed on the page (a regular expression)." },
+        "page": { "type": "integer", "minimum": 1, "description": "The page the signal must be on; any page when absent." },
+        "reportType": { "type": "string", "description": "The first read said this type." }
+      }
+    },
+    "section": {
+      "type": "object",
+      "required": ["kind", "find"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "What this section is, in the layout's words (product, costs, directory, schedule, share-class-table, holdings, legal-notices)."
+        },
+        "find": { "$ref": "#/definitions/find" },
+        "each": {
+          "type": "string",
+          "enum": ["heading"],
+          "description": "`heading`: every heading the finder hits is its own section instance (one sub-fund's schedule each), running from its heading to the next hit of this section, else the first `find.until` heading, else the end; other sections' headings inside it do not end it. A section or table inside an instance is about the instance's record; a `kind.prop` field it gives for its own record's kind is that record's, and one for another kind (`share-class.<prop>`) applies to every record of that kind the instance holds. Two records of one kind and name within an instance (or of the instance's own kind anywhere) are one record. Without `each`, every hit is joined into one section."
+        },
+        "about": {
+          "type": "string",
+          "pattern": "^(document|umbrella|named|none|[a-z0-9]+(-[a-z0-9]+)*)$",
+          "description": "Who the section is about: the document's own subject (default), the umbrella, the fund, the share class, the entity the section's own title names (`named`, as a prospectus schedule: with `each`, the record the section's first record finder names, else the heading's words), or no one."
+        },
+        "read": { "$ref": "#/definitions/read" },
+        "gives": {
+          "type": "object",
+          "description": "What the section states, by rule. A key is an object kind (a record or a list of records: fund, share-class, manager, service-provider, person) or kind.prop (a field, the prop one of the object's own). `asOf` is the document's date.",
+          "propertyNames": { "pattern": "^(asOf|[a-z0-9]+(-[a-z0-9]+)*(\\.[a-zA-Z][a-zA-Z0-9]*)?)$" },
+          "additionalProperties": {
+            "oneOf": [
+              { "$ref": "#/definitions/finder" },
+              { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/finder" }, "description": "Alternative finders for one field, tried in order: one per wording the type is printed in." },
+              { "$ref": "#/definitions/record" },
+              { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/record" } }
+            ]
+          }
+        }
+      }
+    },
+    "find": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "description": "How to find the section. Headings, tables and text are regular expressions, any one of a list; every match is part of the section (a facts block printed as two headings). `order` is the section's place among the layout's sections when headings differ (a translated document). `optional` sections are not flagged when missing.",
+      "properties": {
+        "heading": { "$ref": "#/definitions/oneOrMore" },
+        "table": { "$ref": "#/definitions/oneOrMore", "description": "A table title that marks the section." },
+        "text": { "$ref": "#/definitions/oneOrMore", "description": "Words that mark the section where it has no heading (a notice at the foot of a page); the section is that page." },
+        "page": { "type": "integer", "minimum": 1 },
+        "order": { "type": "integer", "minimum": 1 },
+        "optional": { "type": "boolean" },
+        "next": { "$ref": "#/definitions/oneOrMore", "description": "A heading counts only when the heading printed after it matches one of these (case ignored): a sub-fund's name known by the objective or the 'A Sub-Fund of' that follows it." },
+        "until": { "$ref": "#/definitions/oneOrMore", "description": "With `each`: headings that end an instance (the annex or exhibit after the last schedule); case ignored." }
+      }
+    },
+    "read": {
+      "type": "object",
+      "required": ["tool"],
+      "additionalProperties": false,
+      "description": "What reads the section's text. `model` is the pipeline's own read node (the page reader), given this section only, a fixed header (document, section, scope, defined terms) and `say`; it may return only `kinds`. `rules` means the finders under `gives` alone. `none` reads nothing (a glossary, a disclaimer).",
+      "properties": {
+        "tool": { "type": "string", "enum": ["model", "rules", "none"] },
+        "kinds": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }
+        },
+        "say": { "type": "string", "minLength": 1, "description": "The instruction for this section, in plain words." }
+      }
+    },
+    "finder": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "description": "Where a value is, by rule. One of: `pattern` (a regular expression; group 1 is the value, or `group` says which); `line` (a line by position); `table` and `row` (a cell: the first non-empty cell after the row label, or `column`); or, as a record's field, `group` alone (that group of the record's own name match). `na` is the value when the page prints N/A or 'none'. `map` turns printed wording into the prop's enum value. A pattern is tried on the text as printed, then with runs of spaces made one.",
+      "properties": {
+        "pattern": { "type": "string", "minLength": 1 },
+        "group": { "type": "integer", "minimum": 1, "description": "The group of `pattern` that is the value; alone, in a record's `fields`, the group of the record's name match (\"Minimum Initial Subscription for (Class B) Shares: (250,000)\" gives the class and its minimum)." },
+        "case": { "type": "string", "enum": ["any"], "description": "`any`: the pattern matches whatever the case of the page's words (a heading in capitals, the same words in a sentence)." },
+        "scope": { "type": "string", "enum": ["section", "document"], "description": "Where the pattern is searched: the section (default) or the whole document, for a value printed outside its section (an umbrella named only in the notices)." },
+        "cell": { "type": "string", "enum": ["value", "label", "each"], "description": "With `table` and `row`: take the value cell (default) or the row's label (a class named in the label, 'ISIN - Base Shares'). `each`, as a record's `name` with `table` and `pattern`: every cell of the table that matches `pattern` is its own record (a returns table heading one column per class)." },
+        "line": { "type": "string", "enum": ["after-heading", "first-heading", "first", "last", "title"], "description": "`title`: the document's own title (a workbook may name its class only there)." },
+        "table": { "type": "string", "minLength": 1 },
+        "row": { "type": "string", "minLength": 1 },
+        "column": {
+          "oneOf": [{ "type": "integer", "minimum": 1 }, { "const": "own" }],
+          "description": "With `table` and `row`: the cell at this position. `own`, as a field of a record found by `cell: each`: the cell in that record's own column. `{name}` in such a field's `row` stands for the record's name ('Inception Date for {name}')."
+        },
+        "na": { "description": "The value when the page prints N/A or 'none'." },
+        "map": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Printed wording to the prop's enum value ('Accumulation' to accumulating)."
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "description": "A record given by rule: its name and fields, each a finder or a list of alternative finders. A record with no name finder is named by its identifier field (isin, lei): the matcher finds the record the identifier names, and never invents a name.",
+      "properties": {
+        "name": { "oneOf": [ { "$ref": "#/definitions/finder" }, { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/finder" } } ] },
+        "role": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+        "country": { "oneOf": [ { "type": "string" }, { "type": "object", "properties": { "group": { "type": "integer", "minimum": 1 } }, "required": ["group"], "additionalProperties": false } ], "description": "The country the provider serves: a word, or a group of the name pattern that prints it beside the name." },
+        "split": { "type": "string", "minLength": 1, "description": "Breaks one match into several records: a separator the match is split on (\"; \"), or `run`: a run of designations (\"X1-X5\", \"X1-6\", \"X1 to X3\": a letter code and a number, the second end larger) is one record per designation, each with the fields of the run's match. A match that is no run stays one record." },
+        "trim": { "type": "string", "minLength": 1, "description": "After `split`, a pattern applied to each part; group 1 is the name (the words before the address)." },
+        "fields": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[a-zA-Z][a-zA-Z0-9]*$" },
+          "additionalProperties": { "oneOf": [ { "$ref": "#/definitions/finder" }, { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/finder" } } ] }
+        }
+      }
+    },
+    "never": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason"],
+      "minProperties": 2,
+      "description": "A structural rule, never a list of names (owner, 2026-10-21): `in`, a name found inside sections of these kinds; `after`, a name printed right after this wording (\"regulated by\"); `pattern`, the shape of a name (a defined term, \"^the \\w+$\"). A layout never carries a document's own names.",
+      "properties": {
+        "kind": { "type": "string", "enum": ["fund", "share-class", "manager", "service-provider", "person", "deal", "any"] },
+        "in": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "Section kinds: a name found inside one of them is never a record of this kind." },
+        "after": { "type": "string", "minLength": 1, "description": "A wording the name follows on the page: 'regulated by', 'compared against'." },
+        "pattern": { "type": "string", "minLength": 1, "description": "The shape of a name, never a particular name." },
+        "roles": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }, "description": "Roles the rule spares: a record given with one of these roles (a country's representative or paying agent in the notices) is kept. A record with no role is held by the rule." },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "oneOrMore": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      ]
+    }
+  }
+}

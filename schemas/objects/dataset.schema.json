@@ -68,6 +68,16 @@
             "type": "object",
             "additionalProperties": { "type": "array", "minItems": 1, "items": { "type": "string" } },
             "description": "For a column with `enum`: the words a key-figures row's own label prints for each value (net asset value: [total net assets, fund size]), so one row of a label | value table is one figure. Each key is one of `enum`. Grows by approval (pipelines/tables.md 3b)."
+          },
+          "columnWordings": {
+            "type": "object",
+            "additionalProperties": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "description": "For a column with `enum`: the words a table's column prints for each value (exposure: [market value, of net assets]), so a number kept from any table is known by the column it sits under when its table's title names none. Each key is one of `enum`. Grows by approval (pipelines/tables.md 3f)."
+          },
+          "values": {
+            "type": "object",
+            "additionalProperties": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "description": "For a column with `enum`: the values of another column each of its values gathers (a dimension's own categories: fair value level: [Level 1, Level 2, Level 3]), so a number whose row or column names one is known to be sliced that way. Each key is one of `enum`. Grows by approval (pipelines/tables.md 3i)."
           }
         }
       }
@@ -87,6 +97,25 @@
     "asOf": {
       "type": "string",
       "description": "The column that says when these rows speak as of, so the handle can say it."
+    },
+    "whose": {
+      "type": "object",
+      "required": ["object", "column", "level"],
+      "description": "Whose a row is, as records (pipelines/tables.md 3i step 4): the object a row's subject is, its parts, how one sits inside another, and the `level` value each is filed under. The platform names no industry: the org says its subject is a fund, a store, a client.",
+      "properties": {
+        "object": { "type": "string", "description": "The object a row's subject is (fund)." },
+        "column": { "type": "string", "description": "The column its name goes in (fund)." },
+        "level": { "type": "string", "description": "The `level` value for the subject's own figures (fund)." },
+        "names": { "type": "string", "description": "The subject's field of other names (alsoKnownAs)." },
+        "compare": { "type": "string", "description": "The subject's field naming what it is compared with (benchmark)." },
+        "compareLevel": { "type": "string", "description": "The `level` value for that comparison's figures (index)." },
+        "within": { "type": "object", "required": ["link"], "properties": { "link": { "type": "string" }, "field": { "type": "string" } }, "description": "How a subject sits inside another: the link to its parent (subFundOf) and the field naming the parent (umbrella)." },
+        "part": { "type": "object", "required": ["object", "column", "level", "name", "of"], "properties": { "object": { "type": "string" }, "column": { "type": "string" }, "level": { "type": "string" }, "name": { "type": "string" }, "of": { "type": "string" } }, "description": "Its parts (a fund's share classes): their object, column, `level` value, name field and the field naming their subject." },
+        "none": { "type": "string", "description": "The `level` value for a document about no subject (market)." },
+        "relative": { "type": "array", "items": { "type": "string" }, "description": "The measures that are a subject's figure against its comparison (excess return: the return above the benchmark's): a row of one that names no subject of its own is the subject the table's own rows name, when they name exactly one; with two or more it names none. Each is one of the measure column's `enum`." },
+        "vehicles": { "type": "array", "items": { "type": "string" }, "description": "The words a name of the subject's kind carries when it names one (fund; a segregated portfolio's portfolio): an allocation table's row whose name holds one of them, with words of its own, is a holding, a line from the subject to it (pipelines/tables.md 3c rule 3); a row of words alone is a heading. Absent, the word fund." },
+        "terms": { "type": "array", "items": { "type": "string" }, "description": "The measures that are a record's standing terms, never figures over time (fee): a rate of one is a field of the subject's or part's record, read by the layout, and never a row; an amount of money of one (fees charged over a period) stays a row. Each is one of the measure column's `enum`." }
+      }
     }
   },
   "additionalProperties": false

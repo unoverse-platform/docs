@@ -45,10 +45,11 @@ acme/
   nodes/             your own integrations
 ```
 
-A new org starts with the baseline only: its tokens, its identity and Git with a first commit.
-It also carries one check, run on every pull request: the same lint your universe runs. The other
-folders appear as you build. For worked examples to read and copy, clone the demo org,
-[Acme](https://github.com/unoverse-orgs/acme).
+A new org starts with its tokens, its identity, Git with a first commit, and an empty folder for
+every kind you can author: `components/`, `apps/`, `templates/`, `atoms/`, `skills/`, `blocks/`,
+`nodes/`, `agents/`, `objects/` and `pipelines/`. It also carries one check, run on every pull
+request: the same lint your universe runs. It holds no samples. For worked examples to read and
+copy, clone the demo org, [Acme](https://github.com/unoverse-orgs/acme).
 
 **It is all YAML.** Components, apps, styles, skills and nodes are written in one language.
 Any AI tool you already use can author them. The linter checks its work, and the skills give it

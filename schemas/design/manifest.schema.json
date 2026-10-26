@@ -164,9 +164,17 @@
     "credentials": {
       "type": "array",
       "items": {
-        "type": "string"
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 1,
+            "additionalProperties": { "type": "string", "minLength": 1 }
+          }
+        ]
       },
-      "description": "Credential NAMES, resolved server-side from encrypted storage. A key never enters the folder."
+      "description": "Credential NAMES, resolved server-side from encrypted storage. A key never enters the folder. `- googleApiCredential` takes whichever credential of that type is saved; `- googleApiCredential: MapKey` takes the one saved under that name in canvas Credentials, and no other."
     },
     "analytics": {
       "type": "array",

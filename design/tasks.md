@@ -67,6 +67,7 @@ A task shows wherever it is needed, and it is the same task in each place:
 | **From Spatial** | An Agent finds it and opens it as an MCP tool | Where the person left it, else its first step |
 | **By URI** | A page, or a node's config (`unoverse://templates/<org>/<name>`) | Where the person left it, else its first step |
 | **By id** | An attempt already started, read back from the task table | Where it stopped |
+| **By address** | A link naming an app and a task, by URI or id (`/<org>/app/<app>?task=<task>`); the app opens with the task in it (`docs/mcp/MCP_TASKS.md` § 5c, not built) | As by URI or by id |
 
 ## One state
 

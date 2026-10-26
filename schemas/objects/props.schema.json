@@ -86,8 +86,8 @@
           "description": "The field's id in the org's field list (one org's list is openfunds: OFST452010). A table's column or row named by this field's wordings, or by the standard field's own name, fills it (docs/unoverse/data/pipelines/tables.md)."
         },
         "format": {
-          "const": "date",
-          "description": "The field is a date, written yyyy-mm-dd. A date a document prints another way (31/Mar/2025, 21 October 2024) is written so; one that could be read two ways (03/04/2025) is left, never guessed."
+          "enum": ["date", "country"],
+          "description": "date: the field is a date, written yyyy-mm-dd. A date a document prints another way (31/Mar/2025, 21 October 2024) is written so; one that could be read two ways (03/04/2025) is left, never guessed. country: the field is a country, held by its one name from ISO 3166-1 (its code named by the CLDR English region names) however a document prints it (UK, GB and United Kingdom are United Kingdom); a value no country fits stays as printed."
         },
         "pattern": {
           "type": "string",
@@ -99,6 +99,17 @@
           "minItems": 1,
           "items": { "type": "string", "minLength": 1 },
           "description": "The words documents print for this field (management related fees, mgmt fee), matched exactly after lower case. A new wording is proposed, approved by a person, then added here (docs/unoverse/data/pipelines/tables.md)."
+        },
+        "wordingsIn": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+          "description": "Words that name this field in one kind of document only, as { <document type>: [<words>] }, where one type prints for this field the words another prints for another field (an offering document's management fee is its maximum). The scoped words win over the plain wordings for that type."
+        },
+        "onlyWith": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Another field of this object that this one is a term of; where a record states that field as none, this one is not kept (a hurdle only with a performance fee)."
         },
         "none": {
           "description": "The value a table cell that states there is none (\"None\", \"N/A\", \"-\", \"Nil\") stands for (0 for a fee), kept as stated; without it such a cell fills nothing. Never a default: a field the documents do not state stays empty."

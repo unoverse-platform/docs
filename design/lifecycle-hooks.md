@@ -208,7 +208,10 @@ camel-cased file works on a laptop and fetches nothing in a container.
 definition ships with a node package. Install the package and the credential shows up in
 **canvas** under **Credentials**, ready to fill in, and uninstalling retracts the type
 again. A component simply names a credential: the value exists in the universe or it does
-not, and shipping never blocks on it. Naming one that no installed package defines is a
+not, and shipping never blocks on it. When two credentials of one type are saved, name the
+one you mean by the name it was saved under: `- googleApiCredential: MapKey` takes that one
+and no other, while `- googleApiCredential` takes whichever is saved. The hook reads both
+as `credentials.googleApiCredential`. Naming one that no installed package defines is a
 deploy warning and a loud runtime warning whenever the hook runs without a value, never a
 blocked deploy.
 </Tip>

@@ -1281,7 +1281,11 @@
         "autoScroll": {},
         "revealOnStick": {},
         "selection": {},
-        "appWidth": {}
+        "appWidth": {},
+        "pan": {
+          "type": "boolean",
+          "description": "Drag to move around this box's overflow, the way a map pans; the wheel, a trackpad and touch already do. The view keeps the same point in its centre when the content grows or shrinks. Opt-in; needs `overflow` set on the box."
+        }
       },
       "required": [
         "type"
