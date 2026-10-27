@@ -66,6 +66,17 @@
       "type": "array",
       "items": { "$ref": "#/definitions/never" },
       "description": "Names this type prints that are never records. Structured so the confirm step can apply them."
+    },
+    "codes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["column", "rules"],
+      "description": "A FIXED TEMPLATE READ BY ITS PRINTED CELL CODES (owner 2026-10-26): a type whose every figure cell carries the template's own code (its item number and a bracketed tag naming its column, \"1.2.3 (AB)\") is read by this map alone, never by the general figure reader. A table whose header holds `column` is a coded table: each figure is paired with its code; every rule whose code and tag match applies, in order, a later one over an earlier; a figure whose code gets no measure and unit stays in its table with the reason. Written once from the published template (its sections, its tags as its header rows print them), never from one document. Names no fund, firm or document.",
+      "properties": {
+        "column": { "type": "string", "minLength": 1, "description": "The header of the column holding each row's codes (a regular expression). The parser writes one slot per value column, in column order, ' | ' between them, '' for a column with no code; a row whose codes are printed elsewhere keeps them as a list." },
+        "pattern": { "type": "string", "minLength": 1, "description": "How a code is printed: group 1 the number, group 2 the tag. Default ^(\\d+(?:\\.\\d+)+)(?:\\s*\\(\\s*([^)]*?)\\s*\\))?$." },
+        "rules": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/codeRule" } }
+      }
     }
   },
   "definitions": {
@@ -211,6 +222,28 @@
         { "type": "string", "minLength": 1 },
         { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
       ]
+    },
+    "codeRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 2,
+      "description": "What the cells of a code are. `code`: a prefix ('1.2': the item and every item under it) or a regular expression (opening with ^); `tag`: the bracketed column tag, case ignored. Without `code` a rule holds for every code with its tag; without `tag`, for every column. Values are the org dataset's own (measure, unit, side, adjustment, dimension, period), checked by the lint; null clears what an earlier rule gave.",
+      "properties": {
+        "code": { "$ref": "#/definitions/oneOrMore" },
+        "tag": { "$ref": "#/definitions/oneOrMore" },
+        "measure": { "type": ["string", "null"] },
+        "unit": { "type": ["string", "null"] },
+        "currency": { "type": ["string", "null"], "description": "Which money, an ISO code, when the unit is an amount; null for a share or a count." },
+        "adjustment": { "type": ["string", "null"] },
+        "scale": { "type": "number", "description": "A bare cell times this, in decimal arithmetic (a fraction stored bare takes 100); a cell printing its own '%' is read as it shows." },
+        "side": { "type": ["string", "null"] },
+        "dimension": { "type": ["string", "null"], "description": "The slicing the code's section is. The category is the row's own label resolved to the dimension's standard value (the dataset's category wordings), else the label as printed." },
+        "category": { "enum": ["label", "none"], "description": "`none`: the slicing without a category (a whole)." },
+        "about": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "Whose the figure is when not the document's subject: the dataset's `whose.owner.object` (filed at the owner's level) or `whose.part.object` (the one class the layout names)." },
+        "period": { "type": "string" },
+        "annualised": { "type": "boolean" },
+        "skip": { "type": "string", "minLength": 1, "description": "These cells are no metric: the reason, kept with the number in its table." }
+      }
     }
   }
 }
