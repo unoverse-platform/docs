@@ -86,8 +86,8 @@
           "description": "The field's id in the org's field list (one org's list is openfunds: OFST452010). A table's column or row named by this field's wordings, or by the standard field's own name, fills it (docs/unoverse/data/pipelines/tables.md)."
         },
         "format": {
-          "enum": ["date", "country"],
-          "description": "date: the field is a date, written yyyy-mm-dd. A date a document prints another way (31/Mar/2025, 21 October 2024) is written so; one that could be read two ways (03/04/2025) is left, never guessed. country: the field is a country, held by its one name from ISO 3166-1 (its code named by the CLDR English region names) however a document prints it (UK, GB and United Kingdom are United Kingdom); a value no country fits stays as printed."
+          "enum": ["date", "country", "currency"],
+          "description": "date: the field is a date, written yyyy-mm-dd. A date a document prints another way (31/Mar/2025, 21 October 2024) is written so; one that could be read two ways (03/04/2025) is left, never guessed. country: the field is a country, held by its one name from ISO 3166-1 (its code named by the CLDR English region names) however a document prints it (UK, GB and United Kingdom are United Kingdom); a value no country fits stays as printed. currency: the field is a currency, held by its ISO 4217 code (named by the CLDR English currency names, one and many, and its country's names before the unit) however a document prints it (U.S. Dollars, US dollar and United States Dollars are USD); a value no currency fits, or two fit (Dollars), stays as printed."
         },
         "pattern": {
           "type": "string",

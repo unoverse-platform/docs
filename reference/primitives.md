@@ -78,10 +78,10 @@ Draws one case out of several, chosen by a single discriminant field.
 
 ```yaml
 type: Switch
-on: view
+on: state                # inside a state's shell: one case per step
 cases:
-  products: { type: Text, value: The rail card }
-  detail: { type: Text, value: The full page }
+  detail: { type: Text, value: The product }
+  apply: { type: Text, value: The application form }
 ```
 </ResponseField>
 
@@ -228,6 +228,20 @@ The voice indicator. Shows that a call is live and who is speaking.
 ```yaml
 type: Orb
 style: { width: "20", height: "20" }
+```
+</ResponseField>
+
+<ResponseField name="TalkingHead">
+A face that moves its mouth to the voice the page is playing, drawn in the browser. `avatar` is
+the head, `size` its width, `lipsync` is `realistic` (the default, the sound plays about 0.4 s
+late so the lips match) or `fast` (about 60 ms, a simpler mouth). `state` follows the call:
+`idle`, `active`, `listening`, `speaking`, `thinking`. Its code and files load from the unoverse
+server the first time a page draws one, never before. A native app draws nothing in its place.
+
+```yaml
+type: TalkingHead
+avatar: Jane.zip
+bind: { state: callState }
 ```
 </ResponseField>
 

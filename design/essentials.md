@@ -118,35 +118,34 @@ real interaction makes.
 outside world can ask for. A component or a template can be fetched, delivered or streamed
 in any of its external states, and each one names where it shows. An internal state, a
 substate, is local to the thing. It nests inside one state, and nothing outside ever sees
-it. Only the thing itself moves it, through its own buttons or a value a service projects.
-**studio** lists it on the left.
+it. Only the thing itself moves it, through its own buttons.
 
-<Frame caption="A voice component in studio: its substates, Idle through Thinking, are its own business.">
-  <img src="/images/design/states_substate.png" alt="studio listing the voice-chat component with its substates Idle, Active, Listening, Speaking and Thinking" />
-</Frame>
-
-In the files, a substate is a nested block on its own axis, and its drawing is a layout
-like any other:
+In the files, a substate is a nested block, and its drawing is a layout like any other:
 
 ```yaml
 states:
-  idle:
-    layout: layouts/idle
-  call:                          # the external face a delivery opens
-    layout: layouts/call         # the state's own shell, always on
-    on: callState                # the internal axis the substates switch on
-    states:
-      listening:
-        layout: layouts/callState-listening
-      speaking:
-        layout: layouts/callState-speaking
-      thinking:
-        layout: layouts/callState-thinking
+  grid:
+    layout: layouts/grid
+  page:                          # the external face a tap opens
+    layout: layouts/page         # the state's own shell, always on
+    states:                      # its steps; the first is where it starts
+      detail:
+        layout: layouts/page-detail
+      apply:
+        layout: layouts/page-apply
 ```
 
+**One word, `state`.** A step is a state, so it carries no second name: a button that moves
+on writes `key: state, value: apply`, and the shell's `Switch` is `on: state`. Writing
+`on:` in a state tree is a lint error.
+
+**What data picks is not a state.** A voice call's `callState`, a record's kind, or a
+conversation's mood is a `Switch` on that value inside the layout. Nothing writes it as a
+step, because the component does not choose it.
+
 The link is always the declared path. The naming is convention alone: a state's drawing
-carries the state's name, and a substate's drawing is prefixed with its axis, so
-`layouts/` reads at a glance.
+carries the state's name, and a step's drawing is prefixed with its state, so `layouts/`
+reads at a glance.
 
 ## The toolchain
 

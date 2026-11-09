@@ -130,7 +130,8 @@ swap is the hard boundary, and a new shell starts a new screen.
 
 Two writes exist, and everything else is a native MCP call.
 
-**`setValue`** writes the interface's own slice: its answers, its `step`, its `state`.
+**`setValue`** writes the interface's own slice: its answers and its `state`. A step is a
+state, so moving to the next step writes `state` too.
 
 ```yaml
 action:
@@ -138,8 +139,8 @@ action:
   values:
     - key: subject
       value: "{{value}}"
-    - key: step
-      value: route
+    - key: state
+      value: route          # a step of the face it is in
 ```
 
 **`setAppValue`** writes the app's own chrome, such as a disclosure panel or a composer
@@ -171,7 +172,7 @@ compiler builds the `Switch` on `state` from the declaration, and a case never r
 the discriminant the tree already selected.
 
 **Most "states" are data.** Seven wizard questions sharing one arrangement are one state
-whose data changes, never seven files. The `step` value selects what the layout binds, and
+whose data changes, never seven files. The step selects what the layout binds, and
 only a genuinely different arrangement earns a file. Input is neither a state nor a step,
 because a composer or edit form is the app's one input tool.
 
@@ -180,8 +181,8 @@ discriminant:
 
 | Written by | It belongs to |
 |---|---|
-| The interface's own buttons | Private substates on its own axis, named by your design |
-| A service projecting a value, such as `callState` | Substates named for those values |
+| The interface's own buttons | Steps nested under its state, named by your design |
+| A service projecting a value, such as `callState` | A `Switch` on that value inside the layout, never a state |
 | Conversation facts the app derives, such as "is it empty" | The app, as a condition-guarded mood. Interfaces react |
 
 Borrowing another field's values leaks machinery into your design, so never model a derived

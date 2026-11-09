@@ -24,7 +24,7 @@ names below are a project convention, not a platform one.
   action:
     type: setValue
     values:
-      - key: step
+      - key: state
         value: sent
 ```
 

@@ -72,7 +72,7 @@ The definition's version.
 </ResponseField>
 
 <ResponseField name="defaultState" type="string">
-LEGACY arrival state (STATE MODEL v2). A component declares its arrival as the `initial` of its `state.view` tree; an app's base is the first entry of `states:`. Kept only so unmigrated folders still read.
+LEGACY arrival state. Do not write it: a component, template or app arrives in the first state declared in its `states:` tree. Kept only so unmigrated folders still read, and a value that disagrees with the first state is a mistake.
 </ResponseField>
 
 <ResponseField name="states" type="object">

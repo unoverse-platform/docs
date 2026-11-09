@@ -176,6 +176,14 @@
           "oneOf": [{ "type": "integer", "minimum": 1 }, { "const": "own" }],
           "description": "With `table` and `row`: the cell at this position. `own`, as a field of a record found by `cell: each`: the cell in that record's own column. `{name}` in such a field's `row` stands for the record's name ('Inception Date for {name}')."
         },
+        "classes": {
+          "oneOf": [
+            { "type": "integer", "minimum": 1 },
+            { "const": "other" },
+            { "type": "object", "properties": { "column": { "type": "string", "minLength": 1 }, "is": { "type": "string", "minLength": 1 } }, "required": ["column", "is"], "additionalProperties": false }
+          ],
+          "description": "A term a section instance states for SOME of its classes, given as a `kind.prop` field of another kind: it is only those classes'. A number: that group of `pattern` is a printed list of designations ('For I, IA and IB shares: <term>'; a run is each class), and the term is each listed class's. `other`: every class of the instance that no list in the same field named ('For all other shares: <term>'), only where a list matched. `{ column, is }`: every class whose row, in a class table of the instance, holds `is` in the column headed `column` (both regular expressions; 'For Share Classes subject to a performance fee: <term>' and the table's Performance Fee column saying Yes). Applied before the terms stated for every class; a class's own value is never replaced."
+        },
         "na": { "description": "The value when the page prints N/A or 'none'." },
         "map": {
           "type": "object",

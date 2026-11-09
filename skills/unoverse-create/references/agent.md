@@ -54,6 +54,8 @@ triggers:                          # what wakes it: existing nodes, as a pipelin
 
 memory:
   agent: on                        # its own goal, plan and notes, kept under its id across wakes
+signal:
+  addsPeople: false               # optional: its own save updates people held, never adds one (AGENTS.md § 7c)
 askWhenUnsure: slack
 ```
 

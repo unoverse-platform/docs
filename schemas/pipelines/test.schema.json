@@ -26,6 +26,10 @@
           },
           "description": "Per collect step name, the node's outputs as if it had run."
         },
+        "inputs": {
+          "type": "object",
+          "description": "What the caller hands the pipeline's Input Trigger (pipelines README, collect), for a pipeline that opens with one; its output under test is this, stamped with a timestamp."
+        },
         "expect": {
           "type": "object",
           "additionalProperties": {

@@ -33,7 +33,7 @@ Look these up while you write. Each row is a code habit and the move that replac
 | A ternary between two views | `Switch` on one discriminant, with `cases` | [State](/design/state) |
 | `useEffect` to fetch on mount or open | A declared lifecycle hook: `onStart`, or `onEnterView` for a detail view | [Lifecycle hooks](/design/lifecycle-hooks) |
 | `items.map(item => <Row/>)` | `Each` with `bind: { items: items }` and a `template` subtree | [Components](/design/components) |
-| `onClick={() => setStep("confirm")}` | `action: { type: setValue, values: [{ key: step, value: confirm }] }` | [State](/design/state) |
+| `onClick={() => setStep("confirm")}` | `action: { type: setValue, values: [{ key: state, value: confirm }] }`, with `confirm` a step nested in the state tree | [State](/design/state) |
 | A shared `<Button/>` | An atom, composed with `Ref`. `props` remaps fields, `with` passes literals | [Components](/design/components) |
 | Splitting a big component up | `$include` of a sibling file, but extraction is earned rather than automatic | [Components](/design/components) |
 | CSS, styled-components, Tailwind | Semantic token names only. The values live in your org repo's `styles/` | [Styles and tokens](/design/styles-and-tokens) |

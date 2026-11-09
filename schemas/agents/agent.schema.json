@@ -183,6 +183,16 @@
         }
       }
     },
+    "signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "addsPeople": {
+          "type": "boolean",
+          "description": "false: its own save updates people Signal holds and never adds one; a new person comes in only through a lane's fixed save. Left out, it may add."
+        }
+      }
+    },
     "askWhenUnsure": {
       "type": "string"
     }

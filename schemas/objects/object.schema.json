@@ -248,7 +248,7 @@
           "description": "The node that scores the name against each candidate's names before the judge (Splink on Beam): sure the same, linked; sure different, none; between, the judge.",
           "properties": { "node": { "type": "string", "minLength": 1 }, "config": { "type": "object" } }
         },
-        "review": { "type": "object", "additionalProperties": false, "required": ["node"], "description": "The node that looks last at every name a run left open, with what the documents say where the name is used (OpenAIDecision): sure, it decides as a person would, with Undo; not sure, the name stays open for a person. Absent, the judge looks.", "properties": { "node": { "type": "string", "minLength": 1 }, "config": { "type": "object" } } },
+        "review": { "type": "object", "additionalProperties": false, "minProperties": 1, "description": "The last look at every name a run left open, with what the documents say where the name is used: a decision node (OpenAIDecision) with its config, or `task`, one of the org's own tasks by name, answered by the org's agent (2026-10-31). Sure, it decides as a person would, with Undo (a task: a new record on a createFrom line); not sure, the name stays open for a person. Absent, the judge looks.", "properties": { "node": { "type": "string", "minLength": 1 }, "config": { "type": "object" }, "task": { "type": "string", "minLength": 1 } }, "oneOf": [ { "required": ["node"] }, { "required": ["task"] } ] },
         "createFrom": { "type": "array", "items": { "type": "string" }, "description": "The lines, by name (a document's about), whose name the judge is sure is no record held makes the record. A mention on any other line, or a name of one word, never does." }
       }
     },

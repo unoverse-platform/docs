@@ -27,18 +27,22 @@ props:
   title:
     type: string
     input: true
+    description: The product's name.
     default: Trail Runner
   price:
     type: string
     input: true
+    description: The price, as the shop prints it.
     default: £89
   description:
     type: string
     input: true
+    description: What the product is, in one or two sentences.
     default: Lightweight, and ready for any terrain.
   primaryImage:
     type: string
     input: true
+    description: The product's main photo.
     default: /samples/shoe.jpg
 states:
   grid:
@@ -138,6 +142,8 @@ children:
 ```
 
 ```yaml manifest.yaml
+title: Product card
+category: Commerce
 description: A product with its image, price and description.
 whenToUse: Show one product, or a set the guest is browsing.
 ```
@@ -213,13 +219,15 @@ states:
     layout: layouts/grid
   page:
     layout: layouts/page
-    on: step                # the internal axis
-    states:
+    states:                 # its steps; the first is where it starts
       detail:
-        layout: layouts/step-detail
+        layout: layouts/page-detail
       apply:
-        layout: layouts/step-apply
+        layout: layouts/page-apply
 ```
+
+A step is a state, so it carries no second name. The page's button that moves on writes
+`key: state, value: apply`, exactly as the tile writes `key: state, value: page`.
 
 Two decisions are yours. **Which states are external**, since those are all the app
 ever sees. And **what to call them**: `grid` for

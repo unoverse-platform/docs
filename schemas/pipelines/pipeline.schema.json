@@ -108,6 +108,11 @@
           "content": {
             "type": "object",
             "description": "What the row carries instead of the item as listed, each value over item, index, config and collect."
+          },
+          "about": {
+            "type": "object",
+            "description": "Whose the row is: names to references over the run (collect, config, item), written as `about` on every record the row's reads make; never an identity (SIGNAL.md § 4b).",
+            "additionalProperties": { "type": "string" }
           }
         },
         "additionalProperties": {

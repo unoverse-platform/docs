@@ -18,11 +18,17 @@ install.
 
 ## What you get
 
-A definitions rail on the left, a native preview on the right, and DevTools beneath it.
+**Components** and **Atoms** open on a wall: every definition drawn live, at the size it
+actually is, with its groups and a search down the left. **List** shows the same set A to Z.
 
-<Frame caption="An atom selected: the rail on the left, the live preview, and its controls beneath.">
-  <img src="/images/design/design-system.png" alt="studio showing the atom list, a live button preview, and a controls panel" />
-</Frame>
+Select a tile to view that one. A view draws it in a panel at its true width,
+in each state it declares, with every optional off, with long text and in dark, and its
+controls sit beside them. **Code** opens the files and a live preview beside them. Moving
+between the three changes no address: a definition's URI stays what it always was.
+
+**Styles** has one page per kind of token, read only, because tokens are set in your style
+sheet. Colour shows the semantic roles over the base ramps they borrow from, and Type shows the
+composed text styles over their primitives.
 
 The nav is grouped in three:
 

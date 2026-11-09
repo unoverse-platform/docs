@@ -766,6 +766,22 @@
           "if": {
             "properties": {
               "type": {
+                "const": "TalkingHead"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "$ref": "#/definitions/primitiveTalkingHead"
+          }
+        },
+        {
+          "$comment": "per-primitive dispatch (UNOVERSE_CONFORMANCE §2a)",
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Button"
               }
             },
@@ -935,6 +951,7 @@
             "Skeleton",
             "Icon",
             "Orb",
+            "TalkingHead",
             "Ref"
           ]
         },
@@ -1531,6 +1548,31 @@
         "$include": {},
         "state": {},
         "size": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "primitiveTalkingHead": {
+      "type": "object",
+      "description": "The TalkingHead primitive: a face that moves its mouth to the voice the page is playing. Its code and files load from the unoverse server the first time one is drawn.",
+      "properties": {
+        "type": {
+          "const": "TalkingHead"
+        },
+        "style": {},
+        "visibleWhen": {},
+        "bind": {},
+        "action": {},
+        "analytics": {},
+        "skeleton": {},
+        "brief": {},
+        "$include": {},
+        "state": {},
+        "size": {},
+        "avatar": {},
+        "lipsync": {}
       },
       "required": [
         "type"
